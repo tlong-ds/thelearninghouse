@@ -1,0 +1,62 @@
+/* Markdown component styles */
+.markdown-wrapper {
+  width: 100%;
+  overflow-wrap: break-word;
+}
+
+.md-paragraph {
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+.md-heading {
+  font-weight: 600;
+  line-height: 1.25;
+  margin-top: 24px;
+  margin-bottom: 16px;
+}
+
+.md-list {
+  padding-left: 2em;
+  margin-top: 0;
+  margin-bottom: 16px;
+}
+
+.md-list-item {
+  margin-bottom: 0.25em;
+}
+
+.md-pre {
+  background-color: #f6f8fa;
+  border-radius: 6px;
+  padding: 16px;
+  overflow: auto;
+  margin: 16px 0;
+}
+
+.md-inline-code {
+  background-color: rgba(175, 184, 193, 0.2);
+  border-radius: 3px;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 0.9em;
+  padding: 0.2em 0.4em;
+}
+
+.md-block-code {
+  background-color: transparent;
+  font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+  font-size: 0.9rem;
+  line-height: 1.45;
+}
+
+/* Ensure first elements don't have top margin */
+.markdown-wrapper > h1:first-child,
+.markdown-wrapper > h2:first-child,
+.markdown-wrapper > h3:first-child {
+  margin-top: 0;
+}
+
+/* Ensure last paragraph doesn't have bottom margin */
+.markdown-wrapper > p:last-child {
+  margin-bottom: 0;
+}

@@ -1,0 +1,158 @@
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1.5rem;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  height: 60px; /* Fixed height for consistency */
+  gap: 1rem; /* Add gap between flex items */
+}
+
+.header-logo {
+  display: flex;
+  align-items: center;
+  margin: 0; /* Ensure no margins */
+}
+
+.header-logo a {
+  display: flex;
+  align-items: center;
+  color: #333;
+  text-decoration: none;
+}
+
+.header-logo img {
+  height: 32px;
+  margin-right: 0.75rem;
+}
+
+.header-logo span {
+  font-size: 1rem;
+  font-weight: bold;
+}
+
+.header-nav {
+  margin: 0; /* Ensure no margins */
+  flex: 1; /* Take available space */
+  display: flex;
+  justify-content: center; /* Center the navigation */
+}
+
+.header-nav ul {
+  display: flex;
+  list-style: none;
+  gap: 1.5rem; /* Reduced gap between nav items */
+  margin: 0; /* Added to remove default margins */
+  padding: 0; /* Added to remove default padding */
+  height: 100%; /* Ensure full height */
+  align-items: center; /* Center items vertically */
+}
+
+.header-nav a {
+  color: #555;
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 0.9rem; /* Reduced font size */
+  transition: color 0.2s;
+}
+
+.header-nav a:hover {
+  color: #2296f3;
+}
+
+.header-user {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem; /* Reduced gap */
+  height: 100%; /* Ensure it takes full height of header */
+  justify-content: flex-end;
+}
+
+/* Modified user-info styling for header */
+.header-user .user-info {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  line-height: 1.2;
+  margin: 0;
+  padding: 0;
+  text-align: right; /* Ensure text is right-aligned */
+}
+
+.header-user .user-info .username {
+  font-weight: bold;
+  color: #2296f3;
+  font-size: 0.9rem;
+  margin: 0;
+  padding: 0;
+  display: block;
+}
+
+.header-user .user-info .role {
+  font-size: 0.8rem;
+  color: #777;
+  margin: 0;
+  padding: 0;
+  display: block;
+}
+
+.logout-btn {
+  padding: 6px 12px; /* Reduced padding */
+  background-color: transparent;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  color: #555;
+  font-weight: bold;
+  font-size: 0.85rem; /* Reduced font size */
+  transition: all 0.2s;
+  margin: 0; /* Ensure no margins */
+  white-space: nowrap; /* Prevent text wrapping */
+}
+
+.logout-btn:hover {
+  background-color: #f8f9fa;
+  border-color: #ccc;
+}
+
+@media (max-width: 768px) {
+  .app-header {
+    flex-direction: row;
+    padding: 0.5rem 1rem;
+    height: 50px; /* Fixed height even on mobile */
+    min-height: 0; /* Remove min-height */
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem; /* Add small gap between items */
+  }
+  
+  .header-logo {
+    margin: 0; /* Ensure absolutely no margins */
+  }
+  
+  .header-nav {
+    width: auto; /* Changed from 100% to auto */
+    margin: 0; /* Explicitly ensure no margins */
+    flex-grow: 1; /* Allow it to take available space */
+    display: flex;
+    justify-content: center; /* Center the navigation */
+  }
+  
+  .header-nav ul {
+    justify-content: center;
+    gap: 1rem;
+  }
+  
+  .header-user {
+    width: auto; /* Change from 100% to auto */
+    justify-content: flex-end;
+    margin-left: auto; /* Push to the right */
+    height: 100%; /* Ensure full height */
+  }
+  
+  .header-user .user-info {
+    min-width: 80px; /* Ensure minimum width for username/role */
+    margin: 0; /* Explicitly ensure no margins on mobile */
+    padding: 0; /* Ensure no padding */
+  }
+}

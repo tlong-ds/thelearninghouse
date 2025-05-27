@@ -1,0 +1,101 @@
+/* Import fonts */
+@font-face {
+  font-family: "SF-Pro-Display-Regular";
+  src: url('../fonts/SF-Pro-Display-Medium.otf') format('opentype');
+}
+
+@font-face {
+  font-family: "SF-Pro-Display-Bold";
+  src: url('../fonts/SF-Pro-Display-Bold.otf') format('opentype');
+}
+
+/* Base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'SF-Pro-Display-Regular', sans-serif;
+  line-height: 1.6;
+  color: #333;
+  background-color: #f8f9fa;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'SF-Pro-Display-Bold', sans-serif;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+a {
+  color: #2296f3;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+button {
+  cursor: pointer;
+  font-family: 'SF-Pro-Display-Bold', sans-serif;
+}
+
+/* Layout */
+.App {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Loading and error states */
+.loading, .error {
+  text-align: center;
+  padding: 2rem;
+  margin: 2rem auto;
+  max-width: 600px;
+}
+
+.error {
+  color: #d9534f;
+  border: 1px solid #d9534f;
+  border-radius: 4px;
+  background-color: #f9f2f2;
+}
+
+/* Buttons */
+.btn {
+  display: inline-block;
+  padding: 10px 20px;
+  border-radius: 7px;
+  font-size: 14px;
+  font-weight: bold;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s ease-in;
+}
+
+.primary-btn {
+  background-color: #2296f3;
+  color: white;
+  border: 1px solid #2296f3;
+}
+
+.primary-btn:hover {
+  background-color: #2296f3;
+  text-decoration: none;
+}
+
+.secondary-btn {
+  background-color: transparent;
+  color: #2296f3;
+  border: 1px solid #2296f3;
+}
+
+.secondary-btn:hover {
+  background-color: rgba(61, 106, 255, 0.1);
+  text-decoration: none;
+}
