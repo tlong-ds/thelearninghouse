@@ -812,6 +812,7 @@
 .notes-content pre, 
 .notes-content blockquote {
   margin-bottom: 1rem;
+  text-align: left;
 }
 
 .notes-content code {
