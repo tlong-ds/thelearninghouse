@@ -92,7 +92,7 @@ for route in api_router.routes:
     print(f"Route: {route.path}, Methods: {route.methods}")
 
 # Include API routers
-app.include_router(api_router)
+app.include_router(api_router, prefix="/api")
 app.include_router(chat_router, prefix="/api")
 
 
