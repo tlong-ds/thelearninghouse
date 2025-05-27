@@ -30,7 +30,7 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build",
+    "deploy": "gh-pages -d build --add",
     "backend": "cd .. && python -m pip install -r requirements.txt && python -m uvicorn services.api.db.auth:app --host 8503 --reload"
   },
   "eslintConfig": {
