@@ -8,10 +8,6 @@ requests
 python-dotenv
 fpdf
 mysql-connector-python
-streamlit==1.38.0
-streamlit_extras
-streamlit-cookies-manager
-streamlit-js-eval
 tqdm
 google-generativeai
 streamlit
