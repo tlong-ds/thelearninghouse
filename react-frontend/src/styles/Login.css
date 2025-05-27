@@ -152,11 +152,12 @@ body.dark-theme .role-selector select {
   box-shadow: 0 0 10px #b2dcff;
 }
 
-.auth-footer {
+.footer {
   margin-top: 2rem;
   text-align: center;
   color: #777;
   font-size: 0.8rem;
+  background-color: transparent;
 }
 
 @media (max-width: 768px) {

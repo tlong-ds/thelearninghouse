@@ -263,7 +263,7 @@ const Login = () => {
         )}
       </div>
       
-      <footer className="auth-footer">
+      <footer className="footer">
         <p>© 2025 The Learning House. All rights reserved.</p>
       </footer>
     </div>
