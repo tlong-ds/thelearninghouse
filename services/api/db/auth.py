@@ -40,7 +40,9 @@ app.add_middleware(
         "http://localhost:3000",
         "http://127.0.0.1:3000",
         "https://tlong-ds.github.io",
-        "https://tlong-ds.github.io/thelearninghouse/"
+        "https://tlong-ds.github.io/thelearninghouse/",
+        "https://*.hf.space",
+        "https://*.huggingface.co"
     ],
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
@@ -156,14 +158,15 @@ async def login(response: Response, payload: LoginPayload):
         print(f"Authentication successful for: {payload.username}")
         
         token = create_token(user_data)
+        # Set cookie with less restrictive settings for cross-origin
         response.set_cookie(
             key="auth_token",
             value=token,
-            httponly=False,  # Cookie cannot be accessed by JavaScript
-            samesite="Lax",  # More secure than None
-            secure=True,  # Only send cookie over HTTPS
+            httponly=False,
+            samesite="None",  # Allow cross-site cookie
+            secure=True,
             path="/",
-            max_age=604800  # 7 days
+            max_age=604800
         )
         return {
             "message": f"Login successful for {user_data['username']}", 

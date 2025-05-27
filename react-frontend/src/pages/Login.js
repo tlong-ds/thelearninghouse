@@ -32,15 +32,20 @@ const Login = () => {
       return;
     }
     
-    const success = await login(username, password, role);
-    if (success) {
-      console.log(`Welcome back ${username}! Login successful.`);
-      // Add timeout before navigation
-      setTimeout(() => {
-        navigate('/courses');
-      }, 1000); // 1 second delay
-    } else {
-      setError('Login failed. Please check your credentials.');
+    try {
+      const success = await login(username, password, role);
+      
+      if (success) {
+        console.log(`Welcome back ${username}! Login successful.`);
+        setTimeout(() => {
+          navigate('/courses');
+        }, 1000);
+      } else {
+        setError('Login failed. Please check your credentials.');
+      }
+    } catch (err) {
+      console.error('Login error:', err);
+      setError('Login failed. Please try again.');
     }
   };
   

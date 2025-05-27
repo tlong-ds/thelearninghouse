@@ -10,10 +10,26 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Check if user is already logged in via HTTP-only cookie
+  // Check if user is already logged in via token or HTTP-only cookie
   useEffect(() => {
     const checkLoggedIn = async () => {
       try {
+        // First check if we have a token in localStorage
+        const token = localStorage.getItem('auth_token');
+        const storedUsername = localStorage.getItem('username');
+        const storedRole = localStorage.getItem('user_role');
+        
+        if (token && storedUsername && storedRole) {
+          setCurrentUser({
+            username: storedUsername,
+            role: storedRole
+          });
+          setIsAuthenticated(true);
+          setLoading(false);
+          return;
+        }
+        
+        // If no token in localStorage, try to get from cookies
         const response = await axios.get(`${API_URL}/whoami`, {
           withCredentials: true  // Important: needed to send cookies
         });
@@ -48,7 +64,12 @@ export const AuthProvider = ({ children }) => {
         withCredentials: true
       });
       
-      if (response.data.username) {
+      if (response.data.token) {
+        // Store token in localStorage
+        localStorage.setItem('auth_token', response.data.token);
+        localStorage.setItem('user_role', response.data.role);
+        localStorage.setItem('username', response.data.username);
+        
         setCurrentUser({
           username: response.data.username,
           role: response.data.role
@@ -69,6 +90,11 @@ export const AuthProvider = ({ children }) => {
       await axios.get(`${API_URL}/logout`, {
         withCredentials: true
       });
+      
+      // Clear localStorage
+      localStorage.removeItem('auth_token');
+      localStorage.removeItem('user_role');
+      localStorage.removeItem('username');
       
       setCurrentUser(null);
       setIsAuthenticated(false);
