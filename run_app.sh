@@ -52,7 +52,7 @@ fi
 
 # Start backend in background
 echo -e "${GREEN}Starting the FastAPI backend server...${NC}"
-uvicorn services.api.db.auth:app --reload --port 8502 &
+uvicorn services.api.db.auth:app --reload --port 8503 &
 BACKEND_PID=$!
 echo -e "${YELLOW}Backend server started with PID: $BACKEND_PID${NC}"
 
@@ -60,7 +60,7 @@ echo -e "${YELLOW}Backend server started with PID: $BACKEND_PID${NC}"
 echo -e "${GREEN}Checking for Node.js...${NC}"
 if ! command -v node &> /dev/null; then
     echo -e "${YELLOW}Node.js is not installed. Please install Node.js to run the React frontend.${NC}"
-    echo -e "${YELLOW}Backend server is still running on http://localhost:8502${NC}"
+    echo -e "${YELLOW}Backend server is still running on http://localhost:8503${NC}"
     exit 1
 fi
 
@@ -87,7 +87,7 @@ echo -e "${YELLOW}Frontend server started with PID: $FRONTEND_PID${NC}"
 
 echo ""
 echo -e "${GREEN}Setup complete!${NC}"
-echo -e "${YELLOW}Backend is running at: http://localhost:8502${NC}"
+echo -e "${YELLOW}Backend is running at: http://localhost:8503${NC}"
 echo -e "${YELLOW}Frontend is running at: http://localhost:3000${NC}"
 echo ""
 echo -e "${YELLOW}Press Ctrl+C to stop both servers${NC}"

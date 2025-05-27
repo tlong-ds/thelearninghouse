@@ -71,7 +71,7 @@ MYSQL_PORT = int(os.getenv("MYSQL_PORT", "3306"))
 app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:8503", "http://localhost:3000", "http://127.0.0.1:3000"],
+    allow_origins=["http://localhost:8503", "http://localhost:3000", "http://127.0.0.1:3000", "https://tlong-ds.github.io"],
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],

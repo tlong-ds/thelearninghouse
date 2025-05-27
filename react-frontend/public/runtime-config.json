@@ -1,0 +1,14 @@
+{
+  "apiUrl": "http://localhost:8503",
+  "enableAnalytics": true,
+  "features": {
+    "chat": true,
+    "quizzes": true,
+    "certificates": true
+  },
+  "maintenance": {
+    "enabled": false,
+    "message": "The Learning House is currently undergoing scheduled maintenance. Please check back later."
+  },
+  "version": "1.0.0"
+}

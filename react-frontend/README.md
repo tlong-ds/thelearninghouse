@@ -24,11 +24,11 @@ This is the React-based frontend for The Learning House online learning platform
 
 ## Backend Requirements
 
-The React frontend requires the FastAPI backend to be running on port 8502. Make sure the backend is started before using the React app:
+The React frontend requires the FastAPI backend to be running on port 8503. Make sure the backend is started before using the React app:
 
 ```
 cd /path/to/project
-uvicorn services.api.db.auth:app --reload --port 8502
+uvicorn services.api.db.auth:app --reload --port 8503
 ```
 
 ## Project Structure

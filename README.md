@@ -13,7 +13,7 @@ To run the React version:
    ```
 
    This will:
-   - Start the FastAPI backend on port 8502
+   - Start the FastAPI backend on port 8503
    - Install React dependencies if needed
    - Copy assets from the Streamlit project
    - Start the React development server on port 3000
@@ -26,7 +26,7 @@ If you prefer to start the services manually:
 
 1. Start the backend:
    ```bash
-   uvicorn services.api.db.auth:app --reload --port 8502
+   uvicorn services.api.db.auth:app --reload --port 8503
    ```
 
 2. Navigate to the React frontend directory:

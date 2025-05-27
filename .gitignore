@@ -21,7 +21,11 @@ venv/
 ENV/
 
 # API Keys and Sensitive Data
-.env*
+.env
+.env.local
+.env.development
+.env.production
+!.env.example
 *.pem
 credentials.json
 token.json

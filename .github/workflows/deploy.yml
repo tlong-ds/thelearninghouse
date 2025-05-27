@@ -1,0 +1,79 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [ main ]
+  workflow_dispatch:
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          cache: 'npm'
+          cache-dependency-path: ./react-frontend/package-lock.json
+          
+      - name: Install Dependencies
+        run: |
+          cd react-frontend
+          npm ci
+      
+      - name: Configure runtime config
+        run: |
+          cd react-frontend
+          # Set API URL from secrets or use default
+          API_URL="${{ secrets.API_URL || 'http://localhost:8503' }}"
+          
+          # Create runtime config
+          cat > public/runtime-config.json << EOL
+          {
+            "apiUrl": "${API_URL}",
+            "enableAnalytics": true,
+            "features": {
+              "chat": true,
+              "quizzes": true,
+              "certificates": true
+            },
+            "maintenance": {
+              "enabled": false,
+              "message": "The Learning House is currently undergoing scheduled maintenance. Please check back later."
+            },
+            "version": "${GITHUB_SHA::7}"
+          }
+          EOL
+      
+      - name: Create env file
+        run: |
+          cd react-frontend
+          # Set API URL from secrets or use default
+          API_URL="${{ secrets.API_URL || 'http://localhost:8503' }}"
+          
+          echo "REACT_APP_API_URL=${API_URL}" > .env.production
+          echo "REACT_APP_ASSETS_PATH=/thelearninghouse" >> .env.production
+          echo "REACT_APP_ENABLE_ANALYTICS=true" >> .env.production
+          echo "REACT_APP_BUILD_TIME=$(date +'%Y-%m-%d %H:%M:%S')" >> .env.production
+          echo "REACT_APP_VERSION=${GITHUB_SHA::7}" >> .env.production
+      
+      - name: Build
+        run: |
+          cd react-frontend
+          npm run build
+          
+          # Copy runtime config to build directory
+          cp public/runtime-config.json build/
+          
+          # Make sure copy_assets.sh is executable
+          chmod +x ./copy_assets.sh
+          ./copy_assets.sh
+          
+      - name: Deploy to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          branch: gh-pages
+          folder: react-frontend/build

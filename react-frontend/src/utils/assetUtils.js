@@ -1,3 +1,5 @@
+import config from '../config';
+
 /**
  * Helper function to get the correct path for assets based on environment
  * This ensures assets work both in development and when deployed to GitHub Pages
@@ -8,19 +10,14 @@ export const getAssetPath = (path) => {
     return path;
   }
   
-  // If in production, prepend the basename
-  if (process.env.NODE_ENV === 'production') {
-    // This should match the basename in your Router
-    const basename = '/thelearninghouse';
-    
-    // If path already starts with /, don't add another one
-    if (path && path.startsWith('/')) {
-      return `${basename}${path}`;
-    } else {
-      return `${basename}/${path}`;
-    }
+  // Use the ASSETS_PATH from the config
+  const basename = config.ASSETS_PATH;
+  
+  // If no basename or path doesn't start with /, return as is
+  if (!basename || !path || !path.startsWith('/')) {
+    return path;
   }
   
-  // In development, return the path as is
-  return path;
+  // Otherwise prepend the basename
+  return `${basename}${path}`;
 };
