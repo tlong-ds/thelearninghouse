@@ -72,4 +72,4 @@ The project has been migrated from Streamlit to React for:
 - Separation of frontend and backend concerns
 
 Both versions share the same FastAPI backend to ensure data consistency.
-Learning AI - 2025
+
