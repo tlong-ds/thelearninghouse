@@ -1,7 +1,7 @@
 {
   "files": {
     "main.css": "/thelearninghouse/static/css/main.82cb2f83.css",
-    "main.js": "/thelearninghouse/static/js/main.63a4e4fe.js",
+    "main.js": "/thelearninghouse/static/js/main.b90b4440.js",
     "static/js/453.2c008623.chunk.js": "/thelearninghouse/static/js/453.2c008623.chunk.js",
     "static/media/SF-Pro-Display-Medium.otf": "/thelearninghouse/static/media/SF-Pro-Display-Medium.e1d844da0ee028d4e288.otf",
     "static/media/SF-Pro-Display-Bold.otf": "/thelearninghouse/static/media/SF-Pro-Display-Bold.170e68ac3f4c79ef407d.otf",
@@ -67,11 +67,11 @@
     "static/media/KaTeX_Size3-Regular.woff2": "/thelearninghouse/static/media/KaTeX_Size3-Regular.e1951519f6f0596f7356.woff2",
     "index.html": "/thelearninghouse/index.html",
     "main.82cb2f83.css.map": "/thelearninghouse/static/css/main.82cb2f83.css.map",
-    "main.63a4e4fe.js.map": "/thelearninghouse/static/js/main.63a4e4fe.js.map",
+    "main.b90b4440.js.map": "/thelearninghouse/static/js/main.b90b4440.js.map",
     "453.2c008623.chunk.js.map": "/thelearninghouse/static/js/453.2c008623.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.82cb2f83.css",
-    "static/js/main.63a4e4fe.js"
+    "static/js/main.b90b4440.js"
   ]
 }
