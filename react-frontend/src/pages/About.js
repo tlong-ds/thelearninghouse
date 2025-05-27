@@ -4,6 +4,8 @@ import { useAuth } from '../services/AuthContext';
 import Header from '../components/Header';
 import axios from 'axios';
 import '../styles/About.css';
+import { images } from '../utils/images';
+import { useNavigate } from 'react-router-dom';
 
 // Create axios instance
 const apiClient = axios.create({
@@ -13,6 +15,25 @@ const apiClient = axios.create({
 
 const About = () => {
     const { currentUser, logout } = useAuth();
+    const navigate = useNavigate(); // Add this
+
+    // Add handleLogout function
+    const handleLogout = async () => {
+        try {
+            await apiClient.post('/api/auth/logout');
+            logout(); // Clear user info from context
+            // Add a small delay before navigation to ensure the cookie is cleared
+            setTimeout(() => {
+                navigate('/login');
+            }, 100);
+        } catch (error) {
+            console.error('Logout failed:', error);
+            // Fallback: still logout locally even if the API call fails
+            logout();
+            navigate('/login');
+        }
+    };
+
     const [metrics, setMetrics] = useState({
         totalCourses: 0,
         totalLearners: 0,
@@ -48,10 +69,13 @@ const About = () => {
         }
     };
 
+    // Update the fallback functions with proper error handling
     const countLearners = async () => {
         try {
-            const response = await apiClient.get('/api/users?role=Learner');
-            return response.data.length;
+            const response = await apiClient.get('/api/statistics/users/count', {
+                params: { role: 'Learner' }
+            });
+            return response.data.count;
         } catch (error) {
             console.error('Error counting learners:', error);
             return 0;
@@ -60,8 +84,10 @@ const About = () => {
 
     const countInstructors = async () => {
         try {
-            const response = await apiClient.get('/api/users?role=Instructor');
-            return response.data.length;
+            const response = await apiClient.get('/api/statistics/users/count', {
+                params: { role: 'Instructor' }
+            });
+            return response.data.count;
         } catch (error) {
             console.error('Error counting instructors:', error);
             return 0;
@@ -69,15 +95,19 @@ const About = () => {
     };
 
     const team = [
-        { name: "Doan Quoc Bao", role: "Backend Developer", image: "/assets/ava1.webp" },
-        { name: "Ly Thanh Long", role: "Frontend Developer", image: "/assets/ava2.webp" },
-        { name: "Tran Anh Tuan", role: "Data Engineer", image: "/assets/ava3.webp" },
-        { name: "Ha Quang Minh", role: "UI/UX Designer", image: "/assets/ava4.webp" }
+        { name: "Doan Quoc Bao", role: "Backend Developer", image: images.ava1 },
+        { name: "Ly Thanh Long", role: "Frontend Developer", image: images.ava2 },
+        { name: "Tran Anh Tuan", role: "Data Engineer", image: images.ava3 },
+        { name: "Ha Quang Minh", role: "UI/UX Designer", image: images.ava4 }
     ];
 
     return (
         <div className="about-container">
-            <Header username={currentUser?.username} role={currentUser?.role} onLogout={logout} />
+            <Header 
+                username={currentUser?.username} 
+                role={currentUser?.role} 
+                onLogout={handleLogout} // Update this
+            />
             <BootstrapContainer>
                 <h1 className="text-center mb-4">About The Learning House</h1>
                 

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { getAssetPath } from '../utils/assetUtils';
+import { images } from '../utils/images';
 import '../styles/Header.css';
 
 const Header = ({ username, role, onLogout }) => {
@@ -8,7 +8,7 @@ const Header = ({ username, role, onLogout }) => {
     <header className="app-header">
       <div className="header-logo">
         <Link to="/courses">
-          <img src={getAssetPath('/assets/light_logo.webp')} alt="The Learning House" />
+          <img src={images.lightLogo} alt="The Learning House" />
           <span>The Learning House</span>
         </Link>
       </div>

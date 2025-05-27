@@ -7,17 +7,24 @@ import config from '../config';
 export const getAssetPath = (path) => {
   // Check if the path already starts with http or https
   if (path && (path.startsWith('http://') || path.startsWith('https://'))) {
+    console.log('getAssetPath: returning absolute URL:', path);
     return path;
   }
-  
-  // Use the ASSETS_PATH from the config
-  const basename = config.ASSETS_PATH;
-  
-  // If no basename or path doesn't start with /, return as is
-  if (!basename || !path || !path.startsWith('/')) {
-    return path;
+
+  // Remove any double slashes, except for http(s)://
+  const cleanPath = path?.replace(/([^:])\/\//g, '$1/');
+
+  // In development, use the path relative to the public folder
+  if (!config.IS_PRODUCTION) {
+    console.log('getAssetPath: development mode, returning:', cleanPath);
+    return cleanPath;
   }
   
-  // Otherwise prepend the basename
-  return `${basename}${path}`;
+  // In production, use the ASSETS_PATH from the config
+  const basename = config.ASSETS_PATH || '';
+  
+  // Construct the final path
+  const finalPath = basename && cleanPath ? `${basename}${cleanPath}` : cleanPath;
+  console.log('getAssetPath: production mode, returning:', finalPath);
+  return finalPath;
 };

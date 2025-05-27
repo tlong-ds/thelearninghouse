@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import { fetchCourseDetails, fetchLectures, enrollInCourse, fetchEnrolledCourses } from '../services/api';
 import { useAuth } from '../services/AuthContext';
-import { getAssetPath } from '../utils/assetUtils';
+import { images } from '../utils/images';  // Update this import
 import Header from '../components/Header';
 import '../styles/CoursePreview.css';
 
@@ -94,7 +94,7 @@ const CoursePreview = () => {
           <div className="course-image-container">
             <div className="course-image">
               <img 
-                src={getAssetPath(course.image_url || '/assets/logo_course.webp')} 
+                src={course.image_url || images.logoCourse} 
                 alt={course.name} 
               />
             </div>

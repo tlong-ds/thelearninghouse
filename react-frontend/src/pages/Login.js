@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../services/AuthContext';
-import { getAssetPath } from '../utils/assetUtils';
+import { images } from '../utils/images';
 import '../styles/Login.css';
 
 const Login = () => {
@@ -115,7 +115,7 @@ const Login = () => {
   return (
     <div className="auth-container">
       <div className="auth-logo">
-        <img src={getAssetPath('/assets/light_logo.webp')} alt="The Learning House Logo" />
+        <img src={images.lightLogo} alt="The Learning House Logo" />
       </div>
       
       <h1 className="auth-title">The Learning House</h1>

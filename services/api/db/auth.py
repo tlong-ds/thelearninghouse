@@ -9,7 +9,7 @@ auth.py  –  Lightweight authentication micro-service
 
 from fastapi import FastAPI, Request, Response, Cookie, HTTPException, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from fastapi.responses import HTMLResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.security import OAuth2PasswordRequestForm
 from jose import jwt, JWTError
@@ -24,6 +24,7 @@ import bcrypt
 import sys
 import importlib.util
 from services.api.db.token_utils import create_token, decode_token
+from sqlalchemy.orm import Session
 
 # Add parent directory to path to enable imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -382,3 +383,55 @@ def register_user(user: NewUser):
         conn.close()
 
     return {"msg": "User created", "username": user.username, "role": user.role}, 201
+
+
+@app.post("/api/auth/logout")
+async def logout():
+    response = JSONResponse(content={"message": "Logged out successfully"})
+    # Clear all auth-related cookies
+    response.delete_cookie(key="auth_token", path="/")
+    response.delete_cookie(key="session_id", path="/")
+    return response
+
+@app.get("/api/users")
+async def get_users(role: str):
+    table_map = {
+        "Learner": "Learners",
+        "Instructor": "Instructors"
+    }
+    table = table_map.get(role)
+    if not table:
+        raise HTTPException(status_code=400, detail="Invalid role")
+    
+    conn = connect_db()
+    try:
+        with conn.cursor() as cur:
+            cur.execute(f"SELECT * FROM {table}")
+            columns = [desc[0] for desc in cur.description]
+            users = [dict(zip(columns, row)) for row in cur.fetchall()]
+            return users
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        conn.close()
+
+@app.get("/api/statistics/users/count")
+async def get_user_count(role: str):
+    table_map = {
+        "Learner": "Learners",
+        "Instructor": "Instructors"
+    }
+    table = table_map.get(role)
+    if not table:
+        raise HTTPException(status_code=400, detail="Invalid role")
+    
+    conn = connect_db()
+    try:
+        with conn.cursor() as cur:
+            cur.execute(f"SELECT COUNT(*) FROM {table}")
+            count = cur.fetchone()[0]
+            return {"count": count}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        conn.close()
