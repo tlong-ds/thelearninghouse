@@ -29,15 +29,21 @@ from sqlalchemy.orm import Session
 # Add parent directory to path to enable imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-# Create FastAPI app
+# Create single FastAPI instance
 app = FastAPI()
 
-# Configure CORS
+# Configure CORS with all needed origins
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000, https://tlong-ds.github.io/thelearninghouse/"],  # Your React frontend URL
-    allow_credentials=True,  # Important for cookies
-    allow_methods=["*"],
+    allow_origins=[
+        "http://localhost:8503",
+        "http://localhost:3000",
+        "http://127.0.0.1:3000",
+        "https://tlong-ds.github.io",
+        "https://tlong-ds.github.io/thelearninghouse/"
+    ],
+    allow_credentials=True,
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
     expose_headers=["*"]
 )
@@ -67,17 +73,6 @@ MYSQL_DB = os.getenv("MYSQL_DB")
 MYSQL_PORT = int(os.getenv("MYSQL_PORT", "3306"))
 
 
-
-# Initialize FastAPI app
-app = FastAPI()
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:8503", "http://localhost:3000", "http://127.0.0.1:3000", "https://tlong-ds.github.io"],
-    allow_credentials=True,
-    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allow_headers=["*"],
-    expose_headers=["*"],
-)
 
 # Import and include chat router
 try:
