@@ -33,7 +33,6 @@ s3 = boto3.client('s3',
 )
 
 router = APIRouter(
-    prefix="/api",
     tags=["courses"],
     responses={404: {"description": "Not found"}},
 )
