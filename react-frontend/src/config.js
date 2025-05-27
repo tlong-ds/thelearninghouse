@@ -10,7 +10,7 @@ const config = {
   
   // Path prefix for assets when deployed on GitHub Pages
   ASSETS_PATH: process.env.REACT_APP_ASSETS_PATH || 
-    (process.env.NODE_ENV === 'production' ? '/thelearninghouse' : ''),
+    (process.env.NODE_ENV === 'production' ? '/thelearninghowhouse' : ''),
   
   // App name for branding
   APP_NAME: process.env.REACT_APP_APP_NAME || 'The Learning House',
