@@ -43,56 +43,24 @@ const About = () => {
     useEffect(() => {
         const fetchMetrics = async () => {
             try {
-                const response = await apiClient.get('/api/metrics');
-                setMetrics(response.data);
+                const [coursesRes, learnersRes, instructorsRes] = await Promise.all([
+                    apiClient.get('/api/courses'),
+                    apiClient.get('/api/statistics/users/count', { params: { role: 'Learner' }}),
+                    apiClient.get('/api/statistics/users/count', { params: { role: 'Instructor' }})
+                ]);
+
+                setMetrics({
+                    totalCourses: coursesRes.data.length,
+                    totalLearners: learnersRes.data.count,
+                    totalInstructors: instructorsRes.data.count
+                });
             } catch (error) {
                 console.error('Error fetching metrics:', error);
-                // Set default values if the API call fails
-                setMetrics({
-                    totalCourses: await countCourses(),
-                    totalLearners: await countLearners(),
-                    totalInstructors: await countInstructors()
-                });
+                // Keep the default values (all zeros) if the API calls fail
             }
         };
         fetchMetrics();
     }, []);
-
-    // Fallback functions to count entities if the metrics endpoint fails
-    const countCourses = async () => {
-        try {
-            const response = await apiClient.get('/api/courses');
-            return response.data.length;
-        } catch (error) {
-            console.error('Error counting courses:', error);
-            return 0;
-        }
-    };
-
-    // Update the fallback functions with proper error handling
-    const countLearners = async () => {
-        try {
-            const response = await apiClient.get('/api/statistics/users/count', {
-                params: { role: 'Learner' }
-            });
-            return response.data.count;
-        } catch (error) {
-            console.error('Error counting learners:', error);
-            return 0;
-        }
-    };
-
-    const countInstructors = async () => {
-        try {
-            const response = await apiClient.get('/api/statistics/users/count', {
-                params: { role: 'Instructor' }
-            });
-            return response.data.count;
-        } catch (error) {
-            console.error('Error counting instructors:', error);
-            return 0;
-        }
-    };
 
     const team = [
         { name: "Doan Quoc Bao", role: "Backend Developer", image: images.ava1 },
