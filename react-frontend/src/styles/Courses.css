@@ -51,15 +51,15 @@
   color: #555;
 }
 
-.search-bar:hover,
-.search-bar:focus-within {
+.search-bar:focus-within,
+.search-bar input:not(:placeholder-shown) {
   width: 200px;
   margin-left: -1px;
   z-index: 1;
 }
 
-.search-bar:hover::after,
-.search-bar:focus-within::after {
+.search-bar:focus-within::after,
+.search-bar input:not(:placeholder-shown) ~ .search-bar::after {
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.2s, visibility 0.2s;
@@ -77,15 +77,18 @@
   background-color: #f8f9fa;
   transition: all 0.2s;
   opacity: 0;
+  pointer-events: auto;
 }
 
 .search-bar input:focus {
   outline: none;
   border-color: #2296f3;
   box-shadow: 0 0 0 3px rgba(34, 150, 243, 0.1);
+  opacity: 1;
 }
 
-.search-bar:hover input {
+.search-bar:focus-within input,
+.search-bar input:not(:placeholder-shown) {
   opacity: 1;
 }
 
