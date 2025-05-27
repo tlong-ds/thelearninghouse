@@ -1,13 +1,15 @@
 {
   "files": {
-    "main.css": "/thelearninghouse/static/css/main.82cb2f83.css",
-    "main.js": "/thelearninghouse/static/js/main.b90b4440.js",
+    "main.css": "/thelearninghouse/static/css/main.79a4d16b.css",
+    "main.js": "/thelearninghouse/static/js/main.30f3240e.js",
     "static/js/453.2c008623.chunk.js": "/thelearninghouse/static/js/453.2c008623.chunk.js",
     "static/media/SF-Pro-Display-Medium.otf": "/thelearninghouse/static/media/SF-Pro-Display-Medium.e1d844da0ee028d4e288.otf",
     "static/media/SF-Pro-Display-Bold.otf": "/thelearninghouse/static/media/SF-Pro-Display-Bold.170e68ac3f4c79ef407d.otf",
     "static/media/KaTeX_AMS-Regular.ttf": "/thelearninghouse/static/media/KaTeX_AMS-Regular.853be92419a6c3766b9a.ttf",
     "static/media/KaTeX_Main-Regular.ttf": "/thelearninghouse/static/media/KaTeX_Main-Regular.9eba1d77abcf2aa6e94e.ttf",
     "static/media/KaTeX_Main-Bold.ttf": "/thelearninghouse/static/media/KaTeX_Main-Bold.8169508bf58f8bd92ad8.ttf",
+    "static/media/ava1.webp": "/thelearninghouse/static/media/ava1.abb0bab0015e512c12b7.webp",
+    "static/media/ava3.webp": "/thelearninghouse/static/media/ava3.bd76a95e5819cda0ccba.webp",
     "static/media/KaTeX_Main-Italic.ttf": "/thelearninghouse/static/media/KaTeX_Main-Italic.fa675e5e4bec9eb250b6.ttf",
     "static/media/KaTeX_AMS-Regular.woff": "/thelearninghouse/static/media/KaTeX_AMS-Regular.d562e886c52f12660a41.woff",
     "static/media/KaTeX_Main-BoldItalic.ttf": "/thelearninghouse/static/media/KaTeX_Main-BoldItalic.828abcb200061cffbaae.ttf",
@@ -20,7 +22,11 @@
     "static/media/KaTeX_Main-Regular.woff2": "/thelearninghouse/static/media/KaTeX_Main-Regular.f650f111a3b890d116f1.woff2",
     "static/media/KaTeX_Main-Bold.woff2": "/thelearninghouse/static/media/KaTeX_Main-Bold.39890742bc957b368704.woff2",
     "static/media/KaTeX_SansSerif-Bold.ttf": "/thelearninghouse/static/media/KaTeX_SansSerif-Bold.5b49f4993ae22d7975b4.ttf",
+    "static/media/logo_course.webp": "/thelearninghouse/static/media/logo_course.d2a9e289f3ea56997b2a.webp",
+    "static/media/dark_logo.webp": "/thelearninghouse/static/media/dark_logo.2452ff3f454c8f18d01b.webp",
+    "static/media/light_logo.webp": "/thelearninghouse/static/media/light_logo.7a7a4e24c689b9e60db4.webp",
     "static/media/KaTeX_SansSerif-Italic.ttf": "/thelearninghouse/static/media/KaTeX_SansSerif-Italic.b257a18c016f37ee4543.ttf",
+    "static/media/ava4.webp": "/thelearninghouse/static/media/ava4.9ab2bc3b7c7c65bb7c77.webp",
     "static/media/KaTeX_Main-Italic.woff": "/thelearninghouse/static/media/KaTeX_Main-Italic.fd947498bc16392e76c2.woff",
     "static/media/KaTeX_Fraktur-Bold.ttf": "/thelearninghouse/static/media/KaTeX_Fraktur-Bold.4c761b3711973ab04edf.ttf",
     "static/media/KaTeX_Fraktur-Regular.ttf": "/thelearninghouse/static/media/KaTeX_Fraktur-Regular.ed305b5434865e06ffde.ttf",
@@ -28,6 +34,7 @@
     "static/media/KaTeX_Main-BoldItalic.woff": "/thelearninghouse/static/media/KaTeX_Main-BoldItalic.428978dc7837d46de091.woff",
     "static/media/KaTeX_Math-Italic.woff": "/thelearninghouse/static/media/KaTeX_Math-Italic.96759856b4e70f3a8338.woff",
     "static/media/KaTeX_Math-BoldItalic.woff": "/thelearninghouse/static/media/KaTeX_Math-BoldItalic.3f07ed67f06c720120ce.woff",
+    "static/media/ava2.webp": "/thelearninghouse/static/media/ava2.3fa9ca3b08fa8eadfb6d.webp",
     "static/media/KaTeX_Main-Italic.woff2": "/thelearninghouse/static/media/KaTeX_Main-Italic.fe2176f79edaa716e621.woff2",
     "static/media/KaTeX_Main-BoldItalic.woff2": "/thelearninghouse/static/media/KaTeX_Main-BoldItalic.20f389c4120be058d80a.woff2",
     "static/media/KaTeX_Script-Regular.ttf": "/thelearninghouse/static/media/KaTeX_Script-Regular.fc9ba5249878cd8f8d88.ttf",
@@ -66,12 +73,12 @@
     "static/media/KaTeX_Size3-Regular.woff": "/thelearninghouse/static/media/KaTeX_Size3-Regular.7947224e8a9914fa332b.woff",
     "static/media/KaTeX_Size3-Regular.woff2": "/thelearninghouse/static/media/KaTeX_Size3-Regular.e1951519f6f0596f7356.woff2",
     "index.html": "/thelearninghouse/index.html",
-    "main.82cb2f83.css.map": "/thelearninghouse/static/css/main.82cb2f83.css.map",
-    "main.b90b4440.js.map": "/thelearninghouse/static/js/main.b90b4440.js.map",
+    "main.79a4d16b.css.map": "/thelearninghouse/static/css/main.79a4d16b.css.map",
+    "main.30f3240e.js.map": "/thelearninghouse/static/js/main.30f3240e.js.map",
     "453.2c008623.chunk.js.map": "/thelearninghouse/static/js/453.2c008623.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.82cb2f83.css",
-    "static/js/main.b90b4440.js"
+    "static/css/main.79a4d16b.css",
+    "static/js/main.30f3240e.js"
   ]
 }
