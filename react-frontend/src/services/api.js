@@ -68,20 +68,10 @@ export const fetchLectureDetails = async (lectureId) => {
       throw new Error('Invalid lecture ID format');
     }
     
-    const response = await fetch(`http://localhost:8503/api/lectures/${id}`, {
-      method: 'GET',
-      credentials: 'include',
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
-      }
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.detail || `Error ${response.status}: ${response.statusText}`);
-    }
-
-    return await response.json();
+    // Use apiClient instead of fetch to maintain consistency
+    const response = await apiClient.get(`/api/lectures/${id}`);
+    return response.data;
+    
   } catch (error) {
     console.error('Error fetching lecture details:', error);
     throw error;

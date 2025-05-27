@@ -1,7 +1,7 @@
 import axios from 'axios';
 import config from '../config';
 
-const BASE_URL = `${config.API_URL}/api`;
+const API_URL = config.API_URL;
 
 // Helper function to handle API errors
 const handleApiError = (error) => {
@@ -28,8 +28,8 @@ const getHeaders = () => ({
 export const sendChatMessage = async (message, lectureId = null) => {
   try {
     const endpoint = lectureId 
-      ? `${BASE_URL}/chat/lecture/${lectureId}`
-      : `${BASE_URL}/chat`;
+      ? `${API_URL}/api/chat/lecture/${lectureId}`
+      : `${API_URL}/api/chat`;
 
     const response = await axios.post(endpoint, {
       message
@@ -47,7 +47,7 @@ export const sendChatMessage = async (message, lectureId = null) => {
 // Get chat history for a lecture
 export const getChatHistory = async (lectureId) => {
   try {
-    const response = await axios.get(`${BASE_URL}/chat/history/${lectureId}`, {
+    const response = await axios.get(`${API_URL}/api/chat/history/${lectureId}`, {
       withCredentials: true,
       headers: getHeaders()
     });
@@ -61,7 +61,7 @@ export const getChatHistory = async (lectureId) => {
 // Clear chat history
 export const clearChatHistory = async () => {
   try {
-    const response = await axios.delete(`${BASE_URL}/chat/history`, {
+    const response = await axios.delete(`${API_URL}/api/chat/history`, {
       withCredentials: true,
       headers: getHeaders()
     });

@@ -1,6 +1,8 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import axios from 'axios';
+import config from '../config';
 
+const API_URL = config.API_URL;
 const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
@@ -12,7 +14,7 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const checkLoggedIn = async () => {
       try {
-        const response = await axios.get('http://localhost:8503/whoami', {
+        const response = await axios.get(`${API_URL}/whoami`, {
           withCredentials: true  // Important: needed to send cookies
         });
         
@@ -25,7 +27,6 @@ export const AuthProvider = ({ children }) => {
         }
       } catch (error) {
         console.error('Auth check failed:', error);
-        // Clear any stale data
         setCurrentUser(null);
         setIsAuthenticated(false);
       } finally {
@@ -39,12 +40,12 @@ export const AuthProvider = ({ children }) => {
   // Login function
   const login = async (username, password, role) => {
     try {
-      const response = await axios.post('http://localhost:8503/login', {
+      const response = await axios.post(`${API_URL}/login`, {
         username,
         password,
         role
       }, {
-        withCredentials: true // Important: needed to receive cookies
+        withCredentials: true
       });
       
       if (response.data.username) {
@@ -55,7 +56,6 @@ export const AuthProvider = ({ children }) => {
         setIsAuthenticated(true);
         return true;
       }
-      
       return false;
     } catch (error) {
       console.error('Login failed:', error);
@@ -66,7 +66,7 @@ export const AuthProvider = ({ children }) => {
   // Logout function
   const logout = async () => {
     try {
-      await axios.get('http://localhost:8503/logout', {
+      await axios.get(`${API_URL}/logout`, {
         withCredentials: true
       });
       
@@ -82,12 +82,11 @@ export const AuthProvider = ({ children }) => {
   // Register function
   const register = async (userData) => {
     try {
-      const response = await axios.post('http://localhost:8503/auth/register_user', userData);
+      const response = await axios.post(`${API_URL}/auth/register_user`, userData);
       
       if (response.status === 201) {
         return true;
       }
-      
       return false;
     } catch (error) {
       if (error.response?.status === 409) {
