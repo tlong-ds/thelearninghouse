@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../services/AuthContext';
+import { getAssetPath } from '../utils/assetUtils';
 import Header from '../components/Header';
 import '../styles/ManageCourse.css';
 
@@ -95,7 +96,7 @@ const ManageCourse = () => {
           <div className="course-image-container">
             <div className="course-image">
               <img 
-                src={course.image_url || '/assets/logo_course.webp'} 
+                src={getAssetPath(course.image_url || '/assets/logo_course.webp')} 
                 alt={course.name} 
               />
             </div>

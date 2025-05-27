@@ -26,7 +26,7 @@
   "homepage": "https://tlong-ds.github.io/thelearninghouse",
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "react-scripts build && chmod +x ./copy_assets.sh && ./copy_assets.sh",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "predeploy": "npm run build",

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../services/AuthContext';
+import { getAssetPath } from '../utils/assetUtils';
 import '../styles/CourseCard.css';
 
 const CourseCard = ({ course }) => {
@@ -19,7 +20,7 @@ const CourseCard = ({ course }) => {
     <div className="browse-course-card">
       <div className="browse-course-image">
         <img 
-          src={course.image_url || '/assets/logo_course.webp'} 
+          src={getAssetPath(course.image_url || '/assets/logo_course.webp')} 
           alt={course.name} 
           loading="lazy"
         />
