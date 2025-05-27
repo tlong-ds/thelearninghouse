@@ -1,0 +1,26 @@
+# Version control
+.git
+.gitignore
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+venv
+.env
+
+# IDE
+.vscode
+.idea
+
+# React frontend
+react-frontend/node_modules
+react-frontend/build
+react-frontend/.env*
+
+# Misc
+.DS_Store
+README.md
+*.log
