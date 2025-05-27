@@ -142,15 +142,17 @@
   gap: 2rem;
 }
 
-.course-controls {
+.courses-container .course-controls {
   display: flex;
   gap: 0.75rem;
   align-items: center;
 }
 
-.course-controls select {
-  padding: 0 1rem;
-  border-radius: 0 20px 20px 0;
+.courses-container .course-controls select {
+  padding: 0 2.5rem 0 1rem;
+  text-align: left;
+  text-indent: 0.5rem;
+  border-radius: 20px;
   border: 1px solid #e4e6eb;
   font-size: 0.9rem;
   color: #555;
@@ -164,16 +166,15 @@
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%232a2f35'%3E%3Cpath d='M4.646 6.146a.5.5 0 01.708 0L8 8.793l2.646-2.647a.5.5 0 01.708.708l-3 3a.5.5 0 01-.708 0l-3-3a.5.5 0 010-.708z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 1rem center;
-  padding-right: 2.5rem;
 }
 
-.course-controls select:focus {
+.courses-container .course-controls select:focus {
   outline: none;
   border-color: #2296f3;
   box-shadow: 0 0 0 3px rgba(34, 150, 243, 0.1);
 }
 
-.sort-order-btn {
+.courses-container .sort-order-btn {
   height: 38px;
   width: 38px;
   border-radius: 20px;

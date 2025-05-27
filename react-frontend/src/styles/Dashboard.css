@@ -307,6 +307,81 @@
   color: white;
 }
 
+/* Sorting Controls */
+.courses-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  gap: 1.5rem;
+}
+
+.dashboard-container .course-controls {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  min-width: 220px;
+}
+
+.dashboard-container .course-controls select {
+  padding: 0 2.5rem 0 1rem;
+  text-align: left;
+  text-indent: 0.5rem;
+  border-radius: 20px;
+  border: 1px solid #e4e6eb;
+  font-size: 0.9rem;
+  color: #555;
+  height: 38px;
+  background-color: #f8f9fa;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: auto;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%232a2f35'%3E%3Cpath d='M4.646 6.146a.5.5 0 01.708 0L8 8.793l2.646-2.647a.5.5 0 01.708.708l-3 3a.5.5 0 01-.708 0l-3-3a.5.5 0 010-.708z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  flex: 1;
+}
+
+.dashboard-container .course-controls select:hover {
+  background-color: #f0f2f5;
+  border-color: #ddd;
+}
+
+.dashboard-container .course-controls select:focus {
+  outline: none;
+  border-color: #2296f3;
+  box-shadow: 0 0 0 3px rgba(34, 150, 243, 0.1);
+}
+
+.dashboard-container .sort-order-btn {
+  height: 38px;
+  width: 38px;
+  border-radius: 20px;
+  border: 1px solid #e4e6eb;
+  background: #f8f9fa;
+  cursor: pointer;
+  transition: all 0.2s;
+  color: #555;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.dashboard-container .sort-order-btn:hover {
+  background-color: #f0f2f5;
+  border-color: #ddd;
+}
+
+.dashboard-container .sort-order-btn:focus {
+  outline: none;
+  border-color: #2296f3;
+  box-shadow: 0 0 0 3px rgba(34, 150, 243, 0.1);
+}
+
 @media (max-width: 992px) {
   .charts-container {
     grid-template-columns: 1fr;
@@ -326,6 +401,20 @@
 
   .courses-list {
     grid-template-columns: 1fr;
+  }
+
+  .courses-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+
+  .dashboard-container .course-controls {
+    width: 100%;
+  }
+
+  .dashboard-container .course-controls select {
+    flex: 1;
   }
 }
 

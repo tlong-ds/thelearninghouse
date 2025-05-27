@@ -152,6 +152,8 @@ const Dashboard = () => {
   const [activeTab, setActiveTab] = useState('statistics');
   const [timeFilter, setTimeFilter] = useState('all'); // 'day', 'week', 'month', 'all'
   const [isAnimating, setIsAnimating] = useState(false);
+  const [sortBy, setSortBy] = useState('name');
+  const [sortOrder, setSortOrder] = useState('asc');
   
   const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
@@ -214,15 +216,66 @@ const Dashboard = () => {
     });
   };
   
-  const lecturesPassedData = filterDataByTime(dashboardData.statistics.lecturesPassed.map(item => ({
+  const sortData = (data) => {
+    const sortedData = [...data];
+    
+    sortedData.sort((a, b) => {
+      if (sortBy === 'date') {
+        return sortOrder === 'asc' 
+          ? new Date(a.date) - new Date(b.date) 
+          : new Date(b.date) - new Date(a.date);
+      } else {
+        return sortOrder === 'asc' 
+          ? a.value - b.value 
+          : b.value - a.value;
+      }
+    });
+    
+    return sortedData;
+  };
+  
+  const lecturesPassedData = sortData(filterDataByTime(dashboardData.statistics.lecturesPassed.map(item => ({
     date: item.date,
     value: item.count
-  })));
+  }))));
   
   const averageScoresData = filterDataByTime(dashboardData.statistics.averageScores.map(item => ({
     date: item.date,
     value: item.score
   })));
+  
+  // Sort enrolled courses
+  const sortCourses = (courses) => {
+    return [...courses].sort((a, b) => {
+      let comparison = 0;
+      
+      switch (sortBy) {
+        case 'name':
+          comparison = a.name.localeCompare(b.name);
+          break;
+        case 'instructor':
+          comparison = a.instructor.localeCompare(b.instructor);
+          break;
+        case 'progress':
+          comparison = (a.percentage || 0) - (b.percentage || 0);
+          break;
+        default:
+          comparison = 0;
+      }
+      
+      return sortOrder === 'asc' ? comparison : -comparison;
+    });
+  };
+  
+  const handleSortChange = (e) => {
+    setSortBy(e.target.value);
+  };
+  
+  const toggleSortOrder = () => {
+    setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+  };
+  
+  const sortedEnrolledCourses = sortCourses(dashboardData.enrolledCourses);
   
   return (
     <div className="dashboard-container">
@@ -363,9 +416,27 @@ const Dashboard = () => {
                   </div>
                 ) : (
                   <div className="enrolled-courses">
-                    <h2>Your Courses</h2>
+                    <div className="courses-header">
+                      <h2>Your Courses</h2>
+                      <div className="course-controls">
+                        <select 
+                          value={sortBy}
+                          onChange={handleSortChange}
+                        >
+                          <option value="name">Sort by Name</option>
+                          <option value="instructor">Sort by Instructor</option>
+                          <option value="progress">Sort by Progress</option>
+                        </select>
+                        <button 
+                          className="sort-order-btn"
+                          onClick={toggleSortOrder}
+                        >
+                          {sortOrder === 'asc' ? '↑' : '↓'}
+                        </button>
+                      </div>
+                    </div>
                     <div className="courses-list">
-                      {dashboardData.enrolledCourses.map(course => (
+                      {sortCourses(dashboardData.enrolledCourses).map(course => (
                         <div key={course.id} className="course-card">
                           <div className="course-info">
                             <h3>{course.name}</h3>
