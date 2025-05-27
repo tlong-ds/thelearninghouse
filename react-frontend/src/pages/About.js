@@ -3,33 +3,28 @@ import { Container as BootstrapContainer, Card, Row, Col, Table } from 'react-bo
 import { useAuth } from '../services/AuthContext';
 import Header from '../components/Header';
 import axios from 'axios';
+import config from '../config';
 import '../styles/About.css';
 import { images } from '../utils/images';
 import { useNavigate } from 'react-router-dom';
 
-// Create axios instance
+// Create axios instance with config URL
 const apiClient = axios.create({
-    baseURL: 'http://localhost:8503',
+    baseURL: config.API_URL,
     withCredentials: true
 });
 
 const About = () => {
     const { currentUser, logout } = useAuth();
-    const navigate = useNavigate(); // Add this
+    const navigate = useNavigate();
 
     // Add handleLogout function
     const handleLogout = async () => {
         try {
-            await apiClient.post('/api/auth/logout');
-            logout(); // Clear user info from context
-            // Add a small delay before navigation to ensure the cookie is cleared
-            setTimeout(() => {
-                navigate('/login');
-            }, 100);
+            await logout();
+            navigate('/login');
         } catch (error) {
             console.error('Logout failed:', error);
-            // Fallback: still logout locally even if the API call fails
-            logout();
             navigate('/login');
         }
     };
