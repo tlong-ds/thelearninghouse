@@ -48,9 +48,7 @@ const Header = ({ username, role, onLogout }) => {
           <span className="username">{username || 'User'}</span>
           <span className="role">{role || 'Guest'}</span>
         </div>
-        <button className="logout-btn" onClick={onLogout}>
-          Logout
-        </button>
+        <button className="logout-btn" onClick={onLogout} aria-label="Logout" />
       </div>
     </header>
   );

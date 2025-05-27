@@ -87,6 +87,7 @@
   margin: 0;
   padding: 0;
   display: block;
+  
 }
 
 .header-user .user-info .role {
@@ -98,21 +99,32 @@
 }
 
 .logout-btn {
-  padding: 6px 12px; /* Reduced padding */
+  width: 38px;
+  height: 38px;
+  padding: 0;
   background-color: transparent;
   border: 1px solid #ddd;
-  border-radius: 4px;
+  border-radius: 50%;
   color: #555;
-  font-weight: bold;
-  font-size: 0.85rem; /* Reduced font size */
   transition: all 0.2s;
-  margin: 0; /* Ensure no margins */
-  white-space: nowrap; /* Prevent text wrapping */
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.logout-btn::before {
+  content: "\f52b"; /* Font Awesome door-open icon */
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900;
+  font-size: 1rem;
 }
 
 .logout-btn:hover {
   background-color: #f8f9fa;
-  border-color: #ccc;
+  border-color: #2296f3;
+  color: #2296f3;
 }
 
 @media (max-width: 768px) {

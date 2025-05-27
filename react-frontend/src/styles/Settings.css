@@ -51,10 +51,12 @@
   margin: 0 0 0.3rem 0;
   font-size: 1.1rem;
   color: #333;
+  text-align: left;
 }
 
 .user-details p {
   margin: 0;
+  text-align: left;
   color: #666;
   font-size: 0.9rem;
 }
