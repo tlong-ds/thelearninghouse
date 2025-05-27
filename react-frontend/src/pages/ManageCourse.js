@@ -3,13 +3,14 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../services/AuthContext';
 import { getAssetPath } from '../utils/assetUtils';
 import Header from '../components/Header';
+import config from '../config';
 import '../styles/ManageCourse.css';
 
 const ManageCourse = () => {
   const { courseId } = useParams();
   const navigate = useNavigate();
   const { currentUser, logout } = useAuth();
-  const [course, setCourse] = useState(null);
+  const [course, setCourse] = useState(null); 
   const [lectures, setLectures] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -24,7 +25,7 @@ const ManageCourse = () => {
     const loadCourseDetails = async () => {
       try {
         // Fetch course details
-        const courseResponse = await fetch(`http://localhost:8503/api/instructor/courses/${courseId}`, {
+        const courseResponse = await fetch(`${config.API_URL}/api/instructor/courses/${courseId}`, {
           credentials: 'include',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
@@ -39,7 +40,7 @@ const ManageCourse = () => {
         setCourse(courseData);
 
         // Fetch lectures for this course
-        const lecturesResponse = await fetch(`http://localhost:8503/api/courses/${courseId}/lectures`, {
+        const lecturesResponse = await fetch(`${config.API_URL}/api/courses/${courseId}/lectures`, {
           credentials: 'include',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
