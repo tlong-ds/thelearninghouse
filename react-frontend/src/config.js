@@ -5,7 +5,7 @@ const config = {
   // API URL for backend services
   API_URL: process.env.REACT_APP_API_URL || 
     (process.env.NODE_ENV === 'production' 
-      ? 'http://localhost:8503' 
+      ? 'https://tlong-ds-thelearninghouse-api.hf.space' 
       : 'http://localhost:8503'),
   
   // Path prefix for assets when deployed on GitHub Pages
