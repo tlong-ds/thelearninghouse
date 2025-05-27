@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../services/AuthContext';
-import { getAssetPath } from '../utils/assetUtils';
 import Header from '../components/Header';
 import config from '../config';
+import { images } from '../utils/images';
 import '../styles/ManageCourse.css';
 
 const ManageCourse = () => {
@@ -97,7 +97,7 @@ const ManageCourse = () => {
           <div className="course-image-container">
             <div className="course-image">
               <img 
-                src={getAssetPath(course.image_url || '/assets/logo_course.webp')} 
+                src={course.image_url || images.logoCourse} 
                 alt={course.name} 
               />
             </div>
