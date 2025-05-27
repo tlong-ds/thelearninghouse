@@ -35,7 +35,7 @@ app = FastAPI()
 # Configure CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000"],  # Your React frontend URL
+    allow_origins=["http://localhost:3000, https://tlong-ds.github.io/thelearninghouse/"],  # Your React frontend URL
     allow_credentials=True,  # Important for cookies
     allow_methods=["*"],
     allow_headers=["*"],
