@@ -1,6 +1,7 @@
 import axios from 'axios';
+import config from '../config';
 
-const BASE_URL = 'http://localhost:8503/api';
+const BASE_URL = `${config.API_URL}/api`;
 
 // Helper function to handle API errors
 const handleApiError = (error) => {

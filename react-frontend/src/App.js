@@ -36,7 +36,7 @@ const ProtectedRoute = ({ children, requiredRole }) => {
 function App() {
   return (
     <AuthProvider>
-      <Router>
+      <Router basename="/thelearninghouse">
         <div className="App">
           <Routes>
             <Route path="/login" element={<Login />} />
