@@ -19,7 +19,6 @@ langsmith
 tf-keras
 lark-parser
 qdrant_client
-redis
 lark
 langchain_huggingface
 altair
@@ -34,3 +33,6 @@ python-multipart
 SQLAlchemy
 aiomysql
 pydantic
+torch
+cryptography
+redis

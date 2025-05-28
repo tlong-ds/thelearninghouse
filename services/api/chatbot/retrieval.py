@@ -18,7 +18,13 @@ from .config import (
     QDRANT_COLLECTION_NAME,
     EMBEDDING_SIZE,
     QDRANT_COLLECTION_NAME_LECTURES,
+    HF_HOME,
+    TRANSFORMERS_CACHE,
+    TORCH_HOME,
+    SENTENCE_TRANSFORMERS_HOME,
+    MPLCONFIGDIR
 )
+from .model_init import embedding_model
 
 load_dotenv()
 
@@ -29,12 +35,6 @@ MYSQL_HOST = os.getenv("MYSQL_HOST")
 MYSQL_DB = os.getenv("MYSQL_DB")
 MYSQL_PORT = int(os.getenv("MYSQL_PORT", 3306))
 
-# Initialize embedding model with a more compatible configuration
-embedding_model = HuggingFaceEmbeddings(
-    model_name="sentence-transformers/all-MiniLM-L6-v2",
-    model_kwargs={'device': 'cpu'},
-    encode_kwargs={'normalize_embeddings': True}
-)
 client = qdrant_client.QdrantClient(QDRANT_HOST, api_key=QDRANT_API_KEY)
 
 def connect_db():

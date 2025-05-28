@@ -45,29 +45,45 @@ export const sendChatMessage = async (message, lectureId = null) => {
 };
 
 // Get chat history for a lecture
-export const getChatHistory = async (lectureId) => {
+export const getChatHistory = async (lectureId = null) => {
   try {
-    const response = await axios.get(`${API_URL}/api/chat/history/${lectureId}`, {
+    const endpoint = lectureId 
+      ? `${API_URL}/api/chat/history/${lectureId}`
+      : `${API_URL}/api/chat/history`;
+    
+    console.log(`Fetching chat history from: ${endpoint}`);
+    
+    const response = await axios.get(endpoint, {
       withCredentials: true,
       headers: getHeaders()
     });
 
+    console.log('Chat history response:', response.data);
     return response.data;
   } catch (error) {
+    console.error('Error fetching chat history:', error);
     throw handleApiError(error);
   }
 };
 
 // Clear chat history
-export const clearChatHistory = async () => {
+export const clearChatHistory = async (lectureId = null) => {
   try {
-    const response = await axios.delete(`${API_URL}/api/chat/history`, {
+    const endpoint = `${API_URL}/api/chat/history`;
+    const params = lectureId ? { lectureId } : {};
+    
+    console.log(`Clearing chat history via: ${endpoint}`, params);
+    
+    const response = await axios.delete(endpoint, {
       withCredentials: true,
-      headers: getHeaders()
+      headers: getHeaders(),
+      params
     });
 
+    console.log('Clear chat response:', response.data);
     return response.data;
   } catch (error) {
+    console.error('Error clearing chat history:', error);
     throw handleApiError(error);
   }
 };

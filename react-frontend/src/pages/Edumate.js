@@ -22,28 +22,61 @@ const Edumate = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  // Extract lectureId from URL query parameters
+  // Extract lectureId from URL query parameters and load chat history
   useEffect(() => {
     const queryParams = new URLSearchParams(location.search);
     const lecId = queryParams.get('lectureId');
-    if (lecId) {
-      setLectureId(lecId);
-      // Add initial message with markdown formatting for lecture-specific context
-      setMessages([{
-        id: Date.now(),
-        content: `# Welcome to Lecture Mode\n\nI'm ready to answer questions about this lecture. What would you like to know?\n\n**Example questions you can ask:**\n\n- Can you summarize the key points?\n- Explain the concept of _X_ mentioned in this lecture\n- How does this relate to other topics?`,
-        isUser: false,
-        timestamp: new Date().toLocaleTimeString()
-      }]);
-    } else {
-      // Add initial welcome message for general mode
-      setMessages([{
-        id: Date.now(),
-        content: `# Welcome to Edumate\n\nI'm your learning assistant. Feel free to ask me anything about your courses!\n\n**Example questions:**\n\n- What courses are available?\n- Help me understand the concept of X\n- Can you explain the relationship between A and B?`,
-        isUser: false,
-        timestamp: new Date().toLocaleTimeString()
-      }]);
-    }
+    setLectureId(lecId);
+    
+    const loadChatHistory = async () => {
+      setLoading(true);
+      try {
+        // Import dynamically to avoid circular dependencies
+        const { getChatHistory } = await import('../services/chatbotAPI');
+        console.log(`Fetching chat history for ${lecId ? `lecture ${lecId}` : 'general chat'}`);
+        
+        const response = await getChatHistory(lecId);
+        console.log('Chat history response:', response);
+        
+        if (response?.history && Array.isArray(response.history) && response.history.length > 0) {
+          console.log(`Found ${response.history.length} messages in history`);
+          
+          // Map the response history to our local format
+          const formattedHistory = response.history.map((msg, index) => ({
+            id: Date.now() - (response.history.length - index),
+            content: msg.content,
+            isUser: Boolean(msg.is_user),
+            timestamp: new Date().toLocaleTimeString()
+          }));
+          
+          setMessages(formattedHistory);
+        } else {
+          console.log('No cached history found, showing welcome message');
+          setMessages([{
+            id: Date.now(),
+            content: lecId 
+              ? `# Welcome to Lecture Mode\n\nI'm ready to answer questions about this lecture. What would you like to know?`
+              : `# Welcome to Edumate\n\nI'm your learning assistant. Feel free to ask me anything about your learning!`,
+            isUser: false,
+            timestamp: new Date().toLocaleTimeString()
+          }]);
+        }
+      } catch (error) {
+        console.error('Failed to load chat history:', error);
+        setMessages([{
+          id: Date.now(),
+          content: lecId 
+            ? `# Welcome to Lecture Mode\n\nI'm ready to answer questions about this lecture. What would you like to know?`
+            : `# Welcome to Edumate\n\nI'm your learning assistant. Feel free to ask me anything about your learning!`,
+          isUser: false,
+          timestamp: new Date().toLocaleTimeString()
+        }]);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    loadChatHistory();
   }, [location.search]);
 
   // Auto scroll to bottom when new messages come in
@@ -60,40 +93,111 @@ const Edumate = () => {
     }]);
   };
 
+  const handleSendMessage = async (message) => {
+    if (!message.trim()) return;
+
+    // Create user message with proper formatting
+    const userMessage = {
+      id: Date.now(),
+      content: message.trim(),
+      isUser: true,
+      timestamp: new Date().toLocaleTimeString()
+    };
+    
+    // Add user message to UI immediately
+    setMessages(prev => [...prev, userMessage]);
+    setLoading(true);
+
+    try {
+      // Send to API and get response (will be cached server-side)
+      const response = await sendChatMessage(message, lectureId);
+      
+      // Add only the bot response to the UI (don't reload entire history)
+      const botMessage = {
+        id: Date.now(),
+        content: response.answer,
+        isUser: false,
+        timestamp: new Date().toLocaleTimeString()
+      };
+      
+      // Append bot message to existing messages
+      setMessages(prev => [...prev, botMessage]);
+    } catch (error) {
+      console.error('Failed to send message:', error);
+      setMessages(prev => [...prev, {
+        id: Date.now(),
+        content: "I apologize, but I encountered an error processing your message. Please try again.",
+        isUser: false,
+        timestamp: new Date().toLocaleTimeString()
+      }]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!inputMessage.trim()) return;
 
     const userMessage = inputMessage.trim();
     setInputMessage('');
-    addMessage(userMessage, true);
     setLoading(true);
 
+    // Create message object with exact formatting
+    const newUserMessage = {
+      id: Date.now(),
+      content: userMessage,
+      isUser: true,
+      timestamp: new Date().toLocaleTimeString()
+    };
+
     try {
+      // Add user message immediately for better UX
+      setMessages(prev => [...prev, newUserMessage]);
+      
+      // Get response without reloading full history
       const response = await sendChatMessage(userMessage, lectureId);
-      addMessage(response.answer);
+      
+      // Add just the bot response
+      const botMessage = {
+        id: Date.now(),
+        content: response.answer,
+        isUser: false,
+        timestamp: new Date().toLocaleTimeString()
+      };
+      
+      setMessages(prev => [...prev, botMessage]);
     } catch (error) {
       console.error('Chat error:', error);
-      addMessage(error.message || "I'm sorry, I'm having trouble responding right now. Please try again later.");
+      setMessages(prev => [...prev, {
+        id: Date.now(),
+        content: error.message || "I'm sorry, I'm having trouble responding right now. Please try again later.",
+        isUser: false,
+        timestamp: new Date().toLocaleTimeString()
+      }]);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleClearChat = async () => {
-    try {
-      await clearChatHistory();
-      setMessages([]);
-      addMessage(
-        lectureId
-          ? `# Chat History Cleared\n\nI'm ready to continue helping with this lecture. What would you like to know?`
-          : `# Chat History Cleared\n\nHow can I help you today?`,
-        false
-      );
-    } catch (error) {
-      console.error('Failed to clear chat history:', error);
-      addMessage("**Error**: Failed to clear chat history. Please try again later.");
-    }
+  const handleClearChat = () => {
+    // Immediately clear UI for better UX
+    setMessages([{
+      id: Date.now(),
+      content: lectureId 
+        ? `# Welcome to Lecture Mode\n\nI'm ready to answer questions about this lecture. What would you like to know?`
+        : `# Welcome to Edumate\n\nI'm your learning assistant. Feel free to ask me anything about your learning!`,
+      isUser: false,
+      timestamp: new Date().toLocaleTimeString()
+    }]);
+    
+    // Clear backend cache without waiting
+    import('../services/chatbotAPI').then(({ clearChatHistory }) => {
+      console.log(`Clearing chat history for ${lectureId ? `lecture ${lectureId}` : 'general chat'}`);
+      clearChatHistory(lectureId)
+        .then(() => console.log('Chat history cleared successfully'))
+        .catch(err => console.error('Failed to clear chat history:', err));
+    });
   };
 
   useEffect(() => {
@@ -150,31 +254,26 @@ const Edumate = () => {
                 className={`message ${msg.isUser ? 'user-message' : 'assistant-message'}`}
               >
                 <div className="message-content">
-                  {msg.isUser ? (
-                    <p>{msg.content}</p>
-                  ) : (
-                    <div className="markdown-wrapper markdown-content">
-                      <ReactMarkdown
-                        remarkPlugins={[remarkGfm, remarkMath]}
-                        rehypePlugins={[rehypeRaw, rehypeKatex]}
-                        components={{
-                          // Apply styling through component mapping rather than className
-                          p: ({node, ...props}) => <p className="md-paragraph" {...props} />,
-                          h1: ({node, ...props}) => <h1 className="md-heading" {...props} />,
-                          h2: ({node, ...props}) => <h2 className="md-heading" {...props} />,
-                          h3: ({node, ...props}) => <h3 className="md-heading" {...props} />,
-                          ul: ({node, ...props}) => <ul className="md-list" {...props} />,
-                          ol: ({node, ...props}) => <ol className="md-list" {...props} />,
-                          li: ({node, ...props}) => <li className="md-list-item" {...props} />,
-                          code: ({node, inline, ...props}) => 
-                            inline ? <code className="md-inline-code" {...props} /> : <code className="md-block-code" {...props} />,
-                          pre: ({node, ...props}) => <pre className="md-pre" {...props} />
-                        }}
-                      >
-                        {msg.content}
-                      </ReactMarkdown>
-                    </div>
-                  )}
+                  <div className={`markdown-wrapper markdown-content ${msg.isUser ? 'user-content' : ''}`}>
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm, remarkMath]}
+                      rehypePlugins={[rehypeRaw, rehypeKatex]}
+                      components={{
+                        p: ({node, ...props}) => <p className="md-paragraph" {...props} />,
+                        h1: ({node, ...props}) => <h1 className="md-heading" {...props} />,
+                        h2: ({node, ...props}) => <h2 className="md-heading" {...props} />,
+                        h3: ({node, ...props}) => <h3 className="md-heading" {...props} />,
+                        ul: ({node, ...props}) => <ul className="md-list" {...props} />,
+                        ol: ({node, ...props}) => <ol className="md-list" {...props} />,
+                        li: ({node, ...props}) => <li className="md-list-item" {...props} />,
+                        code: ({node, inline, ...props}) => 
+                          inline ? <code className="md-inline-code" {...props} /> : <code className="md-block-code" {...props} />,
+                        pre: ({node, ...props}) => <pre className="md-pre" {...props} />
+                      }}
+                    >
+                      {msg.content}
+                    </ReactMarkdown>
+                  </div>
                 </div>
                 <div className="message-timestamp">{msg.timestamp}</div>
               </div>

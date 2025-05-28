@@ -1785,3 +1785,157 @@ async def get_instructor_course_details(
     finally:
         if 'conn' in locals():
             conn.close()
+
+
+# CreateLecture model and create_lecture endpoint to handle lecture creation with video upload and quiz
+class CreateLecture(BaseModel):
+    title: str
+    description: str
+    content: str
+    quiz: Optional[dict] = None
+
+@router.post("/courses/{course_id}/lectures")
+async def create_lecture(
+    request: Request,
+    course_id: int,
+    auth_token: str = Cookie(None),
+    title: str = Form(...),
+    description: str = Form(...),
+    content: str = Form(...),
+    video: Optional[UploadFile] = File(None),
+    quiz: Optional[str] = Form(None)
+):
+    try:
+        # Get token from header if not in cookie
+        if not auth_token:
+            auth_header = request.headers.get('Authorization')
+            if auth_header and auth_header.startswith('Bearer '):
+                auth_token = auth_header.split(' ')[1]
+            else:
+                raise HTTPException(status_code=401, detail="No authentication token provided")
+        
+        # Verify token and get user data
+        try:
+            user_data = decode_token(auth_token)
+            username = user_data['username']
+            role = user_data['role']
+            
+            # Verify user is an instructor
+            if role != "Instructor":
+                raise HTTPException(status_code=403, detail="Only instructors can access this endpoint")
+            
+            # Connect to database
+            conn = connect_db()
+            cursor = conn.cursor(pymysql.cursors.DictCursor)
+            
+            try:
+                # Get instructor ID
+                cursor.execute("""
+                    SELECT InstructorID 
+                    FROM Instructors 
+                    WHERE AccountName = %s
+                """, (username,))
+                
+                instructor = cursor.fetchone()
+                if not instructor:
+                    raise HTTPException(status_code=404, detail="Instructor not found")
+                
+                instructor_id = instructor['InstructorID']
+                
+                # Verify this instructor owns this course
+                cursor.execute("""
+                    SELECT CourseID 
+                    FROM Courses 
+                    WHERE CourseID = %s AND InstructorID = %s
+                """, (course_id, instructor_id))
+                
+                if not cursor.fetchone():
+                    raise HTTPException(status_code=403, detail="Not authorized to modify this course")
+                
+                # Create the lecture
+                cursor.execute("""
+                    INSERT INTO Lectures (CourseID, Title, Description, Content) 
+                    VALUES (%s, %s, %s, %s)
+                """, (course_id, title, description, content))
+                conn.commit()
+                
+                # Get the newly created lecture ID
+                lecture_id = cursor.lastrowid
+                
+                # Upload video if provided
+                if video:
+                    # Check file size (100MB limit)
+                    video_content = await video.read()
+                    if len(video_content) > 100 * 1024 * 1024:  # 100MB in bytes
+                        raise HTTPException(status_code=400, detail="Video file size must be less than 100MB")
+                    
+                    # Check file type
+                    if not video.content_type.startswith('video/'):
+                        raise HTTPException(status_code=400, detail="Invalid file type. Please upload a video file")
+                    
+                    # Upload to S3
+                    media_path = f"videos/cid{course_id}/lid{lecture_id}/vid_lecture.mp4"
+                    s3.put_object(
+                        Bucket="tlhmaterials",
+                        Key=media_path,
+                        Body=video_content,
+                        ContentType=video.content_type,
+                        ACL="public-read",
+                        ContentDisposition="inline"
+                    )
+                
+                # Create quiz if provided
+                if quiz:
+                    quiz_data = json.loads(quiz)
+                    if quiz_data and quiz_data.get('questions'):
+                        # Insert quiz
+                        cursor.execute("""
+                            INSERT INTO Quizzes (LectureID, Title, Description) 
+                            VALUES (%s, %s, %s)
+                        """, (lecture_id, f"Quiz for {title}", description))
+                        conn.commit()
+                        
+                        quiz_id = cursor.lastrowid
+                        
+                        # Insert questions and options
+                        for question in quiz_data['questions']:
+                            cursor.execute("""
+                                INSERT INTO Questions (QuizID, QuestionText) 
+                                VALUES (%s, %s)
+                            """, (quiz_id, question['question']))
+                            conn.commit()
+                            
+                            question_id = cursor.lastrowid
+                            
+                            # Insert options
+                            for i, option in enumerate(question['options']):
+                                cursor.execute("""
+                                    INSERT INTO Options (QuestionID, OptionText, IsCorrect)
+                                    VALUES (%s, %s, %s)
+                                """, (question_id, option, i == question['correctAnswer']))
+                            conn.commit()
+                
+                return {
+                    "id": lecture_id,
+                    "title": title,
+                    "message": "Lecture created successfully"
+                }
+                
+            except HTTPException:
+                raise
+            except Exception as e:
+                print(f"Error in create_lecture: {str(e)}")
+                raise HTTPException(status_code=500, detail=f"Failed to create lecture: {str(e)}")
+            
+        except Exception as e:
+            print(f"Token/user verification error: {str(e)}")
+            raise HTTPException(status_code=401, detail="Invalid authentication token or user not found")
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"Error in create_lecture: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        if 'conn' in locals():
+            conn.close()
