@@ -110,7 +110,7 @@ const Quiz = ({ quiz, lectureId, onQuizComplete }) => {
       {submitted ? (
         <div className="quiz-results">
           <h2>Quiz Results</h2>
-          <p>Your score: {score}%</p>
+          <p>Your score: {score !== null ? score.toFixed(2) : 0}%</p>
           {score >= 70 ? (
             <p className="success-message">Congratulations! You passed the quiz!</p>
           ) : (
