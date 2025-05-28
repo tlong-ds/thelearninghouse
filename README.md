@@ -2,6 +2,8 @@
 
 The Learning House is an online learning platform that supports both learners and instructors. The platform allows users to browse, enroll in, and take courses, while instructors can create and manage their course content.
 
+Demo version: https://tlong-ds.github.io/thelearninghouse/
+
 ## Project Overview
 
 
