@@ -67,11 +67,10 @@ If you prefer to start the services manually:
 ## Migration from Streamlit to React
 
 The project has been migrated from Streamlit to React for:
-
-- Better performance
-- More flexibility in UI design
-- Improved user experience
-- Separation of frontend and backend concerns
+- Improved performance: Faster rendering and better handling of dynamic content.
+- Flexible UI design: More control and customization for complex interfaces.
+- Better user experience: Smoother interactions and real-time updates.
+- Frontend-backend separation: Easier to scale, maintain, and integrate with APIs.
 
 Both versions share the same FastAPI backend to ensure data consistency.
 
