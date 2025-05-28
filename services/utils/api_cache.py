@@ -3,7 +3,7 @@ import json
 import zlib
 import base64
 import time
-from services.config.redis_config import get_redis_client
+from services.config.valkey_config import get_redis_client, is_connection_available
 
 redis_client = get_redis_client()
 
@@ -19,90 +19,117 @@ COMPRESSION_THRESHOLD = 10 * 1024
 
 async def get_cached_data(key, db_fetch_func, ttl=3600, use_compression=False):
     """
-    Get data from Redis cache or database with optional compression
+    Get data from Valkey cache or database with optional compression
     
     Args:
-        key: Redis key
+        key: Valkey key
         db_fetch_func: Function to fetch data from database
         ttl: Time-to-live in seconds
         use_compression: Whether to use compression for large objects
     """
     global cache_hits, cache_misses, cached_data_size, compressed_data_size
     
-    # Check if data is in cache
-    cached_data = redis_client.get(key)
-    if cached_data:
-        # Increment hit counter
-        cache_hits += 1
-        print(f"Cache HIT: {key}")
+    # If Valkey is not available, fetch directly from database
+    if not is_connection_available() or not redis_client:
+        print(f"Cache DISABLED: {key} - fetching from database")
+        cache_misses += 1
+        return await db_fetch_func()
+    
+    try:
+        # Check if data is in cache
+        cached_data = redis_client.get(key)
+        if cached_data:
+            # Increment hit counter
+            cache_hits += 1
+            print(f"Cache HIT: {key}")
+            
+            # Check if data is compressed (starts with special prefix)
+            if isinstance(cached_data, bytes) and cached_data.startswith(b'COMPRESSED:'):
+                # Remove prefix and decompress
+                compressed_data = base64.b64decode(cached_data[11:])
+                decompressed_data = zlib.decompress(compressed_data)
+                return json.loads(decompressed_data.decode('utf-8'))
+            else:
+                # Regular non-compressed data
+                return json.loads(cached_data)
         
-        # Check if data is compressed (starts with special prefix)
-        if isinstance(cached_data, bytes) and cached_data.startswith(b'COMPRESSED:'):
-            # Remove prefix and decompress
-            compressed_data = base64.b64decode(cached_data[11:])
-            decompressed_data = zlib.decompress(compressed_data)
-            return json.loads(decompressed_data.decode('utf-8'))
+        # Increment miss counter
+        cache_misses += 1
+        print(f"Cache MISS: {key}")
+        
+        # Fetch data from database
+        data = await db_fetch_func()
+        
+        # Serialize the data
+        serialized_data = json.dumps(data)
+        serialized_bytes = serialized_data.encode('utf-8')
+        
+        # Track original size
+        original_size = len(serialized_bytes)
+        cached_data_size += original_size
+        
+        # Decide whether to compress based on size and flag
+        if use_compression and original_size > COMPRESSION_THRESHOLD:
+            # Compress data
+            compressed_data = zlib.compress(serialized_bytes)
+            encoded_data = base64.b64encode(compressed_data)
+            
+            # Store with a prefix to indicate compression
+            redis_value = b'COMPRESSED:' + encoded_data
+            
+            # Track compressed size
+            compressed_size = len(redis_value)
+            compressed_data_size += compressed_size
+            
+            # Calculate compression ratio
+            ratio = (compressed_size / original_size) * 100
+            print(f"Compressed {key}: {original_size} -> {compressed_size} bytes ({ratio:.2f}%)")
+            
+            # Store compressed data in Valkey
+            redis_client.setex(key, ttl, redis_value)
         else:
-            # Regular non-compressed data
-            return json.loads(cached_data)
-    
-    # Increment miss counter
-    cache_misses += 1
-    print(f"Cache MISS: {key}")
-    
-    # Fetch data from database
-    data = await db_fetch_func()
-    
-    # Serialize the data
-    serialized_data = json.dumps(data)
-    serialized_bytes = serialized_data.encode('utf-8')
-    
-    # Track original size
-    original_size = len(serialized_bytes)
-    cached_data_size += original_size
-    
-    # Decide whether to compress based on size and flag
-    if use_compression and original_size > COMPRESSION_THRESHOLD:
-        # Compress data
-        compressed_data = zlib.compress(serialized_bytes)
-        encoded_data = base64.b64encode(compressed_data)
+            # Store regular data
+            redis_client.setex(key, ttl, serialized_data)
         
-        # Store with a prefix to indicate compression
-        redis_value = b'COMPRESSED:' + encoded_data
-        
-        # Track compressed size
-        compressed_size = len(redis_value)
-        compressed_data_size += compressed_size
-        
-        # Calculate compression ratio
-        ratio = (compressed_size / original_size) * 100
-        print(f"Compressed {key}: {original_size} -> {compressed_size} bytes ({ratio:.2f}%)")
-        
-        # Store compressed data in Redis
-        redis_client.setex(key, ttl, redis_value)
-    else:
-        # Store regular data
-        redis_client.setex(key, ttl, serialized_data)
+        return data
     
-    return data
+    except Exception as e:
+        print(f"Cache ERROR for {key}: {e}")
+        print("Falling back to database")
+        cache_misses += 1
+        return await db_fetch_func()
 
 def invalidate_cache(keys):
     """Delete multiple cache keys"""
-    if keys:
-        redis_client.delete(*keys)
+    if not is_connection_available() or not redis_client:
+        print("Cache DISABLED: Cannot invalidate cache keys")
+        return
+    
+    try:
+        if keys:
+            redis_client.delete(*keys)
+    except Exception as e:
+        print(f"Cache invalidation ERROR: {e}")
 
 def invalidate_cache_pattern(pattern):
     """
     Delete all cache keys matching a pattern
     For example: 'user:profile:*' to delete all user profiles
     """
-    cursor = 0
-    while True:
-        cursor, keys = redis_client.scan(cursor, match=pattern, count=100)
-        if keys:
-            redis_client.delete(*keys)
-        if cursor == 0:
-            break
+    if not is_connection_available() or not redis_client:
+        print("Cache DISABLED: Cannot invalidate cache pattern")
+        return
+    
+    try:
+        cursor = 0
+        while True:
+            cursor, keys = redis_client.scan(cursor, match=pattern, count=100)
+            if keys:
+                redis_client.delete(*keys)
+            if cursor == 0:
+                break
+    except Exception as e:
+        print(f"Cache pattern invalidation ERROR: {e}")
 
 def get_cache_metrics():
     """Get cache hit/miss metrics and efficiency statistics"""

@@ -106,7 +106,7 @@ async def clear_history_endpoint(request: Request, auth_token: str = Cookie(None
             print(f"Token decode error: {str(e)}")
             raise HTTPException(status_code=401, detail="Invalid authentication token")
         
-        # Clear Redis cache
+        # Clear Valkey cache
         clear_user_chat_history(username)
         
         # Clear memory-based chat histories based on lectureId
@@ -152,7 +152,7 @@ async def get_history_endpoint(
             print(f"Token decode error: {str(e)}")
             raise HTTPException(status_code=401, detail="Invalid authentication token")
         
-        # Get chat history from Redis
+        # Get chat history from Valkey
         chat_history = get_chat_history(username)
         
         # Return the chat history - make sure formatting is consistent
@@ -188,7 +188,7 @@ async def get_general_history_endpoint(
             print(f"Token decode error: {str(e)}")
             raise HTTPException(status_code=401, detail="Invalid authentication token")
         
-        # Get chat history from Redis
+        # Get chat history from Valkey
         chat_history = get_chat_history(username)
         
         # Return the chat history with a debugging message

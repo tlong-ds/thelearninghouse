@@ -35,4 +35,4 @@ aiomysql
 pydantic
 torch
 cryptography
-redis
+valkey

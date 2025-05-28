@@ -12,10 +12,10 @@ from botocore.exceptions import ClientError
 from datetime import datetime
 from fastapi.middleware.cors import CORSMiddleware
 from services.utils.cache_utils import cache_data, cache_with_fallback, clear_cache
-from services.config.redis_config import get_redis_client
+from services.config.valkey_config import get_redis_client
 from services.utils.api_cache import get_cached_data, invalidate_cache
 
-# Get Redis client
+# Get Valkey client
 redis_client = get_redis_client()
 
 # Load environment variables
@@ -25,6 +25,9 @@ MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD")
 MYSQL_HOST = os.getenv("MYSQL_HOST", "localhost")
 MYSQL_DB = os.getenv("MYSQL_DB")
 MYSQL_PORT = int(os.getenv("MYSQL_PORT", "3306"))
+SSL = {
+    "ca": os.path.join(os.path.dirname(__file__), "ca.pem")
+}
 
 # AWS Configuration
 AWS_ACCESS_KEY = os.getenv("AWS_ACCESS_KEY_ID")
@@ -56,7 +59,8 @@ def connect_db():
             user=MYSQL_USER,
             password=MYSQL_PASSWORD,
             database=MYSQL_DB,
-            port=MYSQL_PORT
+            port=MYSQL_PORT,
+            ssl=False
         )
         print("Database connection successful")
         return connection
@@ -180,7 +184,7 @@ async def get_courses(request: Request, auth_token: str = Cookie(None)):
                 
             return courses
         
-        # Use the cached data helper to implement the Redis caching pattern
+        # Use the cached data helper to implement the Valkey caching pattern
         return await get_cached_data(cache_key, fetch_courses_from_db, ttl=3600)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -255,7 +259,7 @@ async def get_course_details(request: Request, course_id: int, auth_token: str =
                 
             return course
         
-        # Use the cached data helper to implement the Redis caching pattern
+        # Use the cached data helper to implement the Valkey caching pattern
         return await get_cached_data(cache_key, fetch_course_from_db, ttl=3600)
     except HTTPException:
         raise
@@ -695,7 +699,7 @@ async def create_course(
                 if not new_course:
                     raise HTTPException(status_code=500, detail="Course was created but couldn't be retrieved")
                 
-                # Invalidate Redis cache for all courses
+                # Invalidate Valkey cache for all courses
                 redis_client = get_redis_client()
                 pattern_all = "courses:all:*"
                 print(f"Invalidating cache pattern: {pattern_all}")
@@ -792,7 +796,7 @@ async def enroll_in_course(
                 
                 conn.commit()
                 
-                # Invalidate Redis cache for this course and all courses
+                # Invalidate Valkey cache for this course and all courses
                 redis_client = get_redis_client()
                 # Clear specific course cache for all users
                 pattern_course = f"courses:id:{course_id}:*"
@@ -975,7 +979,7 @@ async def get_user_profile(
                     if 'conn' in locals():
                         conn.close()
                 
-            # Use the cached data helper to implement the Redis caching pattern
+            # Use the cached data helper to implement the Valkey caching pattern
             return await get_cached_data(cache_key, fetch_profile_from_db, ttl=1800)  # 30 minutes TTL
                 
         except Exception as e:
