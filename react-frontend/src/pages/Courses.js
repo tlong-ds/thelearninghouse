@@ -44,10 +44,12 @@ const Courses = () => {
   
   useEffect(() => {
     const loadCourses = async () => {
+      setLoading(true);
+      setError('');
       try {
         let coursesData;
         
-        if (currentUser.role === 'Learner') {
+        if (currentUser?.role === 'Learner') {
           coursesData = await fetchCourses();
         } else {
           coursesData = await fetchInstructorCourses();

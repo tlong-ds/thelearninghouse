@@ -6,7 +6,9 @@ const config = {
   API_URL: process.env.REACT_APP_API_URL || 
     (process.env.NODE_ENV === 'production' 
       ? 'https://tlong-ds-thelearninghouse-api.hf.space' 
-      : 'http://localhost:8503'),
+      : window.location.hostname === 'localhost' 
+        ? 'http://localhost:8503'
+        : `${window.location.protocol}//${window.location.hostname}:8503`),
   
   // Path prefix for assets when deployed on GitHub Pages
   ASSETS_PATH: process.env.REACT_APP_ASSETS_PATH || 

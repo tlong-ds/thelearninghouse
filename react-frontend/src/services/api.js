@@ -9,6 +9,42 @@ const apiClient = axios.create({
   withCredentials: true,
 });
 
+// Add loading state to requests
+apiClient.interceptors.request.use(
+  async (config) => {
+    // Get loading functions from context
+    const loadingState = window.__loadingState;
+    if (loadingState?.startLoading) {
+      loadingState.startLoading();
+    }
+    return config;
+  },
+  (error) => {
+    const loadingState = window.__loadingState;
+    if (loadingState?.stopLoading) {
+      loadingState.stopLoading();
+    }
+    return Promise.reject(error);
+  }
+);
+
+apiClient.interceptors.response.use(
+  (response) => {
+    const loadingState = window.__loadingState;
+    if (loadingState?.stopLoading) {
+      loadingState.stopLoading();
+    }
+    return response;
+  },
+  (error) => {
+    const loadingState = window.__loadingState;
+    if (loadingState?.stopLoading) {
+      loadingState.stopLoading();
+    }
+    return Promise.reject(error);
+  }
+);
+
 // Add interceptor to include auth token in requests
 apiClient.interceptors.request.use(
   (config) => {
@@ -131,7 +167,7 @@ export const fetchUserProfile = async () => {
 
 export const fetchEnrolledCourses = async () => {
   try {
-    const response = await apiClient.get('/api/user/courses');
+    const response = await apiClient.get('/api/learner/courses');
     return response.data;
   } catch (error) {
     console.error('Error fetching enrolled courses:', error);
@@ -141,7 +177,7 @@ export const fetchEnrolledCourses = async () => {
 
 export const fetchDashboardData = async () => {
   try {
-    const response = await apiClient.get('/api/user/dashboard');
+    const response = await apiClient.get('/api/learner/dashboard');
     return response.data;
   } catch (error) {
     console.error('Error fetching dashboard data:', error);
@@ -194,7 +230,7 @@ export const fetchQuizResults = async (lectureId) => {
 
 export const changePassword = async ({ currentPassword, newPassword }) => {
   try {
-    const response = await apiClient.put('/api/user/password', {
+    const response = await apiClient.put('/api/learner/password', {
       current_password: currentPassword,
       new_password: newPassword
     });

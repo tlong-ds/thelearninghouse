@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, Cookie, UploadFile, File, Form
-from typing import List, Optional, Dict
+from typing import List, Optional, Dict, Any, Callable
 from pydantic import BaseModel
 from services.api.db.token_utils import decode_token
 from dotenv import load_dotenv
@@ -11,6 +11,12 @@ import json
 from botocore.exceptions import ClientError
 from datetime import datetime
 from fastapi.middleware.cors import CORSMiddleware
+from services.utils.cache_utils import cache_data, cache_with_fallback, clear_cache
+from services.config.redis_config import get_redis_client
+from services.utils.api_cache import get_cached_data, invalidate_cache
+
+# Get Redis client
+redis_client = get_redis_client()
 
 # Load environment variables
 load_dotenv()
@@ -121,53 +127,61 @@ async def get_courses(request: Request, auth_token: str = Cookie(None)):
             print(f"Token decode error: {str(e)}")
             raise HTTPException(status_code=401, detail="Invalid authentication token")
         
-        conn = connect_db()
-        courses = []
+        # Create a unique cache key using the user's ID
+        cache_key = f"courses:all:user:{user_data.get('user_id', 'anonymous')}"
         
-        try:
-            with conn.cursor(pymysql.cursors.DictCursor) as cursor:
-                query = """
-                SELECT 
-                    c.CourseID as id, 
-                    c.CourseName as name, 
-                    CONCAT(i.InstructorName, ' (', i.AccountName, ')') as instructor,
-                    c.Descriptions as description
-                FROM Courses c
-                JOIN Instructors i ON c.InstructorID = i.InstructorID
-                """
-                cursor.execute(query)
-                courses = cursor.fetchall()
-                
-                # Get ratings for each course
-                for course in courses:
-                    cursor.execute("""
-                    SELECT AVG(Rating) as avg_rating, COUNT(*) as count
-                    FROM Enrollments
-                    WHERE CourseID = %s AND Rating IS NOT NULL
-                    """, (course['id'],))
-                    
-                    rating_data = cursor.fetchone()
-                    if rating_data and rating_data['avg_rating']:
-                        course['rating'] = float(rating_data['avg_rating'])
-                    else:
-                        course['rating'] = None
-                        
-                    # Get enrollment count
-                    cursor.execute("""
-                    SELECT COUNT(*) as enrolled
-                    FROM Enrollments
-                    WHERE CourseID = %s
-                    """, (course['id'],))
-                    
-                    enrolled_data = cursor.fetchone()
-                    if enrolled_data:
-                        course['enrolled'] = enrolled_data['enrolled']
-                    else:
-                        course['enrolled'] = 0
-        finally:
-            conn.close()
+        # Define the database fetch function
+        async def fetch_courses_from_db():
+            conn = connect_db()
+            courses = []
             
-        return courses
+            try:
+                with conn.cursor(pymysql.cursors.DictCursor) as cursor:
+                    query = """
+                    SELECT 
+                        c.CourseID as id, 
+                        c.CourseName as name, 
+                        CONCAT(i.InstructorName, ' (', i.AccountName, ')') as instructor,
+                        c.Descriptions as description
+                    FROM Courses c
+                    JOIN Instructors i ON c.InstructorID = i.InstructorID
+                    """
+                    cursor.execute(query)
+                    courses = cursor.fetchall()
+                    
+                    # Get ratings for each course
+                    for course in courses:
+                        cursor.execute("""
+                        SELECT AVG(Rating) as avg_rating, COUNT(*) as count
+                        FROM Enrollments
+                        WHERE CourseID = %s AND Rating IS NOT NULL
+                        """, (course['id'],))
+                        
+                        rating_data = cursor.fetchone()
+                        if rating_data and rating_data['avg_rating']:
+                            course['rating'] = float(rating_data['avg_rating'])
+                        else:
+                            course['rating'] = None
+                            
+                        # Get enrollment count
+                        cursor.execute("""
+                        SELECT COUNT(*) as enrolled
+                        FROM Enrollments
+                        WHERE CourseID = %s
+                        """, (course['id'],))
+                        
+                        enrolled_data = cursor.fetchone()
+                        if enrolled_data:
+                            course['enrolled'] = enrolled_data['enrolled']
+                        else:
+                            course['enrolled'] = 0
+            finally:
+                conn.close()
+                
+            return courses
+        
+        # Use the cached data helper to implement the Redis caching pattern
+        return await get_cached_data(cache_key, fetch_courses_from_db, ttl=3600)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -191,50 +205,58 @@ async def get_course_details(request: Request, course_id: int, auth_token: str =
             print(f"Token decode error: {str(e)}")
             raise HTTPException(status_code=401, detail="Invalid authentication token")
         
-        conn = connect_db()
-        course = None
+        # Create a unique cache key using the course ID and user ID
+        cache_key = f"courses:id:{course_id}:user:{user_data.get('user_id', 'anonymous')}"
         
-        try:
-            with conn.cursor(pymysql.cursors.DictCursor) as cursor:
-                # First check if course exists
-                query = """
-                SELECT 
-                    c.CourseID as id, 
-                    c.CourseName as name, 
-                    CONCAT(i.InstructorName, ' (', i.AccountName, ')') as instructor,
-                    c.Descriptions as description
-                FROM Courses c
-                JOIN Instructors i ON c.InstructorID = i.InstructorID
-                WHERE c.CourseID = %s
-                """
-                cursor.execute(query, (course_id,))
-                course = cursor.fetchone()
-                
-                if not course:
-                    raise HTTPException(status_code=404, detail=f"Course with ID {course_id} not found")
-                
-                # Get ratings and enrollment count in one query
-                cursor.execute("""
-                SELECT 
-                    COUNT(*) as enrolled,
-                    COALESCE(AVG(Rating), 0) as avg_rating,
-                    COUNT(CASE WHEN Rating IS NOT NULL THEN 1 END) as rating_count
-                FROM Enrollments 
-                WHERE CourseID = %s
-                """, (course_id,))
-                
-                stats = cursor.fetchone()
-                if stats:
-                    course['enrolled'] = stats['enrolled']
-                    course['rating'] = float(stats['avg_rating']) if stats['rating_count'] > 0 else None
-                else:
-                    course['enrolled'] = 0
-                    course['rating'] = None
-                
-        finally:
-            conn.close()
+        # Define the database fetch function
+        async def fetch_course_from_db():
+            conn = connect_db()
+            course = None
             
-        return course
+            try:
+                with conn.cursor(pymysql.cursors.DictCursor) as cursor:
+                    # First check if course exists
+                    query = """
+                    SELECT 
+                        c.CourseID as id, 
+                        c.CourseName as name, 
+                        CONCAT(i.InstructorName, ' (', i.AccountName, ')') as instructor,
+                        c.Descriptions as description
+                    FROM Courses c
+                    JOIN Instructors i ON c.InstructorID = i.InstructorID
+                    WHERE c.CourseID = %s
+                    """
+                    cursor.execute(query, (course_id,))
+                    course = cursor.fetchone()
+                    
+                    if not course:
+                        raise HTTPException(status_code=404, detail=f"Course with ID {course_id} not found")
+                    
+                    # Get ratings and enrollment count in one query
+                    cursor.execute("""
+                    SELECT 
+                        COUNT(*) as enrolled,
+                        COALESCE(AVG(Rating), 0) as avg_rating,
+                        COUNT(CASE WHEN Rating IS NOT NULL THEN 1 END) as rating_count
+                    FROM Enrollments 
+                    WHERE CourseID = %s
+                    """, (course_id,))
+                    
+                    stats = cursor.fetchone()
+                    if stats:
+                        course['enrolled'] = stats['enrolled']
+                        course['rating'] = float(stats['avg_rating']) if stats['rating_count'] > 0 else None
+                    else:
+                        course['enrolled'] = 0
+                        course['rating'] = None
+                    
+            finally:
+                conn.close()
+                
+            return course
+        
+        # Use the cached data helper to implement the Redis caching pattern
+        return await get_cached_data(cache_key, fetch_course_from_db, ttl=3600)
     except HTTPException:
         raise
     except Exception as e:
@@ -260,38 +282,46 @@ async def get_course_lectures(request: Request, course_id: int, auth_token: str 
             print(f"Token decode error: {str(e)}")
             raise HTTPException(status_code=401, detail="Invalid authentication token")
         
-        conn = connect_db()
-        lectures = []
+        # Create cache key using course ID and user ID
+        cache_key = f"courses:id:{course_id}:lectures:user:{user_data.get('user_id', 'anonymous')}"
         
-        try:
-            with conn.cursor(pymysql.cursors.DictCursor) as cursor:
-                # First verify the course exists
-                cursor.execute("SELECT CourseID FROM Courses WHERE CourseID = %s", (course_id,))
-                if not cursor.fetchone():
-                    raise HTTPException(status_code=404, detail="Course not found")
-
-                query = """
-                SELECT 
-                    LectureID as id, 
-                    CourseID as courseId,
-                    Title as title, 
-                    Description as description
-                FROM Lectures
-                WHERE CourseID = %s
-                ORDER BY LectureID
-                """
-                cursor.execute(query, (course_id,))
-                lectures = cursor.fetchall()
-                
-                # Ensure all fields match the Lecture model
-                for lecture in lectures:
-                    # Ensure the fields exist and have appropriate null values if missing
-                    if lecture.get('description') is None:
-                        lecture['description'] = None
-        finally:
-            conn.close()
+        # Define database fetch function
+        async def fetch_lectures_from_db():
+            conn = connect_db()
+            lectures = []
             
-        return lectures
+            try:
+                with conn.cursor(pymysql.cursors.DictCursor) as cursor:
+                    # First verify the course exists
+                    cursor.execute("SELECT CourseID FROM Courses WHERE CourseID = %s", (course_id,))
+                    if not cursor.fetchone():
+                        raise HTTPException(status_code=404, detail="Course not found")
+
+                    query = """
+                    SELECT 
+                        LectureID as id, 
+                        CourseID as courseId,
+                        Title as title, 
+                        Description as description
+                    FROM Lectures
+                    WHERE CourseID = %s
+                    ORDER BY LectureID
+                    """
+                    cursor.execute(query, (course_id,))
+                    lectures = cursor.fetchall()
+                    
+                    # Ensure all fields match the Lecture model
+                    for lecture in lectures:
+                        # Ensure the fields exist and have appropriate null values if missing
+                        if lecture.get('description') is None:
+                            lecture['description'] = None
+            finally:
+                conn.close()
+                
+            return lectures
+            
+        # Use cached data helper
+        return await get_cached_data(cache_key, fetch_lectures_from_db, ttl=3600)
     except HTTPException:
         raise
     except Exception as e:
@@ -318,9 +348,15 @@ async def get_lecture_details(request: Request, lecture_id: int, auth_token: str
             print(f"Token decode error: {str(e)}")
             raise HTTPException(status_code=401, detail="Invalid authentication token")
         
-        conn = connect_db()
-        try:
-            with conn.cursor(pymysql.cursors.DictCursor) as cursor:
+        # Create cache key using lecture ID and user ID
+        cache_key = f"lectures:id:{lecture_id}:user:{user_data.get('user_id', 'anonymous')}"
+        
+        # Define database fetch function
+        async def fetch_lecture_from_db():
+            conn = connect_db()
+            cursor = None
+            try:
+                cursor = conn.cursor(pymysql.cursors.DictCursor)
                 # Get lecture details with course data
                 query = """
                 SELECT 
@@ -341,7 +377,7 @@ async def get_lecture_details(request: Request, lecture_id: int, auth_token: str
                 
                 if not lecture:
                     raise HTTPException(status_code=404, detail="Lecture not found")
-                
+            
                 # Get course lectures
                 cursor.execute("""
                 SELECT 
@@ -445,9 +481,19 @@ async def get_lecture_details(request: Request, lecture_id: int, auth_token: str
                     response_data['quiz'] = quiz
                 
                 return response_data
-                
-        finally:
-            conn.close()
+            finally:
+                if cursor:
+                    cursor.close()
+                if conn:
+                    conn.close()
+        
+        # Use the caching mechanism to get the data
+        return await get_cached_data(
+            cache_key,
+            fetch_lecture_from_db,
+            ttl=3600,  # Cache for 1 hour
+            use_compression=True  # Enable compression for large response
+        )
             
     except HTTPException:
         raise
@@ -480,60 +526,74 @@ async def get_instructor_courses(
             if role != "Instructor":
                 raise HTTPException(status_code=403, detail="Only instructors can access this endpoint")
             
-            # Connect to database
-            conn = connect_db()
+            # Create a cache key for instructor courses
+            cache_key = f"instructor:courses:{username}"
             
-            with conn.cursor(pymysql.cursors.DictCursor) as cursor:
-                # Get instructor ID
-                cursor.execute("""
-                    SELECT InstructorID 
-                    FROM Instructors 
-                    WHERE AccountName = %s
-                """, (username,))
-                
-                instructor = cursor.fetchone()
-                if not instructor:
-                    raise HTTPException(status_code=404, detail="Instructor not found")
-                
-                instructor_id = instructor['InstructorID']
-                
-                # Get courses by this instructor
-                query = """
-                    SELECT 
-                        c.CourseID as id, 
-                        c.CourseName as name, 
-                        CONCAT(i.InstructorName, ' (', i.AccountName, ')') as instructor,
-                        c.Descriptions as description,
-                        (SELECT COUNT(*) FROM Enrollments WHERE CourseID = c.CourseID) as enrolled,
-                        COALESCE(
-                            (SELECT AVG(Rating) 
-                             FROM Enrollments 
-                             WHERE CourseID = c.CourseID AND Rating IS NOT NULL),
-                            0
-                        ) as rating
-                    FROM Courses c
-                    JOIN Instructors i ON c.InstructorID = i.InstructorID
-                    WHERE c.InstructorID = %s
-                    ORDER BY c.CourseID DESC
-                """
-                
-                cursor.execute(query, (instructor_id,))
-                courses = cursor.fetchall()
-                
-                # Format the courses data
-                formatted_courses = []
-                for course in courses:
-                    formatted_course = {
-                        'id': course['id'],
-                        'name': course['name'],
-                        'instructor': course['instructor'],
-                        'description': course['description'],
-                        'enrolled': course['enrolled'],
-                        'rating': float(course['rating']) if course['rating'] else None
-                    }
-                    formatted_courses.append(formatted_course)
-                
-                return formatted_courses
+            # Define database fetch function
+            async def fetch_instructor_courses_from_db():
+                conn = connect_db()
+                try:
+                    with conn.cursor(pymysql.cursors.DictCursor) as cursor:
+                        # Get instructor ID
+                        cursor.execute("""
+                            SELECT InstructorID 
+                            FROM Instructors 
+                            WHERE AccountName = %s
+                        """, (username,))
+                        
+                        instructor = cursor.fetchone()
+                        if not instructor:
+                            raise HTTPException(status_code=404, detail="Instructor not found")
+                        
+                        instructor_id = instructor['InstructorID']
+                        
+                        # Get courses by this instructor
+                        query = """
+                            SELECT 
+                                c.CourseID as id, 
+                                c.CourseName as name, 
+                                CONCAT(i.InstructorName, ' (', i.AccountName, ')') as instructor,
+                                c.Descriptions as description,
+                                (SELECT COUNT(*) FROM Enrollments WHERE CourseID = c.CourseID) as enrolled,
+                                COALESCE(
+                                    (SELECT AVG(Rating) 
+                                     FROM Enrollments 
+                                     WHERE CourseID = c.CourseID AND Rating IS NOT NULL),
+                                    0
+                                ) as rating
+                            FROM Courses c
+                            JOIN Instructors i ON c.InstructorID = i.InstructorID
+                            WHERE c.InstructorID = %s
+                            ORDER BY c.CourseID DESC
+                        """
+                        
+                        cursor.execute(query, (instructor_id,))
+                        courses = cursor.fetchall()
+                        
+                        # Format the courses data
+                        formatted_courses = []
+                        for course in courses:
+                            formatted_course = {
+                                'id': course['id'],
+                                'name': course['name'],
+                                'instructor': course['instructor'],
+                                'description': course['description'],
+                                'enrolled': course['enrolled'],
+                                'rating': float(course['rating']) if course['rating'] else None
+                            }
+                            formatted_courses.append(formatted_course)
+                        
+                        return formatted_courses
+                finally:
+                    conn.close()
+            
+            # Use the caching mechanism to get the data
+            return await get_cached_data(
+                cache_key,
+                fetch_instructor_courses_from_db,
+                ttl=1800,  # Cache for 30 minutes
+                use_compression=True  # Enable compression for large response
+            )
                 
         except Exception as e:
             print(f"Database error: {str(e)}")
@@ -544,9 +604,6 @@ async def get_instructor_courses(
     except Exception as e:
         print(f"Error fetching instructor courses: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        if 'conn' in locals():
-            conn.close()
 
 # Create a new course
 class CourseCreate(BaseModel):
@@ -638,6 +695,12 @@ async def create_course(
                 if not new_course:
                     raise HTTPException(status_code=500, detail="Course was created but couldn't be retrieved")
                 
+                # Invalidate Redis cache for all courses
+                redis_client = get_redis_client()
+                pattern_all = "courses:all:*"
+                print(f"Invalidating cache pattern: {pattern_all}")
+                invalidate_cache([pattern_all])
+                
                 return new_course
                 
         except Exception as e:
@@ -728,6 +791,15 @@ async def enroll_in_course(
                 )
                 
                 conn.commit()
+                
+                # Invalidate Redis cache for this course and all courses
+                redis_client = get_redis_client()
+                # Clear specific course cache for all users
+                pattern_course = f"courses:id:{course_id}:*"
+                pattern_all = "courses:all:*"
+                print(f"Invalidating cache patterns: {pattern_course} and {pattern_all}")
+                invalidate_cache([pattern_course, pattern_all])
+                
                 return {"message": "Successfully enrolled in the course"}
             except Exception as e:
                 conn.rollback()
@@ -743,8 +815,8 @@ async def enroll_in_course(
         if 'conn' in locals():
             conn.close()
 
-# Get enrolled courses for the current user
-@router.get("/user/courses", response_model=List[Course])
+# Get enrolled courses for the current learner
+@router.get("/learner/courses", response_model=List[Course])
 async def get_enrolled_courses(
     request: Request,
     auth_token: str = Cookie(None)
@@ -854,46 +926,57 @@ async def get_user_profile(
             username = user_data['username']
             role = user_data['role']
             
-            # Connect to database
-            conn = connect_db()
+            # Create a unique cache key for this user's profile
+            cache_key = f"user:profile:{username}:{role}"
             
-            # Get user information based on role
-            with conn.cursor(pymysql.cursors.DictCursor) as cursor:
-                if role == "Learner":
-                    cursor.execute("""
-                        SELECT 
-                            LearnerName as name,
-                            Email as email,
-                            PhoneNumber as phoneNumber
-                        FROM Learners
-                        WHERE AccountName = %s
-                    """, (username,))
-                    user_info = cursor.fetchone()
-                    
-                    if not user_info:
-                        raise HTTPException(status_code=404, detail="Learner not found")
+            # Define the database fetch function
+            async def fetch_profile_from_db():
+                # Connect to database
+                conn = connect_db()
+                try:
+                    # Get user information based on role
+                    with conn.cursor(pymysql.cursors.DictCursor) as cursor:
+                        if role == "Learner":
+                            cursor.execute("""
+                                SELECT 
+                                    LearnerName as name,
+                                    Email as email,
+                                    PhoneNumber as phoneNumber
+                                FROM Learners
+                                WHERE AccountName = %s
+                            """, (username,))
+                            user_info = cursor.fetchone()
+                            
+                            if not user_info:
+                                raise HTTPException(status_code=404, detail="Learner not found")
+                                
+                        elif role == "Instructor":
+                            cursor.execute("""
+                                SELECT 
+                                    InstructorName as name,
+                                    Email as email,
+                                    Expertise as expertise
+                                FROM Instructors
+                                WHERE AccountName = %s
+                            """, (username,))
+                            user_info = cursor.fetchone()
+                            
+                            if not user_info:
+                                raise HTTPException(status_code=404, detail="Instructor not found")
+                        else:
+                            raise HTTPException(status_code=403, detail="Invalid user role")
                         
-                elif role == "Instructor":
-                    cursor.execute("""
-                        SELECT 
-                            InstructorName as name,
-                            Email as email,
-                            Expertise as expertise
-                        FROM Instructors
-                        WHERE AccountName = %s
-                    """, (username,))
-                    user_info = cursor.fetchone()
-                    
-                    if not user_info:
-                        raise HTTPException(status_code=404, detail="Instructor not found")
-                else:
-                    raise HTTPException(status_code=403, detail="Invalid user role")
+                        # Add role and username to the response
+                        user_info['role'] = role
+                        user_info['username'] = username
+                        
+                        return user_info
+                finally:
+                    if 'conn' in locals():
+                        conn.close()
                 
-                # Add role and username to the response
-                user_info['role'] = role
-                user_info['username'] = username
-                
-                return user_info
+            # Use the cached data helper to implement the Redis caching pattern
+            return await get_cached_data(cache_key, fetch_profile_from_db, ttl=1800)  # 30 minutes TTL
                 
         except Exception as e:
             print(f"Token/user verification error: {str(e)}")
@@ -904,8 +987,7 @@ async def get_user_profile(
         print(f"Error fetching user profile: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error fetching user profile: {str(e)}")
     finally:
-        if 'conn' in locals():
-            conn.close()
+        pass  # Connection is closed in the fetch function
 
 # Update user profile
 @router.put("/user/profile")
@@ -1017,8 +1099,8 @@ async def update_user_profile(
             conn.close()
 
 # Get dashboard data for the current user
-@router.get("/user/dashboard")
-async def get_user_dashboard(
+@router.get("/learner/dashboard")
+async def get_learner_dashboard(
     request: Request,
     auth_token: str = Cookie(None)
 ):
@@ -1558,33 +1640,47 @@ async def get_quiz_results(
             
         try:
             user_data = decode_token(auth_token)
+            user_id = user_data.get("id")
+            
+            # Create a cache key based on user ID and lecture ID
+            cache_key = f"quiz:results:lecture:{lecture_id}:learner:{user_id}"
+            
+            # Define the database fetch function
+            async def fetch_quiz_results_from_db():
+                conn = connect_db()
+                try:
+                    with conn.cursor(pymysql.cursors.DictCursor) as cursor:
+                        cursor.execute("""
+                            SELECT Score, State, Date
+                            FROM LectureResults
+                            WHERE LearnerID = %s AND LectureID = %s
+                            ORDER BY Date DESC
+                            LIMIT 1
+                        """, (user_id, lecture_id))
+                        
+                        result = cursor.fetchone()
+                        if not result:
+                            return None
+                            
+                        return {
+                            "score": float(result["Score"]),
+                            "status": result["State"],
+                            "date": result["Date"].isoformat()
+                        }
+                finally:
+                    conn.close()
+            
+            # Use the caching mechanism to get the data
+            # Short TTL since quiz results may change frequently
+            return await get_cached_data(
+                cache_key,
+                fetch_quiz_results_from_db,
+                ttl=300  # Cache for 5 minutes
+            )
+                
         except Exception as e:
             print(f"Token decode error: {str(e)}")
             raise HTTPException(status_code=401, detail="Invalid authentication token")
-
-        conn = connect_db()
-        try:
-            with conn.cursor(pymysql.cursors.DictCursor) as cursor:
-                cursor.execute("""
-                    SELECT Score, State, Date
-                    FROM LectureResults
-                    WHERE LearnerID = %s AND LectureID = %s
-                    ORDER BY Date DESC
-                    LIMIT 1
-                """, (user_data["id"], lecture_id))
-                
-                result = cursor.fetchone()
-                if not result:
-                    return None
-                    
-                return {
-                    "score": float(result["Score"]),
-                    "status": result["State"],
-                    "date": result["Date"].isoformat()
-                }
-                
-        finally:
-            conn.close()
             
     except HTTPException:
         raise
@@ -1592,14 +1688,6 @@ async def get_quiz_results(
         print(f"Error in get_quiz_results: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
 
-# Test endpoints for debugging route registration
-@router.get("/instructor/courses/test")
-async def test_instructor_courses_get():
-    return {"message": "GET /instructor/courses/test works"}
-
-@router.post("/instructor/courses/test")
-async def test_instructor_courses_post():
-    return {"message": "POST /instructor/courses/test works"}
 
 # Get instructor course details
 @router.get("/instructor/courses/{course_id}", response_model=Course)
@@ -1693,159 +1781,6 @@ async def get_instructor_course_details(
         raise he
     except Exception as e:
         print(f"Error fetching instructor course details: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
-    finally:
-        if 'conn' in locals():
-            conn.close()
-
-# CreateLecture model and create_lecture endpoint to handle lecture creation with video upload and quiz
-class CreateLecture(BaseModel):
-    title: str
-    description: str
-    content: str
-    quiz: Optional[dict] = None
-
-@router.post("/courses/{course_id}/lectures")
-async def create_lecture(
-    request: Request,
-    course_id: int,
-    auth_token: str = Cookie(None),
-    title: str = Form(...),
-    description: str = Form(...),
-    content: str = Form(...),
-    video: Optional[UploadFile] = File(None),
-    quiz: Optional[str] = Form(None)
-):
-    try:
-        # Get token from header if not in cookie
-        if not auth_token:
-            auth_header = request.headers.get('Authorization')
-            if auth_header and auth_header.startswith('Bearer '):
-                auth_token = auth_header.split(' ')[1]
-            else:
-                raise HTTPException(status_code=401, detail="No authentication token provided")
-        
-        # Verify token and get user data
-        try:
-            user_data = decode_token(auth_token)
-            username = user_data['username']
-            role = user_data['role']
-            
-            # Verify user is an instructor
-            if role != "Instructor":
-                raise HTTPException(status_code=403, detail="Only instructors can access this endpoint")
-            
-            # Connect to database
-            conn = connect_db()
-            cursor = conn.cursor(pymysql.cursors.DictCursor)
-            
-            try:
-                # Get instructor ID
-                cursor.execute("""
-                    SELECT InstructorID 
-                    FROM Instructors 
-                    WHERE AccountName = %s
-                """, (username,))
-                
-                instructor = cursor.fetchone()
-                if not instructor:
-                    raise HTTPException(status_code=404, detail="Instructor not found")
-                
-                instructor_id = instructor['InstructorID']
-                
-                # Verify this instructor owns this course
-                cursor.execute("""
-                    SELECT CourseID 
-                    FROM Courses 
-                    WHERE CourseID = %s AND InstructorID = %s
-                """, (course_id, instructor_id))
-                
-                if not cursor.fetchone():
-                    raise HTTPException(status_code=403, detail="Not authorized to modify this course")
-                
-                # Create the lecture
-                cursor.execute("""
-                    INSERT INTO Lectures (CourseID, Title, Description, Content) 
-                    VALUES (%s, %s, %s, %s)
-                """, (course_id, title, description, content))
-                conn.commit()
-                
-                # Get the newly created lecture ID
-                lecture_id = cursor.lastrowid
-                
-                # Upload video if provided
-                if video:
-                    # Check file size (100MB limit)
-                    video_content = await video.read()
-                    if len(video_content) > 100 * 1024 * 1024:  # 100MB in bytes
-                        raise HTTPException(status_code=400, detail="Video file size must be less than 100MB")
-                    
-                    # Check file type
-                    if not video.content_type.startswith('video/'):
-                        raise HTTPException(status_code=400, detail="Invalid file type. Please upload a video file")
-                    
-                    # Upload to S3
-                    media_path = f"videos/cid{course_id}/lid{lecture_id}/vid_lecture.mp4"
-                    s3.put_object(
-                        Bucket="tlhmaterials",
-                        Key=media_path,
-                        Body=video_content,
-                        ContentType=video.content_type,
-                        ACL="public-read",
-                        ContentDisposition="inline"
-                    )
-                
-                # Create quiz if provided
-                if quiz:
-                    quiz_data = json.loads(quiz)
-                    if quiz_data and quiz_data.get('questions'):
-                        # Insert quiz
-                        cursor.execute("""
-                            INSERT INTO Quizzes (LectureID, Title, Description) 
-                            VALUES (%s, %s, %s)
-                        """, (lecture_id, f"Quiz for {title}", description))
-                        conn.commit()
-                        
-                        quiz_id = cursor.lastrowid
-                        
-                        # Insert questions and options
-                        for question in quiz_data['questions']:
-                            cursor.execute("""
-                                INSERT INTO Questions (QuizID, QuestionText) 
-                                VALUES (%s, %s)
-                            """, (quiz_id, question['question']))
-                            conn.commit()
-                            
-                            question_id = cursor.lastrowid
-                            
-                            # Insert options
-                            for i, option in enumerate(question['options']):
-                                cursor.execute("""
-                                    INSERT INTO Options (QuestionID, OptionText, IsCorrect)
-                                    VALUES (%s, %s, %s)
-                                """, (question_id, option, i == question['correctAnswer']))
-                            conn.commit()
-                
-                return {
-                    "id": lecture_id,
-                    "title": title,
-                    "message": "Lecture created successfully"
-                }
-                
-            except HTTPException:
-                raise
-            except Exception as e:
-                print(f"Error in create_lecture: {str(e)}")
-                raise HTTPException(status_code=500, detail=f"Failed to create lecture: {str(e)}")
-            
-        except Exception as e:
-            print(f"Token/user verification error: {str(e)}")
-            raise HTTPException(status_code=401, detail="Invalid authentication token or user not found")
-            
-    except HTTPException:
-        raise
-    except Exception as e:
-        print(f"Error in create_lecture: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
     finally:
         if 'conn' in locals():

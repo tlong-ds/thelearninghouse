@@ -1,8 +1,10 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './services/AuthContext';
+import { LoadingProvider, useLoading } from './services/LoadingContext';
 import { SSRProvider } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import Loading from './components/Loading';
 import Login from './pages/Login';
 import Courses from './pages/Courses';
 import AddCourse from './pages/AddCourse';
@@ -33,12 +35,14 @@ const ProtectedRoute = ({ children, requiredRole }) => {
   return children;
 };
 
-function App() {
+const AppContent = () => {
+  const { loading } = useLoading();
+
   return (
-    <AuthProvider>
-      <Router basename="/thelearninghouse">
-        <div className="App">
-          <Routes>
+    <Router basename="/thelearninghouse">
+      <div className="App">
+        {loading && <Loading fullscreen />}
+        <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/about" element={<About />} />
             <Route 
@@ -133,7 +137,18 @@ function App() {
           </Routes>
         </div>
       </Router>
-    </AuthProvider>
+    );
+};
+
+function App() {
+  return (
+    <SSRProvider>
+      <AuthProvider>
+        <LoadingProvider>
+          <AppContent />
+        </LoadingProvider>
+      </AuthProvider>
+    </SSRProvider>
   );
 }
 
