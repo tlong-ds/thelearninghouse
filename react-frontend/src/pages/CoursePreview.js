@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { fetchCourseDetails, fetchLectures, enrollInCourse, fetchEnrolledCourses } from '../services/api';
+import { fetchCoursePreviewData, enrollInCourse } from '../services/api';
 import { useAuth } from '../services/AuthContext';
+import { useLoading } from '../services/LoadingContext';
 import { images } from '../utils/images';  // Update this import
+import { formatDuration } from '../utils/duration';
 import Header from '../components/Header';
 import '../styles/CoursePreview.css';
 
@@ -10,46 +12,36 @@ const CoursePreview = () => {
   const { id } = useParams();
   const [course, setCourse] = useState(null);
   const [lectures, setLectures] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [isEnrolled, setIsEnrolled] = useState(false);
   const [enrolling, setEnrolling] = useState(false);
   
   const { currentUser, logout } = useAuth();
+  const { startLoading, stopLoading } = useLoading();
   const navigate = useNavigate();
   
   useEffect(() => {
     const loadCourseData = async () => {
       try {
-        const courseData = await fetchCourseDetails(id);
-        const lecturesData = await fetchLectures(id);
+        startLoading('Loading course details...');
         
-        // Check if the user is enrolled in this course
-        const enrolledCourses = await fetchEnrolledCourses();
-        const enrolled = enrolledCourses.some(course => course.id === parseInt(id));
+        // Use the new optimized preview endpoint that combines course + lectures data
+        const previewData = await fetchCoursePreviewData(id);
         
-        setCourse(courseData);
-        setLectures(lecturesData);
-        setIsEnrolled(enrolled);
-        setLoading(false);
+        setCourse(previewData.course);
+        setLectures(previewData.lectures);
+        setIsEnrolled(previewData.course.is_enrolled);
       } catch (err) {
         console.error('Failed to fetch course data:', err);
         setError('Failed to load course. Please try again later.');
-        setLoading(false);
+      } finally {
+        stopLoading();
       }
     };
     
     loadCourseData();
-  }, [id]);
+  }, [id, startLoading, stopLoading]);
   
-  if (loading) {
-    return (
-      <div className="course-preview-container">
-        <Header username={currentUser.username} role={currentUser.role} onLogout={logout} />
-        <div className="loading">Loading course...</div>
-      </div>
-    );
-  }
   
   if (error || !course) {
     return (
@@ -65,6 +57,16 @@ const CoursePreview = () => {
       setEnrolling(true);
       await enrollInCourse(id);
       setIsEnrolled(true);
+      
+      // Optionally refresh the data to get updated enrollment count
+      try {
+        const previewData = await fetchCoursePreviewData(id);
+        setCourse(previewData.course);
+      } catch (refreshError) {
+        console.warn('Failed to refresh course data after enrollment:', refreshError);
+        // Continue anyway since enrollment was successful
+      }
+      
       setEnrolling(false);
     } catch (err) {
       console.error('Failed to enroll in course:', err);
@@ -85,8 +87,8 @@ const CoursePreview = () => {
             <p className="course-description">{course.description}</p>
             
             <div className="course-meta">
-              <span className="course-duration">{course.duration || 'Self-paced'}</span>
-              <span className="course-rating">★ {course.rating || 'N/A'}</span>
+              <span className="course-duration">⏱️ {formatDuration(course.duration)}</span>
+              <span className="course-rating">★ {course.rating ? parseFloat(course.rating).toFixed(1) : '0.0'}</span>
               <span className="course-enrolled">{course.enrolled || 0} enrolled</span>
             </div>
           </div>
@@ -102,7 +104,12 @@ const CoursePreview = () => {
             {isEnrolled ? (
               <button 
                 className="view-lectures-button"
-                onClick={() => navigate(`/lecture/${lectures[0]?.id}`)}
+                onClick={() => navigate(`/lecture/${lectures[0]?.id}`, {
+                  state: { 
+                    courseName: course.name,
+                    courseId: course.id
+                  }
+                })}
               >
                 View Lectures
               </button>
@@ -132,7 +139,14 @@ const CoursePreview = () => {
                     <h3>{lecture.title}</h3>
                     <p>{lecture.description}</p>
                   </div>
-                  <Link to={`/lecture/${lecture.id}`} className="lecture-button">
+                  <Link 
+                    to={`/lecture/${lecture.id}`} 
+                    className="lecture-button"
+                    state={{ 
+                      courseName: course.name,
+                      courseId: course.id
+                    }}
+                  >
                     View
                   </Link>
                 </div>

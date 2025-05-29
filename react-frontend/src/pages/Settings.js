@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../services/AuthContext';
+import { useLoading } from '../services/LoadingContext';
 import { fetchUserProfile, updateUserProfile, changePassword } from '../services/api';
 import Header from '../components/Header';
 import '../styles/Settings.css';
 
 const Settings = () => {
   const { currentUser, logout } = useAuth();
+  const { startLoading, stopLoading } = useLoading();
   
   // User information state
   const [userInfo, setUserInfo] = useState({
@@ -36,12 +38,11 @@ const Settings = () => {
     passwordError: ''
   });
   
-  // Loading states
+  // Loading states for individual operations (keep these for non-blocking operations)
   const [loading, setLoading] = useState({
     profile: false,
     settings: false,
-    password: false,
-    initial: true
+    password: false
   });
   
   // Active section state for navigation
@@ -51,7 +52,7 @@ const Settings = () => {
   useEffect(() => {
     const loadUserProfile = async () => {
       try {
-        setLoading(prev => ({ ...prev, initial: true }));
+        startLoading('Loading settings...');
         const userData = await fetchUserProfile();
         
         setUserInfo({
@@ -67,15 +68,15 @@ const Settings = () => {
         
         setTheme(savedTheme);
         setNotifications(savedNotifications);
+        stopLoading();
       } catch (error) {
         console.error('Failed to load user profile:', error);
-      } finally {
-        setLoading(prev => ({ ...prev, initial: false }));
+        stopLoading();
       }
     };
     
     loadUserProfile();
-  }, []);
+  }, [startLoading, stopLoading]);
   
   // Handle input changes for user info
   const handleUserInfoChange = (e) => {
@@ -221,24 +222,10 @@ const Settings = () => {
         ...prev, 
         passwordError: error.response?.data?.detail || 'Failed to change password. Please check your current password and try again.' 
       }));
-    } finally {
-      setLoading(prev => ({ ...prev, password: false }));
+    } finally {      setLoading(prev => ({ ...prev, password: false }));
     }
   };
-  
-  if (loading.initial) {
-    return (
-      <div className="settings-container">
-        <Header username={currentUser?.username} role={currentUser?.role} onLogout={logout} />
-        <div className="settings-layout">
-          <div className="settings-content">
-            <div className="loading">Loading settings...</div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-  
+
   return (
     <div className="settings-container">
       <Header username={currentUser?.username} role={currentUser?.role} onLogout={logout} />
@@ -246,7 +233,7 @@ const Settings = () => {
       <div className="settings-layout">
         {/* Left sidebar navigation */}
         <div className="settings-sidebar">
-          <div className="user-info">
+          <div className="settings-user-info">
             <div className="user-avatar">
               <span>{currentUser?.username?.charAt(0).toUpperCase() || 'U'}</span>
             </div>

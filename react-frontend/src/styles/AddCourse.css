@@ -3,6 +3,7 @@
   flex-direction: column;
   min-height: 100vh;
   background-color: #f8f9fa;
+  padding-top: 84px; /* Space for floating header (60px + 24px gap) */
 }
 
 .add-course-content {

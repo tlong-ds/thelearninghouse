@@ -5,6 +5,7 @@
   align-items: center;
   padding: 2rem 1rem;
   background-color: #f8f9fa;
+  padding-top: calc(60px + 2rem); /* Space for fixed header plus existing padding */
 }
 
 .auth-logo {

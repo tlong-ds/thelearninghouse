@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { fetchLectureDetails, submitQuizAnswers } from '../services/api';
 import { useAuth } from '../services/AuthContext';
+import { useLoading } from '../services/LoadingContext';
 import Header from '../components/Header';
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
@@ -116,17 +117,23 @@ const QuizSection = ({ quiz, lectureId }) => {
 
 const LecturePreview = () => {
   const { id } = useParams();
+  const location = useLocation();
   const [lecture, setLecture] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [isSidebarOpen, setSidebarOpen] = useState(true);
   const { currentUser, logout } = useAuth();
+  const { startLoading, stopLoading, isLoading } = useLoading();
   const navigate = useNavigate();
+  
+  // Extract course information from navigation state
+  const courseFromState = location.state || {};
+  const courseName = courseFromState.courseName || 'Course Home';
+  const courseId = courseFromState.courseId || 'unknown';
   
   useEffect(() => {
     const loadLectureData = async () => {
       try {
-        setLoading(true);
+        startLoading('Loading lecture...');
         setError('');
         
         // Check if id is a valid string and can be parsed to a number
@@ -146,37 +153,31 @@ const LecturePreview = () => {
         setError(err.message);
         console.error('Error loading lecture:', err);
       } finally {
-        setLoading(false);
+        stopLoading();
       }
     };
 
     if (id) {
       loadLectureData();
     }
-  }, [id]);
+  }, [id, startLoading, stopLoading]);
   
-  if (loading) {
-    return (
-      <div className="lecture-preview-container">
-        <Header username={currentUser?.username} role={currentUser?.role} onLogout={logout} />
-        <div className="loading">Loading lecture...</div>
-      </div>
-    );
-  }
+
   
-  if (error || !lecture) {
-    return (
-      <div className="lecture-preview-container">
-        <Header username={currentUser?.username} role={currentUser?.role} onLogout={logout} />
-        <div className="error-container">
-          <div className="error">{error || 'Lecture not found'}</div>
-          <button className="back-button" onClick={() => navigate('/courses')}>
-            Back to Courses
-          </button>
-        </div>
-      </div>
-    );
-  }
+  // Create default lecture structure when no lecture is available
+  const defaultLecture = {
+    id: id || 'unknown',
+    title: 'No Lecture Available',
+    courseName: courseName,
+    courseId: courseId,
+    content: null,
+    videoUrl: null,
+    quiz: null,
+    courseLectures: []
+  };
+
+  // Use actual lecture data if available, otherwise use default
+  const displayLecture = lecture || defaultLecture;
   
   return (
     <div className="lecture-preview-container">
@@ -189,30 +190,48 @@ const LecturePreview = () => {
             <i className={`fas fa-${isSidebarOpen ? 'times' : 'bars'}`}></i>
           </button>
           <div className="course-nav-header">
-            <Link 
-              to={currentUser?.role === 'Instructor' 
-                ? `/manage-course/${lecture.courseId}` 
-                : `/course/${lecture.courseId}`} 
-              className="course-nav-title"
-            >
-              <i className="fas fa-chevron-left"></i>
-              <span>{lecture.courseName || 'Course Home'}</span>
-            </Link>
+            {lecture ? (
+              <Link 
+                to={currentUser?.role === 'Instructor' 
+                  ? `/manage-course/${displayLecture.courseId}` 
+                  : `/course/${displayLecture.courseId}`} 
+                className="course-nav-title"
+              >
+                <i className="fas fa-chevron-left"></i>
+                <span>{displayLecture.courseName}</span>
+              </Link>
+            ) : (
+              <div className="course-nav-title">
+                <button onClick={() => navigate('/courses')} className="course-nav-title">
+                  <i className="fas fa-chevron-left"></i>
+                  <span>{displayLecture.courseName}</span>
+                </button>
+              </div>
+            )}
           </div>
 
           <nav className="lecture-nav">
-
             <ul className="lecture-nav-list">
-              {lecture.courseLectures?.map((l, index) => (
+              {displayLecture.courseLectures?.map((l, index) => (
                 <li
                   key={l.id}
-                  className={`lecture-nav-item ${parseInt(l.id) === parseInt(lecture.id) ? 'active' : ''}`}
-                  onClick={() => navigate(`/lecture/${l.id}`)}
+                  className={`lecture-nav-item ${parseInt(l.id) === parseInt(displayLecture.id) ? 'active' : ''}`}
+                  onClick={() => navigate(`/lecture/${l.id}`, {
+                    state: { 
+                      courseName: displayLecture.courseName,
+                      courseId: displayLecture.courseId
+                    }
+                  })}
                 >
                   <span className="lecture-index">{index + 1}</span>
                   <span className="lecture-nav-title">{l.title}</span>
                 </li>
               ))}
+              {(!displayLecture.courseLectures || displayLecture.courseLectures.length === 0) && (
+                <li className="lecture-nav-item empty">
+                  <span className="empty-message">No lectures available</span>
+                </li>
+              )}
             </ul>
           </nav>
         </aside>
@@ -221,18 +240,20 @@ const LecturePreview = () => {
         <main className={`lecture-main ${!isSidebarOpen ? 'sidebar-closed' : ''}`}>
           <div className="lecture-content-wrapper">
             <div className="lecture-header">
-              <h1>{lecture.title}</h1>
+              <h1>{displayLecture.title}</h1>
               <div className="lecture-quick-actions">
-                <Link 
-                  to={`/edumate?lectureId=${lecture.id}`} 
-                  className="quick-action-btn ai-btn" 
-                  title="Ask Edumate"
-                >
-                  <i className="fas fa-robot"></i>
-                </Link>
-                {lecture.quiz && (
+                {lecture && (
                   <Link 
-                    to={`/quiz/${lecture.id}`} 
+                    to={`/edumate?lectureId=${displayLecture.id}`} 
+                    className="quick-action-btn ai-btn" 
+                    title="Ask Edumate"
+                  >
+                    <i className="fas fa-robot"></i>
+                  </Link>
+                )}
+                {lecture && displayLecture.quiz && (
+                  <Link 
+                    to={`/quiz/${displayLecture.id}`} 
                     className="quick-action-btn quiz-btn" 
                     title="Take Quiz"
                   >
@@ -243,43 +264,96 @@ const LecturePreview = () => {
             </div>
 
             <div className="content-columns">
-              <div className="video-section">
-                <div className="video-container">
-                  {lecture.videoUrl ? (
-                    <video 
-                      controls 
-                      preload="metadata"
-                      controlsList="nodownload"
-                      playsInline
+              {!lecture ? (
+                <div className="no-lecture-container" style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  minHeight: '60vh',
+                  textAlign: 'center',
+                  padding: '2rem'
+                }}>
+                  <div className="no-lecture-box" style={{
+                    backgroundColor: '#f8f9fa',
+                    border: '2px solid #e9ecef',
+                    borderRadius: '12px',
+                    padding: '3rem 2rem',
+                    maxWidth: '400px',
+                    width: '100%'
+                  }}>
+                    <i className="fas fa-graduation-cap" style={{
+                      fontSize: '3rem',
+                      color: '#6c757d',
+                      marginBottom: '1.5rem'
+                    }}></i>
+                    <h2 style={{
+                      fontSize: '1.5rem',
+                      color: '#495057',
+                      marginBottom: '2rem',
+                      fontWeight: '600'
+                    }}>
+                      No lectures available
+                    </h2>
+                    <button 
+                      onClick={() => navigate('/courses')} 
+                      style={{
+                        padding: '0.75rem 2rem',
+                        backgroundColor: '#3498db',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        fontSize: '1rem',
+                        fontWeight: '500',
+                        transition: 'background-color 0.2s ease'
+                      }}
+                      onMouseOver={(e) => e.target.style.backgroundColor = '#2980b9'}
+                      onMouseOut={(e) => e.target.style.backgroundColor = '#3498db'}
                     >
-                      <source src={lecture.videoUrl} type="video/mp4" />
-                      Your browser does not support the video tag.
-                    </video>
-                  ) : (
-                    <div className="placeholder-video">
-                      <i className="fas fa-video-slash"></i>
-                      <p>No video available for this lecture</p>
-                    </div>
-                  )}
+                      Browse Courses
+                    </button>
+                  </div>
                 </div>
-                <div className="notes-section">
-                  <div className="notes-content">
-                    {lecture.content ? (
-                      <ReactMarkdown
-                        remarkPlugins={[remarkGfm, remarkMath]} 
-                        rehypePlugins={[rehypeRaw, rehypeKatex]}
+              ) : (
+                <div className="video-section">
+                  <div className="video-container">
+                    {displayLecture.videoUrl ? (
+                      <video 
+                        controls 
+                        preload="metadata"
+                        controlsList="nodownload"
+                        playsInline
                       >
-                        {lecture.content}
-                      </ReactMarkdown>
+                        <source src={displayLecture.videoUrl} type="video/mp4" />
+                        Your browser does not support the video tag.
+                      </video>
                     ) : (
-                      <div className="empty-notes">
-                        <i className="fas fa-file-alt"></i>
-                        <p>No notes available for this lecture.</p>
+                      <div className="placeholder-video">
+                        <i className="fas fa-video-slash"></i>
+                        <p>No video available for this lecture</p>
                       </div>
                     )}
                   </div>
+                  <div className="notes-section">
+                    <div className="notes-content">
+                      {displayLecture.content ? (
+                        <ReactMarkdown
+                          remarkPlugins={[remarkGfm, remarkMath]} 
+                          rehypePlugins={[rehypeRaw, rehypeKatex]}
+                        >
+                          {displayLecture.content}
+                        </ReactMarkdown>
+                      ) : (
+                        <div className="empty-notes">
+                          <i className="fas fa-file-alt"></i>
+                          <p>No notes available for this lecture.</p>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                 </div>
-              </div>
+              )}
             </div>
           </div>
         </main>

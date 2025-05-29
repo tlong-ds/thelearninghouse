@@ -4,20 +4,21 @@ import { fetchLectureDetails } from '../services/api';
 import Quiz from '../components/Quiz';
 import Header from '../components/Header';
 import { useAuth } from '../services/AuthContext';
+import { useLoading } from '../services/LoadingContext';
 import '../styles/QuizPage.css';
 
 const QuizPage = () => {
   const { lectureId } = useParams();
   const [lecture, setLecture] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const { currentUser, logout } = useAuth();
+  const { startLoading, stopLoading } = useLoading();
   const navigate = useNavigate();
 
   useEffect(() => {
     const loadData = async () => {
       try {
-        setLoading(true);
+        startLoading('Loading quiz...');
         const data = await fetchLectureDetails(lectureId);
         
         // Debug the received data
@@ -26,7 +27,7 @@ const QuizPage = () => {
         if (!data || !data.quiz) {
           console.error('No quiz data found in lecture:', data);
           setError('No quiz available for this lecture.');
-          setLoading(false);
+          stopLoading();
           return;
         }
         
@@ -34,34 +35,25 @@ const QuizPage = () => {
         if (!data.quiz.questions || Object.keys(data.quiz.questions).length === 0) {
           console.error('Quiz has no questions:', data.quiz);
           setError('This quiz has no questions.');
-          setLoading(false);
+          stopLoading();
           return;
         }
         
         setLecture(data);
-        setLoading(false);
+        stopLoading();
       } catch (err) {
         console.error('Error loading quiz:', err);
         setError('Failed to load quiz. Please try again later.');
-        setLoading(false);
+        stopLoading();
       }
     };
 
     loadData();
-  }, [lectureId, navigate]);
+  }, [lectureId, startLoading, stopLoading]);
 
   const handleBack = () => {
     navigate(`/lecture/${lectureId}`);
   };
-
-  if (loading) {
-    return (
-      <div className="quiz-page">
-        <Header username={currentUser?.username} role={currentUser?.role} onLogout={logout} />
-        <div className="loading">Loading quiz...</div>
-      </div>
-    );
-  }
 
   if (error || !lecture) {
     return (

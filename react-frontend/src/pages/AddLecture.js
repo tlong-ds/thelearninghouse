@@ -1,14 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../services/AuthContext';
+import { useLoading } from '../services/LoadingContext';
 import Header from '../components/Header';
+import config from '../config';
 import '../styles/AddLecture.css';
+
+const API_URL = config.API_URL
 
 const AddLecture = () => {
   const { courseId } = useParams();
   const navigate = useNavigate();
   const { currentUser, logout } = useAuth();
-  const [loading, setLoading] = useState(false);
+  const { startLoading, stopLoading, updateProgress, updateMessage, isLoading } = useLoading();
   const [error, setError] = useState('');
   const [course, setCourse] = useState(null);
   const [lectureData, setLectureData] = useState({
@@ -23,6 +27,14 @@ const AddLecture = () => {
   });
   const [videoPreview, setVideoPreview] = useState(null);
   const [uploadProgress, setUploadProgress] = useState(0);
+  
+  // Progress tracking states
+  const [processStage, setProcessStage] = useState('');
+  const [stageProgress, setStageProgress] = useState({
+    lectureDetails: { status: 'pending', progress: 0 },
+    quiz: { status: 'pending', progress: 0 },
+    videoUpload: { status: 'pending', progress: 0 }
+  });
 
   useEffect(() => {
     // Redirect if not an instructor
@@ -34,7 +46,7 @@ const AddLecture = () => {
     // Fetch course details
     const fetchCourse = async () => {
       try {
-        const response = await fetch(`http://localhost:8503/api/instructor/courses/${courseId}`, {
+        const response = await fetch(`${API_URL}/api/instructor/courses/${courseId}`, {
           credentials: 'include',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
@@ -135,21 +147,65 @@ const AddLecture = () => {
     }
   };
 
+  const updateStageProgress = (stage, status, progress = 0) => {
+    setStageProgress(prev => ({
+      ...prev,
+      [stage]: { status, progress }
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
+    startLoading('Creating lecture...', true);
     setError('');
 
     try {
-      // Create FormData object to handle file upload
+      // Stage 1: Adding lecture details to database
+      setProcessStage('lectureDetails');
+      updateStageProgress('lectureDetails', 'processing', 0);
+      updateMessage('Adding lecture details to database...');
+      updateProgress(10);
+
       const formData = new FormData();
       formData.append('title', lectureData.title);
       formData.append('description', lectureData.description);
       formData.append('content', lectureData.content);
-      if (lectureData.video) {
-        formData.append('video', lectureData.video);
+      
+      // Only add quiz if there are questions
+      if (lectureData.quiz.questions.length > 0) {
+        formData.append('quiz', JSON.stringify(lectureData.quiz));
       }
-      formData.append('quiz', JSON.stringify(lectureData.quiz));
+
+      updateStageProgress('lectureDetails', 'processing', 50);
+      updateProgress(30);
+
+      // Stage 2: Adding quiz to database (if exists)
+      if (lectureData.quiz.questions.length > 0) {
+        setProcessStage('quiz');
+        updateStageProgress('quiz', 'processing', 0);
+        updateMessage('Processing quiz questions...');
+        updateProgress(50);
+        // Quiz is included in the main request, so we'll simulate progress
+        await new Promise(resolve => setTimeout(resolve, 500));
+        updateStageProgress('quiz', 'processing', 100);
+        updateStageProgress('quiz', 'completed', 100);
+      } else {
+        updateStageProgress('quiz', 'skipped', 100);
+      }
+
+      updateStageProgress('lectureDetails', 'completed', 100);
+      updateProgress(60);
+
+      // Stage 3: Uploading video to cloud (if exists)
+      if (lectureData.video) {
+        setProcessStage('videoUpload');
+        updateStageProgress('videoUpload', 'processing', 0);
+        updateMessage('Uploading video to cloud storage...');
+        updateProgress(70);
+        formData.append('video', lectureData.video);
+      } else {
+        updateStageProgress('videoUpload', 'skipped', 100);
+      }
 
       const response = await fetch(`http://localhost:8503/api/courses/${courseId}/lectures`, {
         method: 'POST',
@@ -157,23 +213,46 @@ const AddLecture = () => {
           'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
         },
         credentials: 'include',
-        body: formData,
-        onUploadProgress: (progressEvent) => {
-          const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-          setUploadProgress(percentCompleted);
-        }
+        body: formData
       });
+
+      // Simulate video upload progress if video exists
+      if (lectureData.video) {
+        // Simulate upload progress
+        for (let i = 10; i <= 100; i += 10) {
+          await new Promise(resolve => setTimeout(resolve, 200));
+          updateStageProgress('videoUpload', 'processing', i);
+          setUploadProgress(i);
+          updateProgress(70 + (i * 0.25)); // Progress from 70% to 95%
+        }
+        updateStageProgress('videoUpload', 'completed', 100);
+      }
 
       if (!response.ok) {
         throw new Error('Failed to create lecture');
       }
 
-      navigate(`/manage-course/${courseId}`);
+      // All stages completed
+      setProcessStage('completed');
+      updateMessage('Lecture created successfully!');
+      updateProgress(100);
+      
+      // Navigate after a short delay to show completion
+      setTimeout(() => {
+        stopLoading();
+        navigate(`/manage-course/${courseId}`);
+      }, 1000);
+
     } catch (err) {
       setError('Failed to create lecture. Please try again.');
       console.error('Error:', err);
-    } finally {
-      setLoading(false);
+      // Reset progress on error
+      setStageProgress({
+        lectureDetails: { status: 'error', progress: 0 },
+        quiz: { status: 'pending', progress: 0 },
+        videoUpload: { status: 'pending', progress: 0 }
+      });
+      stopLoading();
     }
   };
 
@@ -311,21 +390,6 @@ const AddLecture = () => {
                   </div>
                 </div>
               )}
-
-              {uploadProgress > 0 && loading && (
-                <div className="upload-progress">
-                  <div className="progress-details">
-                    <span className="upload-status">Uploading video...</span>
-                    <span className="progress-percentage">{uploadProgress}%</span>
-                  </div>
-                  <div className="progress-bar-container">
-                    <div 
-                      className="progress-bar" 
-                      style={{ width: `${uploadProgress}%` }}
-                    />
-                  </div>
-                </div>
-              )}
             </div>
           </div>
 
@@ -404,9 +468,9 @@ const AddLecture = () => {
             <button 
               type="submit" 
               className="primary-btn"
-              disabled={loading}
+              disabled={isLoading}
             >
-              {loading ? 'Creating...' : 'Create Lecture'}
+              {isLoading ? 'Creating...' : 'Create Lecture'}
             </button>
           </div>
         </form>

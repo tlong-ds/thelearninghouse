@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { fetchDashboardData } from '../services/api';
 import { useAuth } from '../services/AuthContext';
+import { useLoading } from '../services/LoadingContext';
 import Header from '../components/Header';
 import '../styles/Dashboard.css';
 
@@ -139,7 +140,6 @@ const ProgressBar = ({ percentage }) => {
   return (
     <div className="progress-container">
       <div className="progress-bar" style={{ width: `${percentage}%` }}>
-        <span className="progress-text">{percentage}%</span>
       </div>
     </div>
   );
@@ -147,7 +147,6 @@ const ProgressBar = ({ percentage }) => {
 
 const Dashboard = () => {
   const [dashboardData, setDashboardData] = useState(null);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('statistics');
   const [timeFilter, setTimeFilter] = useState('all'); // 'day', 'week', 'month', 'all'
@@ -156,35 +155,27 @@ const Dashboard = () => {
   const [sortOrder, setSortOrder] = useState('asc');
   
   const { currentUser, logout } = useAuth();
+  const { startLoading, stopLoading } = useLoading();
   const navigate = useNavigate();
   
   useEffect(() => {
     const loadDashboardData = async () => {
       try {
-        setLoading(true);
+        startLoading('Loading dashboard data...');
         setError('');
         
         const data = await fetchDashboardData();
         setDashboardData(data);
-        setLoading(false);
+        stopLoading();
       } catch (err) {
         console.error('Failed to fetch dashboard data:', err);
         setError('Failed to load dashboard data. Please try again later.');
-        setLoading(false);
+        stopLoading();
       }
     };
     
     loadDashboardData();
-  }, []);
-  
-  if (loading) {
-    return (
-      <div className="dashboard-container">
-        <Header username={currentUser?.username} role={currentUser?.role} onLogout={logout} />
-        <div className="loading">Loading dashboard data...</div>
-      </div>
-    );
-  }
+  }, [startLoading, stopLoading]);
   
   if (error || !dashboardData) {
     return (
@@ -447,7 +438,7 @@ const Dashboard = () => {
                             </div>
                           </div>
                           <div className="course-actions">
-                            <Link to={`/course/${course.id}`} className="view-course-btn">
+                            <Link to={`/course/${course.id}`} className="student-view-course-btn">
                               View Course
                             </Link>
                           </div>

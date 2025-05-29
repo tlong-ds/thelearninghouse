@@ -20,8 +20,9 @@ def create_valkey_client():
     global valkey_client, connection_available
     
     try:
-        # First try with SSL if password is provided
+        # Try with SSL if password is provided (production)
         if VALKEY_PASSWORD:
+            print(f"🔐 Attempting SSL connection to Valkey at {VALKEY_HOST}:{VALKEY_PORT}")
             valkey_client = valkey.Valkey(
                 host=VALKEY_HOST,
                 port=VALKEY_PORT,
@@ -33,11 +34,21 @@ def create_valkey_client():
                 ssl_cert_reqs="required",
                 cache_ttl=VALKEY_TTL
             )
+        else:
+            # Try without SSL for local development
+            print(f"🔓 Attempting local connection to Valkey at {VALKEY_HOST}:{VALKEY_PORT}")
+            valkey_client = valkey.Valkey(
+                host=VALKEY_HOST,
+                port=VALKEY_PORT,
+                db=VALKEY_DB,
+                decode_responses=True,
+                cache_ttl=VALKEY_TTL
+            )
         
-            # Test the connection
-            valkey_client.ping()
-            connection_available = True
-            print("✅ Successfully connected to Valkey")
+        # Test the connection for both SSL and non-SSL
+        valkey_client.ping()
+        connection_available = True
+        print("✅ Successfully connected to Valkey")
         
     except Exception as e:
         print(f"⚠️  Valkey connection failed: {e}")

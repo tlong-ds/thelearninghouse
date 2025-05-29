@@ -135,6 +135,17 @@ export const createCourse = async (courseData) => {
   }
 };
 
+// Optimized course preview data - gets course + lectures in one call
+export const fetchCoursePreviewData = async (courseId) => {
+  try {
+    const response = await apiClient.get(`/api/courses/${courseId}/preview`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching course preview data:', error);
+    throw error;
+  }
+};
+
 export const enrollInCourse = async (courseId) => {
   try {
     const response = await apiClient.post(`/api/courses/${courseId}/enroll`);

@@ -405,7 +405,7 @@ const InstructorDashboard = () => {
                             </div>
                           </div>
                           <div className="course-actions">
-                            <Link to={`/manage-course/${course.id}`} className="view-course-btn">
+                            <Link to={`/manage-course/${course.id}`} className="instructor-view-course-btn">
                               Manage Course
                             </Link>
                           </div>

@@ -36,12 +36,19 @@ const ProtectedRoute = ({ children, requiredRole }) => {
 };
 
 const AppContent = () => {
-  const { loading } = useLoading();
+  const { loading, loadingMessage, showProgress, progress } = useLoading();
 
   return (
     <Router basename="/thelearninghouse">
       <div className="App">
-        {loading && <Loading fullscreen />}
+        {loading && (
+          <Loading 
+            fullscreen 
+            message={loadingMessage}
+            showProgress={showProgress}
+            progress={progress}
+          />
+        )}
         <Routes>
             <Route path="/login" element={<Login />} />
             <Route path="/about" element={<About />} />

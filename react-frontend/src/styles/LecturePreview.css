@@ -4,12 +4,13 @@
   flex-direction: column;
   background-color: #f8f9fa;
   width: 100%;
+  padding-top: 84px; /* Space for floating header */
 }
 
 .lecture-preview-layout {
   flex: 1;
   display: flex;
-  height: calc(100vh - 64px);
+  height: calc(100vh - 84px); /* Updated to account for floating header height */
   overflow: hidden;
   position: relative;
 }

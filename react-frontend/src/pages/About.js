@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Container as BootstrapContainer, Card, Row, Col, Table } from 'react-bootstrap';
 import { useAuth } from '../services/AuthContext';
 import Header from '../components/Header';
@@ -13,6 +13,48 @@ const apiClient = axios.create({
     baseURL: config.API_URL,
     withCredentials: true
 });
+
+// Cache configuration
+const CACHE_CONFIG = {
+    METRICS_KEY: 'about_metrics_cache',
+    TTL: 5 * 60 * 1000 // 5 minutes in milliseconds
+};
+
+// Cache utility functions
+const getCachedData = (key) => {
+    try {
+        const cached = localStorage.getItem(key);
+        if (!cached) return null;
+        
+        const { data, timestamp } = JSON.parse(cached);
+        const now = Date.now();
+        
+        // Check if cache is still valid
+        if (now - timestamp < CACHE_CONFIG.TTL) {
+            return data;
+        }
+        
+        // Cache expired, remove it
+        localStorage.removeItem(key);
+        return null;
+    } catch (error) {
+        console.error('Error reading from cache:', error);
+        localStorage.removeItem(key);
+        return null;
+    }
+};
+
+const setCachedData = (key, data) => {
+    try {
+        const cacheEntry = {
+            data,
+            timestamp: Date.now()
+        };
+        localStorage.setItem(key, JSON.stringify(cacheEntry));
+    } catch (error) {
+        console.error('Error writing to cache:', error);
+    }
+};
 
 const About = () => {
     const { currentUser, logout } = useAuth();
@@ -34,28 +76,55 @@ const About = () => {
         totalLearners: 0,
         totalInstructors: 0
     });
+    const [metricsLoading, setMetricsLoading] = useState(true);
+
+    // Memoized function to fetch metrics with caching
+    const fetchMetrics = useCallback(async () => {
+        try {
+            // Check cache first
+            const cachedMetrics = getCachedData(CACHE_CONFIG.METRICS_KEY);
+            if (cachedMetrics) {
+                setMetrics(cachedMetrics);
+                setMetricsLoading(false);
+                return;
+            }
+
+            setMetricsLoading(true);
+            
+            // Fetch from API if not cached
+            const [coursesRes, learnersRes, instructorsRes] = await Promise.all([
+                apiClient.get('/api/courses'),
+                apiClient.get('/api/statistics/users/count', { params: { role: 'Learner' }}),
+                apiClient.get('/api/statistics/users/count', { params: { role: 'Instructor' }})
+            ]);
+
+            const newMetrics = {
+                totalCourses: coursesRes.data.length,
+                totalLearners: learnersRes.data.count,
+                totalInstructors: instructorsRes.data.count
+            };
+
+            // Update state and cache
+            setMetrics(newMetrics);
+            setCachedData(CACHE_CONFIG.METRICS_KEY, newMetrics);
+            
+        } catch (error) {
+            console.error('Error fetching metrics:', error);
+            // Keep the default values (all zeros) if the API calls fail
+        } finally {
+            setMetricsLoading(false);
+        }
+    }, []);
+
+    // Function to force refresh metrics (bypass cache)
+    const refreshMetrics = useCallback(async () => {
+        localStorage.removeItem(CACHE_CONFIG.METRICS_KEY);
+        await fetchMetrics();
+    }, [fetchMetrics]);
 
     useEffect(() => {
-        const fetchMetrics = async () => {
-            try {
-                const [coursesRes, learnersRes, instructorsRes] = await Promise.all([
-                    apiClient.get('/api/courses'),
-                    apiClient.get('/api/statistics/users/count', { params: { role: 'Learner' }}),
-                    apiClient.get('/api/statistics/users/count', { params: { role: 'Instructor' }})
-                ]);
-
-                setMetrics({
-                    totalCourses: coursesRes.data.length,
-                    totalLearners: learnersRes.data.count,
-                    totalInstructors: instructorsRes.data.count
-                });
-            } catch (error) {
-                console.error('Error fetching metrics:', error);
-                // Keep the default values (all zeros) if the API calls fail
-            }
-        };
         fetchMetrics();
-    }, []);
+    }, [fetchMetrics]);
 
     const team = [
         { name: "Doan Quoc Bao", role: "Backend Developer", image: images.ava1 },
@@ -84,7 +153,7 @@ const About = () => {
                     <Col md={4}>
                         <Card className="metric-card">
                             <Card.Body className="text-center">
-                                <h2>📚 {metrics.totalCourses}</h2>
+                                <h2>📚 {metricsLoading ? '...' : metrics.totalCourses}</h2>
                                 <p>Courses</p>
                             </Card.Body>
                         </Card>
@@ -92,7 +161,7 @@ const About = () => {
                     <Col md={4}>
                         <Card className="metric-card">
                             <Card.Body className="text-center">
-                                <h2>👩‍🎓 {metrics.totalLearners}</h2>
+                                <h2>👩‍🎓 {metricsLoading ? '...' : metrics.totalLearners}</h2>
                                 <p>Learners</p>
                             </Card.Body>
                         </Card>
@@ -100,7 +169,7 @@ const About = () => {
                     <Col md={4}>
                         <Card className="metric-card">
                             <Card.Body className="text-center">
-                                <h2>👩‍🏫 {metrics.totalInstructors}</h2>
+                                <h2>👩‍🏫 {metricsLoading ? '...' : metrics.totalInstructors}</h2>
                                 <p>Instructors</p>
                             </Card.Body>
                         </Card>
@@ -225,4 +294,4 @@ const About = () => {
     );
 };
 
-export default About;
+export default React.memo(About);

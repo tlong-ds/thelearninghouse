@@ -3,6 +3,7 @@
   display: flex;
   flex-direction: column;
   background-color: #f8f9fa;
+  padding-top: 84px; /* Space for floating header (60px + 24px gap) */
 }
 
 .settings-layout {
@@ -25,7 +26,7 @@
   height: fit-content;
 }
 
-.user-info {
+.settings-user-info {
   display: flex;
   align-items: center;
   margin-bottom: 2rem;
@@ -329,7 +330,7 @@ body.dark-theme .form-group input[type="password"] {
     margin-bottom: 1.5rem;
   }
   
-  .user-info {
+  .settings-user-info {
     margin-bottom: 1.5rem;
     padding-bottom: 1rem;
   }

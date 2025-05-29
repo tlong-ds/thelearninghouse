@@ -26,6 +26,9 @@
   overflow: hidden;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
   margin-bottom: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .browse-course-card:hover {
@@ -36,7 +39,7 @@
 .browse-course-image {
   position: relative;
   width: 100%;
-  height: 200px;
+  height: 160px; /* Reduced from 200px to make card shorter */
   overflow: hidden;
 }
 
@@ -50,7 +53,7 @@
   position: absolute;
   top: 12px;
   right: 12px;
-  background-color: #3d6aff;
+  background-color: #2296f3;
   color: white;
   padding: 4px 12px;
   border-radius: 16px;
@@ -59,10 +62,10 @@
 }
 
 .browse-course-content {
-  padding: 1.5rem;
+  padding: 1.25rem; /* Reduced from 1.5rem */
   display: flex;
   flex-direction: column;
-  min-height: 280px; /* Add minimum height to maintain consistent card size */
+  height: 100%;
 }
 
 .browse-course-title {
@@ -81,22 +84,23 @@
 .browse-course-description {
   color: #444;
   font-size: 0.95rem;
-  margin: 0 0 1rem 0;
+  margin: 0 0 1.5rem 0; /* Increased margin to push meta away from description */
   line-height: 1.5;
   display: -webkit-box;
-  -webkit-line-clamp: 3;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
   -webkit-box-orient: vertical;
   overflow: hidden;
-  height: 3em;
-  flex: 1; /* Allow description to take available space */
+  height: 6em; /* Fixed height for exactly 4 lines (1.5 line-height * 4 lines) */
+  flex-shrink: 0; /* Prevent shrinking */
 }
 
 .browse-course-meta {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  margin-bottom: 1rem;
-  margin-top: auto;
+  justify-content: space-between;
+  margin-bottom: 0.01rem; /* Small margin to keep some space above button */
+  margin-top: auto; /* Push meta row down towards button */
 }
 
 .browse-course-duration,
@@ -107,6 +111,8 @@
   align-items: center;
   gap: 0.25rem;
 }
+
+
 
 .browse-course-button {
   display: inline-block;
@@ -119,8 +125,7 @@
   transition: all 0.2s ease;
   width: 100%;
   text-align: center;
-  /* Adjust margin-top to be smaller */
-  margin-top: 0.5rem;
+  margin-top: auto; /* Push button to bottom */
 }
 
 .browse-course-button:hover {

@@ -6,6 +6,7 @@
   background-color: #f8f9fa;
   display: flex;
   flex-direction: column;
+  padding-top: 84px; /* Space for floating header (60px + 24px gap) */
 }
 
 .quiz-page-content {

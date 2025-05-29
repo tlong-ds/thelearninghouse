@@ -3,6 +3,7 @@
   display: flex;
   flex-direction: column;
   background-color: #f8f9fa;
+  padding-top: 84px; /* Space for floating header (60px + 24px gap) */
 }
 
 .add-lecture-content {
@@ -438,6 +439,194 @@
   color: #666;
 }
 
+/* Progress Display Modal */
+.progress-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.progress-modal {
+  background: white;
+  border-radius: 16px;
+  padding: 2rem;
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+}
+
+.progress-modal h3 {
+  margin: 0 0 2rem 0;
+  text-align: center;
+  color: #333;
+  font-size: 1.5rem;
+}
+
+.progress-stages {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.progress-stage {
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 1.5rem;
+  border-left: 4px solid #e9ecef;
+  transition: all 0.3s ease;
+}
+
+.progress-stage.pending {
+  border-left-color: #6c757d;
+}
+
+.progress-stage.processing {
+  border-left-color: #007bff;
+  background: #e7f3ff;
+}
+
+.progress-stage.completed {
+  border-left-color: #28a745;
+  background: #d4edda;
+}
+
+.progress-stage.skipped {
+  border-left-color: #ffc107;
+  background: #fff3cd;
+}
+
+.progress-stage.error {
+  border-left-color: #dc3545;
+  background: #f8d7da;
+}
+
+.stage-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.stage-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  color: white;
+  background-color: #6c757d;
+  flex-shrink: 0;
+}
+
+.progress-stage.pending .stage-icon {
+  background-color: #6c757d;
+}
+
+.progress-stage.processing .stage-icon {
+  background-color: #007bff;
+}
+
+.progress-stage.completed .stage-icon {
+  background-color: #28a745;
+}
+
+.progress-stage.skipped .stage-icon {
+  background-color: #ffc107;
+}
+
+.progress-stage.error .stage-icon {
+  background-color: #dc3545;
+}
+
+.stage-number {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.stage-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  flex: 1;
+}
+
+.stage-title {
+  font-weight: 600;
+  color: #333;
+  font-size: 1rem;
+}
+
+.stage-description {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.stage-progress-bar {
+  margin-top: 1rem;
+  height: 8px;
+  background-color: #e9ecef;
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+}
+
+.progress-fill {
+  height: 100%;
+  background-color: #007bff;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.progress-percentage {
+  position: absolute;
+  right: 0;
+  top: -24px;
+  font-size: 0.8rem;
+  color: #007bff;
+  font-weight: 600;
+}
+
+.spinner {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ffffff40;
+  border-top: 2px solid #ffffff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.completion-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: #d4edda;
+  border-radius: 12px;
+  color: #155724;
+  font-weight: 600;
+}
+
+.completion-message svg {
+  color: #28a745;
+}
+
 @media (max-width: 768px) {
   .add-lecture-content {
     padding: 1rem;
@@ -473,5 +662,19 @@
   .secondary-btn,
   .primary-btn {
     width: 100%;
+  }
+  
+  .progress-modal {
+    padding: 1.5rem;
+    margin: 1rem;
+  }
+  
+  .stage-header {
+    gap: 0.75rem;
+  }
+  
+  .stage-icon {
+    width: 36px;
+    height: 36px;
   }
 }

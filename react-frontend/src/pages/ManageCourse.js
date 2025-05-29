@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../services/AuthContext';
+import { useLoading } from '../services/LoadingContext';
 import Header from '../components/Header';
 import config from '../config';
 import { images } from '../utils/images';
@@ -10,9 +11,9 @@ const ManageCourse = () => {
   const { courseId } = useParams();
   const navigate = useNavigate();
   const { currentUser, logout } = useAuth();
+  const { startLoading, stopLoading } = useLoading();
   const [course, setCourse] = useState(null); 
   const [lectures, setLectures] = useState([]);
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -24,6 +25,8 @@ const ManageCourse = () => {
 
     const loadCourseDetails = async () => {
       try {
+        startLoading('Loading course details...');
+        
         // Fetch course details
         const courseResponse = await fetch(`${config.API_URL}/api/instructor/courses/${courseId}`, {
           credentials: 'include',
@@ -57,21 +60,12 @@ const ManageCourse = () => {
         setError('Failed to load course details. Please try again later.');
         console.error('Error:', err);
       } finally {
-        setLoading(false);
+        stopLoading();
       }
     };
 
     loadCourseDetails();
-  }, [courseId, currentUser, navigate]);
-
-  if (loading) {
-    return (
-      <div className="manage-course-container">
-        <Header username={currentUser?.username} role={currentUser?.role} onLogout={logout} />
-        <div className="loading">Loading course...</div>
-      </div>
-    );
-  }
+  }, [courseId, currentUser, navigate, startLoading, stopLoading]);
 
   if (error || !course) {
     return (
@@ -106,6 +100,24 @@ const ManageCourse = () => {
           </div>
         </div>
         
+        <div className="course-statistics">
+          <h2>Course Statistics</h2>
+          <div className="stats-container">
+            <div className="stat-card">
+              <div className="stat-value">{course.enrolled || 0}</div>
+              <div className="stat-label">Students Enrolled</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-value">{course.rating ? course.rating.toFixed(1) : 'N/A'}</div>
+              <div className="stat-label">Average Rating</div>
+            </div>
+            <div className="stat-card">
+              <div className="stat-value">{lectures.length}</div>
+              <div className="stat-label">Lectures</div>
+            </div>
+          </div>
+        </div>
+        
         <div className="course-lectures">
           <div className="section-header">
             <h2>Course Content</h2>
@@ -137,24 +149,6 @@ const ManageCourse = () => {
               ))}
             </div>
           )}
-        </div>
-        
-        <div className="course-statistics">
-          <h2>Course Statistics</h2>
-          <div className="stats-container">
-            <div className="stat-card">
-              <div className="stat-value">{course.enrolled || 0}</div>
-              <div className="stat-label">Students Enrolled</div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-value">{course.rating ? course.rating.toFixed(1) : 'N/A'}</div>
-              <div className="stat-label">Average Rating</div>
-            </div>
-            <div className="stat-card">
-              <div className="stat-value">{lectures.length}</div>
-              <div className="stat-label">Lectures</div>
-            </div>
-          </div>
         </div>
       </div>
     </div>

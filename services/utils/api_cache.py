@@ -2,6 +2,7 @@
 import json
 import zlib
 import base64
+import binascii
 import time
 from services.config.valkey_config import get_redis_client, is_connection_available
 
@@ -43,15 +44,28 @@ async def get_cached_data(key, db_fetch_func, ttl=3600, use_compression=False):
             cache_hits += 1
             print(f"Cache HIT: {key}")
             
-            # Check if data is compressed (starts with special prefix)
-            if isinstance(cached_data, bytes) and cached_data.startswith(b'COMPRESSED:'):
-                # Remove prefix and decompress
-                compressed_data = base64.b64decode(cached_data[11:])
-                decompressed_data = zlib.decompress(compressed_data)
-                return json.loads(decompressed_data.decode('utf-8'))
-            else:
-                # Regular non-compressed data
-                return json.loads(cached_data)
+            try:
+                # Check if data is compressed (starts with special prefix)
+                # Handle both string and bytes (due to decode_responses setting)
+                if ((isinstance(cached_data, bytes) and cached_data.startswith(b'COMPRESSED:')) or
+                    (isinstance(cached_data, str) and cached_data.startswith('COMPRESSED:'))):
+                    # Remove prefix and decompress
+                    if isinstance(cached_data, str):
+                        compressed_data = base64.b64decode(cached_data[11:])
+                    else:
+                        compressed_data = base64.b64decode(cached_data[11:])
+                    decompressed_data = zlib.decompress(compressed_data)
+                    return json.loads(decompressed_data.decode('utf-8'))
+                else:
+                    # Regular non-compressed data
+                    return json.loads(cached_data)
+            except (json.JSONDecodeError, zlib.error, binascii.Error) as e:
+                print(f"Cache ERROR for {key}: {e}")
+                print("Falling back to database")
+                # Delete corrupted cache entry
+                redis_client.delete(key)
+                cache_misses += 1
+                return await db_fetch_func()
         
         # Increment miss counter
         cache_misses += 1

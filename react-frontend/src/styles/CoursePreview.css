@@ -3,6 +3,7 @@
   display: flex;
   flex-direction: column;
   background-color: #f8f9fa;
+  padding-top: 84px; /* Space for floating header (60px + 24px gap) */
 }
 
 .course-preview-content {
@@ -172,6 +173,155 @@
 
 .lecture-locked i {
   margin-right: 0.5rem;
+}
+
+/* Loading Skeleton Styles */
+.loading-skeleton {
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.skeleton-header {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.skeleton-info {
+  flex: 3;
+}
+
+.skeleton-title {
+  height: 2.5rem;
+  background-color: #e9ecef;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  width: 60%;
+}
+
+.skeleton-instructor {
+  height: 1.2rem;
+  background-color: #e9ecef;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  width: 30%;
+}
+
+.skeleton-description {
+  height: 1rem;
+  background-color: #e9ecef;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+  width: 100%;
+}
+
+.skeleton-description:last-child {
+  width: 80%;
+}
+
+.skeleton-meta {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.skeleton-meta-item {
+  height: 1rem;
+  background-color: #e9ecef;
+  border-radius: 4px;
+  width: 80px;
+}
+
+.skeleton-image-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  max-width: 250px;
+}
+
+.skeleton-image {
+  width: 100%;
+  height: 180px;
+  background-color: #e9ecef;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.skeleton-button {
+  height: 3rem;
+  background-color: #e9ecef;
+  border-radius: 6px;
+  width: 100%;
+}
+
+.skeleton-lectures {
+  background-color: white;
+  border-radius: 8px;
+  padding: 2rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.skeleton-lectures-title {
+  height: 1.8rem;
+  background-color: #e9ecef;
+  border-radius: 4px;
+  margin-bottom: 1.5rem;
+  width: 200px;
+}
+
+.skeleton-lecture-item {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid #e9ecef;
+  border-radius: 8px;
+  gap: 1rem;
+}
+
+.skeleton-lecture-number {
+  width: 30px;
+  height: 30px;
+  background-color: #e9ecef;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.skeleton-lecture-details {
+  flex: 1;
+}
+
+.skeleton-lecture-title {
+  height: 1.2rem;
+  background-color: #e9ecef;
+  border-radius: 4px;
+  margin-bottom: 0.5rem;
+  width: 70%;
+}
+
+.skeleton-lecture-desc {
+  height: 1rem;
+  background-color: #e9ecef;
+  border-radius: 4px;
+  width: 90%;
+}
+
+.skeleton-lecture-button {
+  width: 80px;
+  height: 2.5rem;
+  background-color: #e9ecef;
+  border-radius: 6px;
 }
 
 @media (max-width: 992px) {

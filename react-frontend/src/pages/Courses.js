@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { fetchCourses, fetchInstructorCourses } from '../services/api';
 import { useAuth } from '../services/AuthContext';
+import { useLoading } from '../services/LoadingContext';
 import Header from '../components/Header';
 import CourseCard from '../components/CourseCard';
 import '../styles/Courses.css';
@@ -10,12 +11,12 @@ const Courses = () => {
   const [courses, setCourses] = useState([]);
   const [filteredCourses, setFilteredCourses] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [sortBy, setSortBy] = useState('enrollments');
   const [sortOrder, setSortOrder] = useState('desc');
   
   const { currentUser, logout } = useAuth();
+  const { startLoading, stopLoading } = useLoading();
   const navigate = useNavigate();
 
   const sortCourses = (coursesToSort) => {
@@ -44,7 +45,7 @@ const Courses = () => {
   
   useEffect(() => {
     const loadCourses = async () => {
-      setLoading(true);
+      startLoading('Loading courses...');
       setError('');
       try {
         let coursesData;
@@ -57,16 +58,16 @@ const Courses = () => {
         
         setCourses(coursesData);
         setFilteredCourses(coursesData);
-        setLoading(false);
+        stopLoading();
       } catch (err) {
         console.error('Failed to fetch courses:', err);
         setError('Failed to load courses. Please try again later.');
-        setLoading(false);
+        stopLoading();
       }
     };
     
     loadCourses();
-  }, [currentUser.role]);
+  }, [currentUser.role, startLoading, stopLoading]);
   
   useEffect(() => {
     if (searchTerm.trim() === '') {
@@ -97,15 +98,6 @@ const Courses = () => {
     setSortBy(newSortBy);
     setSortOrder(newSortOrder);
   };
-  
-  if (loading) {
-    return (
-      <div className="courses-container">
-        <Header username={currentUser.username} role={currentUser.role} onLogout={handleLogout} />
-        <div className="loading">Loading courses...</div>
-      </div>
-    );
-  }
   
   if (error) {
     return (
