@@ -17,7 +17,6 @@ const Edumate = () => {
   const [messages, setMessages] = useState([]);
   const [inputMessage, setInputMessage] = useState('');
   const [loading, setLoading] = useState(false);
-  const [lectureId, setLectureId] = useState(null);
   const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
   const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
   const messagesEndRef = useRef(null);
@@ -86,20 +85,16 @@ const Edumate = () => {
     }
   }, [isKeyboardVisible]);
 
-  // Extract lectureId from URL query parameters and load chat history
   useEffect(() => {
-    const queryParams = new URLSearchParams(location.search);
-    const lecId = queryParams.get('lectureId');
-    setLectureId(lecId);
     
     const loadChatHistory = async () => {
       setLoading(true);
       try {
         // Import dynamically to avoid circular dependencies
         const { getChatHistory } = await import('../services/chatbotAPI');
-        console.log(`Fetching chat history for ${lecId ? `lecture ${lecId}` : 'general chat'}`);
+        console.log(`Fetching chat history for 'general chat'}`);
         
-        const response = await getChatHistory(lecId);
+        const response = await getChatHistory();
         console.log('Chat history response:', response);
         
         if (response?.history && Array.isArray(response.history) && response.history.length > 0) {
@@ -118,9 +113,7 @@ const Edumate = () => {
           console.log('No cached history found, showing welcome message');
           setMessages([{
             id: Date.now(),
-            content: lecId 
-              ? `# Welcome to Lecture Mode\n\nI'm ready to answer questions about this lecture. What would you like to know?`
-              : `# Welcome to Edumate\n\nI'm your learning assistant. Feel free to ask me anything about your learning!`,
+            content: `# Welcome to Edumate\n\nI'm your learning assistant. Feel free to ask me anything about your learning!`,
             isUser: false,
             timestamp: new Date().toLocaleTimeString()
           }]);
@@ -129,9 +122,7 @@ const Edumate = () => {
         console.error('Failed to load chat history:', error);
         setMessages([{
           id: Date.now(),
-          content: lecId 
-            ? `# Welcome to Lecture Mode\n\nI'm ready to answer questions about this lecture. What would you like to know?`
-            : `# Welcome to Edumate\n\nI'm your learning assistant. Feel free to ask me anything about your learning!`,
+          content: `# Welcome to Edumate\n\nI'm your learning assistant. Feel free to ask me anything about your learning!`,
           isUser: false,
           timestamp: new Date().toLocaleTimeString()
         }]);
@@ -183,7 +174,7 @@ const Edumate = () => {
 
     try {
       // Send to API and get response (will be cached server-side)
-      const response = await sendChatMessage(message, lectureId);
+      const response = await sendChatMessage(message);
       
       // Add only the bot response to the UI (don't reload entire history)
       const botMessage = {
@@ -239,7 +230,7 @@ const Edumate = () => {
       }
       
       // Get response without reloading full history
-      const response = await sendChatMessage(userMessage, lectureId);
+      const response = await sendChatMessage(userMessage);
       
       // Add just the bot response
       const botMessage = {
@@ -267,9 +258,7 @@ const Edumate = () => {
     // Immediately clear UI for better UX
     setMessages([{
       id: Date.now(),
-      content: lectureId 
-        ? `# Welcome to Lecture Mode\n\nI'm ready to answer questions about this lecture. What would you like to know?`
-        : `# Welcome to Edumate\n\nI'm your learning assistant. Feel free to ask me anything about your learning!`,
+      content: `# Welcome to Edumate\n\nI'm your learning assistant. Feel free to ask me anything about your learning!`,
       isUser: false,
       timestamp: new Date().toLocaleTimeString()
     }]);
@@ -286,33 +275,14 @@ const Edumate = () => {
     
     // Clear backend cache without waiting
     import('../services/chatbotAPI').then(({ clearChatHistory }) => {
-      console.log(`Clearing chat history for ${lectureId ? `lecture ${lectureId}` : 'general chat'}`);
-      clearChatHistory(lectureId)
+      console.log(`Clearing chat history for 'general chat'}`);
+      clearChatHistory()
         .then(() => console.log('Chat history cleared successfully'))
         .catch(err => console.error('Failed to clear chat history:', err));
     });
   };
 
-  // Enhanced navigation for mobile
-  const handleReturnToLecture = () => {
-    if (isMobile) {
-      // Use replace on mobile for better navigation
-      navigate(`/lecture/${lectureId}`, { replace: true });
-    } else {
-      navigate(`/lecture/${lectureId}`);
-    }
-  };
-
-  const handleExitLectureMode = () => {
-    setLectureId(null);
-    navigate('/edumate', { replace: true });
-    setMessages([{
-      id: Date.now(),
-      content: `# Switched to General Mode\n\nI'm now in general mode and can answer questions about any topic in your courses. How can I help you?`,
-      isUser: false,
-      timestamp: new Date().toLocaleTimeString()
-    }]);
-  };
+  
 
   useEffect(() => {
     scrollToBottom();
@@ -326,25 +296,6 @@ const Edumate = () => {
         <div className="edumate-header">
           <div className="header-content">
             <h1>Edumate - Your Learning Assistant</h1>
-            {lectureId && (
-              <div className="lecture-mode-indicator">
-                <span>Lecture Mode</span>
-                <div className="lecture-mode-buttons">
-                  <button 
-                    onClick={handleReturnToLecture} 
-                    className="return-to-lecture-btn"
-                  >
-                    Return to Lecture
-                  </button>
-                  <button 
-                    onClick={handleExitLectureMode} 
-                    className="exit-lecture-mode-btn"
-                  >
-                    Exit Lecture Mode
-                  </button>
-                </div>
-              </div>
-            )}
           </div>
           <button onClick={handleClearChat} className="clear-chat-btn">
             Clear Chat
@@ -409,7 +360,7 @@ const Edumate = () => {
               type="text"
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
-              placeholder={lectureId ? "Ask me about this lecture..." : "Ask me anything about your courses..."}
+              placeholder={"Ask me anything about your courses..."}
               disabled={loading}
               autoComplete="off"
               autoCorrect="off"
