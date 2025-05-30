@@ -88,7 +88,7 @@
 }
 
 .video-upload-label:hover {
-  border-color: #2296f3;
+  border-color: #007AFF;
   background-color: rgba(0, 123, 255, 0.05);
 }
 
@@ -105,7 +105,7 @@
 
 .upload-icon {
   margin-bottom: 1.5rem;
-  color: #2296f3;
+  color: #007AFF;
   background-color: rgba(0, 123, 255, 0.1);
   width: 64px;
   height: 64px;
@@ -129,7 +129,7 @@
 }
 
 .upload-text .secondary-text {
-  color: #2296f3;
+  color: #007AFF;
   font-weight: 500;
 }
 
@@ -157,7 +157,7 @@
 }
 
 .file-preview svg {
-  color: #2296f3;
+  color: #007AFF;
 }
 
 .file-name {
@@ -237,7 +237,7 @@
 }
 
 .progress-percentage {
-  color: #2296f3;
+  color: #007AFF;
   font-weight: 600;
 }
 
@@ -410,7 +410,7 @@
 }
 
 .primary-btn {
-  background-color: #2296f3;
+  background-color: #007AFF;
   color: white;
   border: none;
 }

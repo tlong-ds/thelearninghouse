@@ -64,7 +64,7 @@
 }
 
 .role-selector select:focus {
-  border-color: #2296f3;
+  border-color: #007AFF;
   box-shadow: 0 0 0 3px rgba(34, 150, 243, 0.1);
   outline: none;
 }
@@ -94,8 +94,8 @@ body.dark-theme .role-selector select {
 }
 
 .auth-tabs button.active {
-  color: #2296f3;
-  border-bottom: 2px solid #2296f3;
+  color: #007AFF;
+  border-bottom: 2px solid #007AFF;
 }
 
 .auth-form {
@@ -116,7 +116,7 @@ body.dark-theme .role-selector select {
 .form-group input {
   width: 100%;
   padding: 10px;
-  border: 1px solid #2296f3;
+  border: 1px solid #007AFF;
   border-radius: 4px;
   font-size: 16px;
 }
@@ -142,7 +142,7 @@ body.dark-theme .role-selector select {
   border: 1px solid #6fbeff;
   font-size: 16px;
   font-weight: bold;
-  background-color: #2296f3;
+  background-color: #007AFF;
   color: white;
   overflow: hidden;
   transition: all 0.2s ease-in;

@@ -1,8 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { fetchLectureDetails, submitQuizAnswers } from '../services/api';
 import { useAuth } from '../services/AuthContext';
 import { useLoading } from '../services/LoadingContext';
+import EdumateChat from '../components/EdumateChat';
 import Header from '../components/Header';
 import ReactMarkdown from 'react-markdown';
 import rehypeRaw from 'rehype-raw';
@@ -12,119 +13,66 @@ import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css'; // Import KaTeX CSS
 import '../styles/LecturePreview.css';
 
-const QuizSection = ({ quiz, lectureId }) => {
-  const [quizStarted, setQuizStarted] = useState(false);
-  const [userAnswers, setUserAnswers] = useState({});
-  const [quizResult, setQuizResult] = useState(null);
-  
-  const handleStartQuiz = () => {
-    setQuizStarted(true);
-    setUserAnswers({});
-    setQuizResult(null);
-  };
-  
-  const handleSubmit = async () => {
-    try {
-      const response = await submitQuizAnswers(lectureId, userAnswers);
-      setQuizResult(response);
-    } catch (err) {
-      console.error('Failed to submit quiz:', err);
-    }
-  };
-  
-  // Debug quiz display
-  console.log('Quiz being rendered:', quiz);
-  
-  if (!quiz?.questions) {
-    return (
-      <div className="quiz-intro">
-        <h2>{quiz?.title || 'Quiz'}</h2>
-        {quiz?.description && <p className="quiz-description">{quiz.description}</p>}
-        <button className="start-quiz-btn" onClick={handleStartQuiz}>
-          Take Quiz (No Questions Available)
-        </button>
-      </div>
-    );
-  }
-
-  if (!quizStarted) {
-    return (
-      <div className="quiz-intro">
-        <h2>{quiz.title || 'Quiz'}</h2>
-        {quiz.description && <p className="quiz-description">{quiz.description}</p>}
-        <button className="start-quiz-btn" onClick={handleStartQuiz}>
-          Take Quiz
-        </button>
-      </div>
-    );
-  }
-  
-  if (quizResult) {
-    return (
-      <div className="quiz-section">
-        <h2>Quiz Results</h2>
-        <div className="quiz-result">
-          <p>Score: {quizResult.score}%</p>
-          <p>Correct Answers: {quizResult.correct_answers} out of {quizResult.total_questions}</p>
-        </div>
-        <button className="retry-quiz-btn" onClick={handleStartQuiz}>
-          Retake Quiz
-        </button>
-      </div>
-    );
-  }
-  
-  return (
-    <div className="quiz-section">
-      <h2>{quiz.title}</h2>
-      {quiz.description && <p className="quiz-description">{quiz.description}</p>}
-      
-      <div className="questions">
-        {Object.entries(quiz.questions).map(([questionId, questionData]) => (
-          <div key={questionId} className="question">
-            <h3>{questionData.question}</h3>
-            <div className="options">
-              {questionData.options.map((option, idx) => (
-                <label key={idx} className="option">
-                  <input
-                    type="radio"
-                    name={`question_${questionId}`}
-                    value={option}
-                    onChange={(e) => setUserAnswers({
-                      ...userAnswers,
-                      [questionId]: e.target.value
-                    })}
-                    checked={userAnswers[questionId] === option}
-                  />
-                  {option}
-                </label>
-              ))}
-            </div>
-          </div>
-        ))}
-      </div>
-      
-      <button
-        className="submit-quiz"
-        onClick={handleSubmit}
-        disabled={Object.keys(userAnswers).length !== Object.keys(quiz.questions).length}
-      >
-        Submit Quiz
-      </button>
-    </div>
-  );
-};
-
 const LecturePreview = () => {
   const { id } = useParams();
   const location = useLocation();
   const [lecture, setLecture] = useState(null);
   const [error, setError] = useState('');
   const [isSidebarOpen, setSidebarOpen] = useState(true);
+  const [activeTab, setActiveTab] = useState(null);
+  const [isRightTabsExpanded, setRightTabsExpanded] = useState(false);
+  const [isChatActive, setChatActive] = useState(false);
+  const chatRef = useRef(null);
   const { currentUser, logout } = useAuth();
   const { startLoading, stopLoading, isLoading } = useLoading();
   const navigate = useNavigate();
   
+  // Handle tab interactions
+  const handleTabClick = (tabName) => {
+    if (activeTab === tabName && isRightTabsExpanded) {
+      // Close if clicking the same active tab
+      setActiveTab(null);
+      setRightTabsExpanded(false);
+      setChatActive(false);
+    } else {
+      // Open or switch tab
+      setActiveTab(tabName);
+      setRightTabsExpanded(true);
+      // Reset chat state when switching tabs
+      if (tabName !== 'chatbot') {
+        setChatActive(false);
+      }
+    }
+  };
+
+  const closeRightTabs = () => {
+    setActiveTab(null);
+    setRightTabsExpanded(false);
+    setChatActive(false);
+  };
+
+  const startChat = () => {
+    setChatActive(true);
+  };
+
+  // Handle sidebar toggle with blur effect
+  const toggleSidebar = () => {
+    setSidebarOpen(!isSidebarOpen);
+    // Close right tabs when opening sidebar to prevent conflicts
+    if (!isSidebarOpen && isRightTabsExpanded) {
+      setActiveTab(null);
+      setRightTabsExpanded(false);
+    }
+  };
+
+  // Handle keyboard navigation
+  const handleKeyDown = (event, action, ...args) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      action(...args);
+    }
+  };
+
   // Extract course information from navigation state
   const courseFromState = location.state || {};
   const courseName = courseFromState.courseName || 'Course Home';
@@ -184,11 +132,18 @@ const LecturePreview = () => {
       <Header username={currentUser?.username} role={currentUser?.role} onLogout={logout} />
       
       <div className="lecture-preview-layout">
-        {/* Course Navigation Sidebar */}
+        {/* Left Sidebar - Course Navigation */}
         <aside className={`course-sidebar ${!isSidebarOpen ? 'closed' : ''}`}>
-          <button className="sidebar-toggle" onClick={() => setSidebarOpen(!isSidebarOpen)}>
-            <i className={`fas fa-${isSidebarOpen ? 'times' : 'bars'}`}></i>
+          <button 
+            className="sidebar-toggle" 
+            onClick={toggleSidebar} 
+            onKeyDown={(e) => handleKeyDown(e, toggleSidebar)}
+            aria-label={isSidebarOpen ? "Close sidebar" : "Open sidebar"}
+            aria-expanded={isSidebarOpen}
+          >
+            <i className={`fas fa-${isSidebarOpen ? 'chevron-left' : 'chevron-right'}`}></i>
           </button>
+          
           <div className="course-nav-header">
             {lecture ? (
               <Link 
@@ -197,16 +152,14 @@ const LecturePreview = () => {
                   : `/course/${displayLecture.courseId}`} 
                 className="course-nav-title"
               >
-                <i className="fas fa-chevron-left"></i>
+                <i className="fas fa-arrow-left"></i>
                 <span>{displayLecture.courseName}</span>
               </Link>
             ) : (
-              <div className="course-nav-title">
-                <button onClick={() => navigate('/courses')} className="course-nav-title">
-                  <i className="fas fa-chevron-left"></i>
-                  <span>{displayLecture.courseName}</span>
-                </button>
-              </div>
+              <button onClick={() => navigate('/courses')} className="course-nav-title">
+                <i className="fas fa-arrow-left"></i>
+                <span>{displayLecture.courseName}</span>
+              </button>
             )}
           </div>
 
@@ -222,6 +175,15 @@ const LecturePreview = () => {
                       courseId: displayLecture.courseId
                     }
                   })}
+                  onKeyDown={(e) => handleKeyDown(e, () => navigate(`/lecture/${l.id}`, {
+                    state: { 
+                      courseName: displayLecture.courseName,
+                      courseId: displayLecture.courseId
+                    }
+                  }))}
+                  tabIndex={0}
+                  role="button"
+                  aria-label={`Go to lecture ${index + 1}: ${l.title}`}
                 >
                   <span className="lecture-index">{index + 1}</span>
                   <span className="lecture-nav-title">{l.title}</span>
@@ -237,124 +199,323 @@ const LecturePreview = () => {
         </aside>
 
         {/* Main Content Area */}
-        <main className={`lecture-main ${!isSidebarOpen ? 'sidebar-closed' : ''}`}>
-          <div className="lecture-content-wrapper">
-            <div className="lecture-header">
-              <h1>{displayLecture.title}</h1>
-              <div className="lecture-quick-actions">
-                {lecture && (
-                  <Link 
-                    to={`/edumate?lectureId=${displayLecture.id}`} 
-                    className="quick-action-btn ai-btn" 
-                    title="Ask Edumate"
-                  >
-                    <i className="fas fa-robot"></i>
-                  </Link>
-                )}
-                {lecture && displayLecture.quiz && (
-                  <Link 
-                    to={`/quiz/${displayLecture.id}`} 
-                    className="quick-action-btn quiz-btn" 
-                    title="Take Quiz"
-                  >
-                    <i className="fas fa-tasks"></i>
-                  </Link>
-                )}
+        <main className={`lecture-main ${!isSidebarOpen ? 'sidebar-closed' : ''} ${isRightTabsExpanded ? 'right-tabs-expanded' : ''}`}>
+          <div className="lecture-main-wrapper">
+            <div className="lecture-content-wrapper">
+              {/* Header with centered title only */}
+              <div className="lecture-header">
+                <h1>{displayLecture.title}</h1>
               </div>
-            </div>
 
-            <div className="content-columns">
-              {!lecture ? (
-                <div className="no-lecture-container" style={{
-                  display: 'flex',
-                  flexDirection: 'column',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  minHeight: '60vh',
-                  textAlign: 'center',
-                  padding: '2rem'
-                }}>
-                  <div className="no-lecture-box" style={{
-                    backgroundColor: '#f8f9fa',
-                    border: '2px solid #e9ecef',
-                    borderRadius: '12px',
-                    padding: '3rem 2rem',
-                    maxWidth: '400px',
-                    width: '100%'
-                  }}>
-                    <i className="fas fa-graduation-cap" style={{
-                      fontSize: '3rem',
-                      color: '#6c757d',
-                      marginBottom: '1.5rem'
-                    }}></i>
-                    <h2 style={{
-                      fontSize: '1.5rem',
-                      color: '#495057',
-                      marginBottom: '2rem',
-                      fontWeight: '600'
-                    }}>
-                      No lectures available
-                    </h2>
-                    <button 
-                      onClick={() => navigate('/courses')} 
-                      style={{
-                        padding: '0.75rem 2rem',
-                        backgroundColor: '#3498db',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '8px',
-                        cursor: 'pointer',
-                        fontSize: '1rem',
-                        fontWeight: '500',
-                        transition: 'background-color 0.2s ease'
-                      }}
-                      onMouseOver={(e) => e.target.style.backgroundColor = '#2980b9'}
-                      onMouseOut={(e) => e.target.style.backgroundColor = '#3498db'}
-                    >
-                      Browse Courses
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <div className="video-section">
-                  <div className="video-container">
-                    {displayLecture.videoUrl ? (
-                      <video 
-                        controls 
-                        preload="metadata"
-                        controlsList="nodownload"
-                        playsInline
+              {/* Main Layout with Video and Right Tabs */}
+              <div className="content-layout">
+              {/* Central Video and Content Section */}
+              <div className="video-content-section">
+                {!lecture ? (
+                  <div className="no-lecture-container">
+                    <div className="no-lecture-box">
+                      <i className="fas fa-graduation-cap"></i>
+                      <h2>No lectures available</h2>
+                      <button 
+                        onClick={() => navigate('/courses')} 
+                        className="browse-courses-btn"
                       >
-                        <source src={displayLecture.videoUrl} type="video/mp4" />
-                        Your browser does not support the video tag.
-                      </video>
-                    ) : (
-                      <div className="placeholder-video">
-                        <i className="fas fa-video-slash"></i>
-                        <p>No video available for this lecture</p>
-                      </div>
-                    )}
+                        Browse Courses
+                      </button>
+                    </div>
                   </div>
-                  <div className="notes-section">
-                    <div className="notes-content">
-                      {displayLecture.content ? (
-                        <ReactMarkdown
-                          remarkPlugins={[remarkGfm, remarkMath]} 
-                          rehypePlugins={[rehypeRaw, rehypeKatex]}
+                ) : (
+                  <>
+                    {/* Video Container */}
+                    <div className="video-container">
+                      {displayLecture.videoUrl ? (
+                        <video 
+                          controls 
+                          preload="metadata"
+                          controlsList="nodownload"
+                          playsInline
                         >
-                          {displayLecture.content}
-                        </ReactMarkdown>
+                          <source src={displayLecture.videoUrl} type="video/mp4" />
+                          Your browser does not support the video tag.
+                        </video>
                       ) : (
-                        <div className="empty-notes">
-                          <i className="fas fa-file-alt"></i>
-                          <p>No notes available for this lecture.</p>
+                        <div className="placeholder-video">
+                          <i className="fas fa-video-slash"></i>
+                          <p>No video available for this lecture</p>
                         </div>
                       )}
                     </div>
+                  </>
+                )}
+              </div>
+
+              {/* Mobile Horizontal Tabs (Dashboard-style) - Only shown on mobile */}
+              <div className="mobile-tabs-container">
+                <div className="mobile-tabs-header">
+                  {lecture && (
+                    <button 
+                      className={`mobile-tab ${activeTab === 'chatbot' ? 'active' : ''}`}
+                      onClick={() => handleTabClick('chatbot')}
+                      onKeyDown={(e) => handleKeyDown(e, handleTabClick, 'chatbot')}
+                      title="Ask Edumate"
+                      aria-label="Ask Edumate"
+                      aria-pressed={activeTab === 'chatbot'}
+                    >
+                      <i className="fas fa-robot"></i>
+                      <span>Edumate</span>
+                    </button>
+                  )}
+                  {lecture && displayLecture.content && (
+                    <button 
+                      className={`mobile-tab ${activeTab === 'content' ? 'active' : ''}`}
+                      onClick={() => handleTabClick('content')}
+                      onKeyDown={(e) => handleKeyDown(e, handleTabClick, 'content')}
+                      title="Lecture Notes"
+                      aria-label="Lecture Notes"
+                      aria-pressed={activeTab === 'content'}
+                    >
+                      <i className="fas fa-file-text"></i>
+                      <span>Notes</span>
+                    </button>
+                  )}
+                  {lecture && displayLecture.quiz && (
+                    <button 
+                      className={`mobile-tab ${activeTab === 'quiz' ? 'active' : ''}`}
+                      onClick={() => handleTabClick('quiz')}
+                      onKeyDown={(e) => handleKeyDown(e, handleTabClick, 'quiz')}
+                      title="Take Quiz"
+                      aria-label="Take Quiz"
+                      aria-pressed={activeTab === 'quiz'}
+                    >
+                      <i className="fas fa-tasks"></i>
+                      <span>Quiz</span>
+                    </button>
+                  )}
+                </div>
+
+                {activeTab && (
+                  <div className="mobile-tab-content">
+                    {activeTab === 'content' && (
+                      <div className="content-tab">
+                        {displayLecture.content ? (
+                          <ReactMarkdown
+                            remarkPlugins={[remarkGfm, remarkMath]} 
+                            rehypePlugins={[rehypeRaw, rehypeKatex]}
+                            className="lecture-content"
+                          >
+                            {displayLecture.content}
+                          </ReactMarkdown>
+                        ) : (
+                          <div className="empty-content">
+                            <i className="fas fa-file-alt"></i>
+                            <p>No notes available for this lecture.</p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {activeTab === 'chatbot' && (
+                      <div className="chatbot-tab">
+                        {!isChatActive ? (
+                          <div className="chatbot-placeholder">
+                            <i className="fas fa-robot"></i>
+                            <h4>Ask Edumate</h4>
+                            <p>Get instant help with your questions about this lecture</p>
+                            <button 
+                              onClick={startChat}
+                              className="chat-action-btn"
+                            >
+                              Start Conversation
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="embedded-chat-container">
+                            <EdumateChat 
+                                ref={chatRef}
+                              lectureId={displayLecture.id} 
+                              isEmbedded={true}
+                              className="lecture-chat"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {activeTab === 'quiz' && (
+                      <div className="quiz-tab">
+                        {displayLecture.quiz ? (
+                          <div className="quiz-placeholder">
+                            <i className="fas fa-tasks"></i>
+                            <h4>Quiz Available</h4>
+                            <p>Test your knowledge of this lecture</p>
+                            <Link 
+                              to={`/quiz/${displayLecture.id}`}
+                              className="quiz-action-btn"
+                            >
+                              Start Quiz
+                            </Link>
+                          </div>
+                        ) : (
+                          <div className="quiz-placeholder">
+                            <i className="fas fa-tasks"></i>
+                            <h4>Quiz</h4>
+                            <p>Test your knowledge of this lecture</p>
+                            <button className="quiz-action-btn" disabled>
+                              No Quiz Available
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Right Side Expandable Tabs */}
+              <div className={`right-tabs-container ${isRightTabsExpanded ? 'expanded' : ''}`}>
+                <div className="tabs-toggle-area">
+                  {lecture && (
+                    <button 
+                      className={`tab-toggle ${activeTab === 'chatbot' ? 'active' : ''}`}
+                      onClick={() => handleTabClick('chatbot')}
+                      onKeyDown={(e) => handleKeyDown(e, handleTabClick, 'chatbot')}
+                      title="Ask Edumate"
+                      aria-label="Ask Edumate"
+                      aria-pressed={activeTab === 'chatbot'}
+                    >
+                      <i className="fas fa-robot"></i>
+                    </button>
+                  )}
+                  {lecture && displayLecture.content && (
+                    <button 
+                      className={`tab-toggle ${activeTab === 'content' ? 'active' : ''}`}
+                      onClick={() => handleTabClick('content')}
+                      onKeyDown={(e) => handleKeyDown(e, handleTabClick, 'content')}
+                      title="Lecture Notes"
+                      aria-label="Lecture Notes"
+                      aria-pressed={activeTab === 'content'}
+                    >
+                      <i className="fas fa-file-text"></i>
+                    </button>
+                  )}
+                  {lecture && displayLecture.quiz && (
+                    <button 
+                      className={`tab-toggle ${activeTab === 'quiz' ? 'active' : ''}`}
+                      onClick={() => handleTabClick('quiz')}
+                      onKeyDown={(e) => handleKeyDown(e, handleTabClick, 'quiz')}
+                      title="Take Quiz"
+                      aria-label="Take Quiz"
+                      aria-pressed={activeTab === 'quiz'}
+                    >
+                      <i className="fas fa-tasks"></i>
+                    </button>
+                  )}
+                </div>
+
+                <div className="tabs-content">
+                  <div className="tab-content-header">
+                    <h3>
+                      {activeTab === 'content' && 'Lecture Notes'}
+                      {activeTab === 'chatbot' && 'Ask Edumate'}
+                      {activeTab === 'quiz' && 'Quiz'}
+                    </h3>
+                    <div className="tab-header-buttons">
+                      {activeTab === 'chatbot' && isChatActive && (
+                        <button 
+                          className="clear-chat-btn" 
+                          onClick={() => {
+                            // Use the ref to call the clearChat method
+                            if (chatRef.current) {
+                              chatRef.current.clearChat();
+                            }
+                          }}
+                          title="Clear Chat"
+                          aria-label="Clear Chat"
+                        >
+                          <i className="fas fa-trash"></i>
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="tab-content-body">
+                    {activeTab === 'content' && (
+                      <div className="content-tab">
+                        {displayLecture.content ? (
+                          <ReactMarkdown
+                            remarkPlugins={[remarkGfm, remarkMath]} 
+                            rehypePlugins={[rehypeRaw, rehypeKatex]}
+                            className="lecture-content"
+                          >
+                            {displayLecture.content}
+                          </ReactMarkdown>
+                        ) : (
+                          <div className="empty-content">
+                            <i className="fas fa-file-alt"></i>
+                            <p>No notes available for this lecture.</p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {activeTab === 'chatbot' && (
+                      <div className="chatbot-tab">
+                        {!isChatActive ? (
+                          <div className="chatbot-placeholder">
+                            <i className="fas fa-robot"></i>
+                            <h4>Ask Edumate</h4>
+                            <p>Get instant help with your questions about this lecture</p>
+                            <button 
+                              onClick={startChat}
+                              className="chat-action-btn"
+                            >
+                              Start Conversation
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="embedded-chat-container">
+                            <EdumateChat 
+                              ref={chatRef}
+                              lectureId={displayLecture.id} 
+                              isEmbedded={true}
+                              className="lecture-chat"
+                            />
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    {activeTab === 'quiz' && (
+                      <div className="quiz-tab">
+                        {displayLecture.quiz ? (
+                          <div className="quiz-placeholder">
+                            <i className="fas fa-tasks"></i>
+                            <h4>Quiz Available</h4>
+                            <p>Test your knowledge of this lecture</p>
+                            <Link 
+                              to={`/quiz/${displayLecture.id}`}
+                              className="quiz-action-btn"
+                            >
+                              Start Quiz
+                            </Link>
+                          </div>
+                        ) : (
+                          <div className="quiz-placeholder">
+                            <i className="fas fa-tasks"></i>
+                            <h4>Quiz</h4>
+                            <p>Test your knowledge of this lecture</p>
+                            <button className="quiz-action-btn" disabled>
+                              No Quiz Available
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
-              )}
+              </div>
             </div>
+          </div>
           </div>
         </main>
       </div>

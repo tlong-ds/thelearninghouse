@@ -1,4 +1,4 @@
-import { useState, createContext, useContext, useCallback, useEffect } from 'react';
+import { useState, createContext, useContext, useCallback, useEffect, useRef } from 'react';
 
 const LoadingContext = createContext();
 
@@ -8,16 +8,32 @@ export const LoadingProvider = ({ children }) => {
   const [loadingMessage, setLoadingMessage] = useState('Loading...');
   const [showProgress, setShowProgress] = useState(false);
   const [progress, setProgress] = useState(0);
+  const loadingTimerRef = useRef(null);
 
   const startLoading = useCallback((message = 'Loading...', withProgress = false) => {
+    // Clear any existing timer
+    if (loadingTimerRef.current) {
+      clearTimeout(loadingTimerRef.current);
+    }
+    
     setLoadingCount(prev => prev + 1);
-    setLoading(true);
-    setLoadingMessage(message);
-    setShowProgress(withProgress);
-    if (withProgress) setProgress(0);
+    
+    // Add a small delay before showing loading screen to prevent flickering
+    loadingTimerRef.current = setTimeout(() => {
+      setLoading(true);
+      setLoadingMessage(message);
+      setShowProgress(withProgress);
+      if (withProgress) setProgress(0);
+    }, 150); // 150ms delay before showing loading
   }, []);
 
   const stopLoading = useCallback(() => {
+    // Clear any pending loading timer
+    if (loadingTimerRef.current) {
+      clearTimeout(loadingTimerRef.current);
+      loadingTimerRef.current = null;
+    }
+    
     setLoadingCount(prev => {
       const newCount = prev - 1;
       if (newCount <= 0) {

@@ -98,7 +98,7 @@
 
 .header-nav a:hover {
   background: rgba(255, 255, 255, 0.8);
-  color: #2296f3;
+  color: #007AFF;
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
@@ -109,7 +109,7 @@
 
 .header-nav a.active {
   background: rgba(0, 123, 255, 0.09);
-  color: #2296f3;
+  color: #007AFF;
   font-weight: 600;
   box-shadow: 0 2px 8px rgba(0, 122, 255, 0.2);
 }
@@ -221,7 +221,7 @@
     top: 8px;
     left: 8px;
     right: 8px;
-    padding: 8px 16px;
+    padding: 8px 16px 8px 12px; /* Adjusted padding to be asymmetric, less on left, more on right */
     height: 52px;
     justify-content: space-between;
   }
@@ -247,7 +247,8 @@
   }
   
   .header-user {
-    gap: 8px;
+    gap: 16px; /* Increased gap between nav and logout button */
+    margin-left: 12px; /* Added margin to create more separation */
   }
   
   .header-user-info {
@@ -289,7 +290,8 @@
   }
   
   .header-user {
-    gap: 6px;
+    gap: 14px; /* Maintain good spacing even on smaller screens */
+    margin-left: 10px; /* Slightly reduced but still maintain separation */
   }
   
   .logout-btn {
@@ -317,6 +319,11 @@
   .header-nav a {
     font-size: 11px;
     padding: 4px 6px;
+  }
+  
+  .header-user {
+    gap: 12px; /* Still maintain good gap on very small screens */
+    margin-left: 8px; /* Smaller margin but still provide separation */
   }
   
   .logout-btn {

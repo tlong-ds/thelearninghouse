@@ -8,15 +8,40 @@ import '../styles/InstructorDashboard.css';
 // Unified StatisticsChart component
 const StatisticsChart = ({ data, title, yAxisLabel, color }) => {
   const chartRef = useRef(null);
+  const [chartDimensions, setChartDimensions] = useState({ width: 500, height: 280 });
+  
+  useEffect(() => {
+    const updateDimensions = () => {
+      if (chartRef.current) {
+        const containerWidth = chartRef.current.parentElement.offsetWidth;
+        const isMobile = window.innerWidth <= 768;
+        const isSmallMobile = window.innerWidth <= 480;
+        
+        const width = Math.min(containerWidth - 32, isSmallMobile ? 340 : isMobile ? 450 : 500);
+        const height = isSmallMobile ? 240 : isMobile ? 260 : 280;
+        
+        setChartDimensions({ width, height });
+      }
+    };
+
+    updateDimensions();
+    window.addEventListener('resize', updateDimensions);
+    return () => window.removeEventListener('resize', updateDimensions);
+  }, []);
   
   if (!data || data.length === 0) {
     return <div className="no-data-message">No data available for this chart.</div>;
   }
 
   // Calculate chart dimensions
-  const chartWidth = 500;
-  const chartHeight = 280;
-  const padding = { top: 20, right: 30, bottom: 40, left: 50 };
+  const chartWidth = chartDimensions.width;
+  const chartHeight = chartDimensions.height;
+  const padding = { 
+    top: 20, 
+    right: window.innerWidth <= 480 ? 20 : 30, 
+    bottom: window.innerWidth <= 480 ? 35 : 40, 
+    left: window.innerWidth <= 480 ? 40 : 50 
+  };
   const chartInnerWidth = chartWidth - padding.left - padding.right;
   const chartInnerHeight = chartHeight - padding.top - padding.bottom;
   
@@ -39,7 +64,14 @@ const StatisticsChart = ({ data, title, yAxisLabel, color }) => {
   return (
     <div className="statistics-chart">
       <h3>{title}</h3>
-      <svg width={chartWidth} height={chartHeight} ref={chartRef}>
+      <div className="chart-svg-container">
+        <svg 
+          width="100%" 
+          height="100%" 
+          viewBox={`0 0 ${chartWidth} ${chartHeight}`} 
+          preserveAspectRatio="xMidYMid meet"
+          ref={chartRef}
+        >
         {/* Y-axis */}
         <line 
           x1={padding.left} 
@@ -128,6 +160,7 @@ const StatisticsChart = ({ data, title, yAxisLabel, color }) => {
           </g>
         ))}
       </svg>
+      </div>
     </div>
   );
 };
@@ -173,6 +206,11 @@ const InstructorDashboard = () => {
 
   const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
+
+  // Handle course card navigation
+  const handleCourseClick = (courseId) => {
+    navigate(`/manage-course/${courseId}`);
+  };
 
   useEffect(() => {
     // Redirect if not an instructor
@@ -392,7 +430,19 @@ const InstructorDashboard = () => {
 
                     <div className="courses-list">
                       {sortCourses(dashboardData.courses).map(course => (
-                        <div key={course.id} className="course-card">
+                        <div 
+                          key={course.id} 
+                          className="course-card"
+                          onClick={() => handleCourseClick(course.id)}
+                          role="button"
+                          tabIndex={0}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              handleCourseClick(course.id);
+                            }
+                          }}
+                        >
                           <div className="course-info">
                             <h3>{course.name}</h3>
                             <div className="course-stats">
@@ -403,11 +453,6 @@ const InstructorDashboard = () => {
                               <p>Completion Rate: {course.completionRate}%</p>
                               <ProgressBar percentage={course.completionRate} />
                             </div>
-                          </div>
-                          <div className="course-actions">
-                            <Link to={`/manage-course/${course.id}`} className="instructor-view-course-btn">
-                              Manage Course
-                            </Link>
                           </div>
                         </div>
                       ))}

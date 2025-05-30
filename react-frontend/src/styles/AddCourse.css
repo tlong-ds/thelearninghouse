@@ -60,7 +60,7 @@
 }
 
 .form-group:focus-within label {
-  color: #2296f3;
+  color: #007AFF;
 }
 
 .form-group input,
@@ -91,7 +91,7 @@
 .form-group input:focus,
 .form-group textarea:focus,
 .form-group select:focus {
-  border-color: #2296f3;
+  border-color: #007AFF;
   box-shadow: 0 0 0 3px rgba(34, 150, 243, 0.1);
   outline: none;
 }
@@ -160,7 +160,7 @@
 
 .skills-input-container input:focus {
   outline: none;
-  border-color: #2296f3;
+  border-color: #007AFF;
   box-shadow: 0 0 0 3px rgba(34, 150, 243, 0.1);
 }
 
@@ -205,20 +205,20 @@
 .skill-suggestion:before {
   content: "+";
   font-size: 1.1rem;
-  color: #2296f3;
+  color: #007AFF;
   font-weight: 500;
 }
 
 .skill-suggestion:hover {
   background-color: #f0f7ff;
-  color: #2296f3;
+  color: #007AFF;
 }
 
 .skill-suggestion.new-skill {
   margin-top: 0.5rem;
   border-top: 1px dashed #e2e8f0;
   padding-top: 1rem;
-  color: #2296f3;
+  color: #007AFF;
   font-weight: 500;
 }
 
@@ -235,7 +235,7 @@
 }
 
 .selected-skills-container:focus-within {
-  border-color: #2296f3;
+  border-color: #007AFF;
   box-shadow: 0 0 0 3px rgba(34, 150, 243, 0.1);
 }
 
@@ -253,7 +253,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background-color: #2296f3;
+  background-color: #007AFF;
   color: white;
   padding: 0.5rem 1rem;
   border-radius: 20px;
@@ -335,7 +335,7 @@
 }
 
 .primary-btn {
-  background-color: #2296f3;
+  background-color: #007AFF;
   border: none;
   color: white;
   box-shadow: 0 4px 12px rgba(34, 150, 243, 0.15);

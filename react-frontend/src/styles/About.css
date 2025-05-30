@@ -67,7 +67,7 @@ section:hover {
 section h2 {
     color: #2c3e50;
     margin-bottom: 2rem;
-    border-bottom: 3px solid #2296f3;
+    border-bottom: 3px solid #007AFF;
     padding-bottom: 0.75rem;
     font-weight: 700;
     font-size: 1.75rem;
@@ -91,7 +91,7 @@ section p.mb-2 {
 }
 
 section p.mb-2:hover {
-    border-left-color: #2296f3;
+    border-left-color: #007AFF;
     background-color: #f8f9fa;
 }
 
@@ -180,7 +180,7 @@ footer {
     background: #f8f9fa;
     font-weight: 600;
     color: #2c3e50;
-    border-bottom: 2px solid #2296f3;
+    border-bottom: 2px solid #007AFF;
 }
 
 .table td {
@@ -201,7 +201,7 @@ footer {
     display: inline-block;
     margin: 0.5rem 0;
     padding: 0.5rem 1rem;
-    color: #2296f3;
+    color: #007AFF;
     text-decoration: none;
     font-size: 1.1rem;
     transition: all 0.3s ease;

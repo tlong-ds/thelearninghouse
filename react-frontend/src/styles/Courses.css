@@ -2,13 +2,15 @@
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: #f8f9fa;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  backdrop-filter: blur(20px);
   padding-top: 84px; /* Space for floating header (60px + 24px gap) */
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
 }
 
 .courses-content {
   flex: 1;
-  padding: 2rem;
+  padding: 2.5rem;
   max-width: 1200px;
   margin: 0 auto;
   width: 100%;
@@ -16,231 +18,483 @@
 
 .courses-header {
   display: flex;
-  justify-content: flex-end;
+  justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
-  gap: 0;
+  margin-bottom: 2.5rem;
+  gap: 16px;
+  padding: 12px 20px;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.search-section {
+  display: flex;
+  align-items: center;
+  flex: 1;
+  max-width: 400px;
 }
 
 .search-bar {
   position: relative;
-  width: 38px;
-  height: 38px;
-  transition: all 0.3s ease;
-  margin-left: -1px;
+  width: 100%;
+  height: 40px;
   display: flex;
   align-items: center;
 }
 
-.search-bar::after {
-  content: "\f002";
-  font-family: "Font Awesome 6 Free";
-  font-weight: 900;
+.search-bar::before {
+  content: "🔍";
   position: absolute;
-  left: 0;
-  top: 0;
-  height: 38px;
-  width: 38px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid #e4e6eb;
-  border-radius: 20px;
-  background: none;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 16px;
+  color: #86868b;
+  z-index: 2;
   pointer-events: none;
-  font-size: 14px;
-  color: #555;
-}
-
-.search-bar:focus-within,
-.search-bar input:not(:placeholder-shown) {
-  width: 200px;
-  margin-left: -1px;
-  z-index: 1;
-}
-
-.search-bar:focus-within::after,
-.search-bar input:not(:placeholder-shown) ~ .search-bar::after {
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.2s, visibility 0.2s;
 }
 
 .search-bar input {
-  position: absolute;
-  left: 0;
-  width: 200px;
-  height: 38px;
-  padding: 0.6rem 1rem 0.6rem 38px;
-  font-size: 0.95rem;
-  border: 1px solid #e4e6eb;
-  border-radius: 20px;
-  background-color: #f8f9fa;
-  transition: all 0.2s;
-  opacity: 0;
-  pointer-events: auto;
+  width: 100%;
+  height: 40px;
+  padding: 0 16px 0 44px;
+  font-size: 15px;
+  font-weight: 400;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  color: #1d1d1f;
+}
+
+.search-bar input::placeholder {
+  color: #86868b;
+  font-weight: 400;
 }
 
 .search-bar input:focus {
   outline: none;
-  border-color: #2296f3;
-  box-shadow: 0 0 0 3px rgba(34, 150, 243, 0.1);
-  opacity: 1;
+  border-color: #007AFF;
+  box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.2), 0 4px 16px rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 1);
 }
 
-.search-bar:focus-within input,
-.search-bar input:not(:placeholder-shown) {
+.search-bar input:focus::placeholder {
+  opacity: 0.6;
+}
+
+/* Enhanced search bar interactions */
+.search-bar:focus-within::before {
+  color: #007AFF;
+  transform: translateY(-50%) scale(1.1);
+}
+
+.search-bar input:not(:placeholder-shown) ~ .search-clear-btn {
   opacity: 1;
+  pointer-events: auto;
+}
+
+.search-clear-btn {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: rgba(142, 142, 147, 0.12);
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.2s ease;
+  z-index: 3;
+}
+
+.search-clear-btn:hover {
+  background: rgba(142, 142, 147, 0.16);
+  transform: translateY(-50%) scale(1.1);
+}
+
+.search-clear-btn::after {
+  content: "×";
+  font-size: 14px;
+  color: #86868b;
+  font-weight: 500;
+}
+
+/* Improved focus ring for better accessibility */
+.search-bar input:focus-visible {
+  outline: 2px solid #007AFF;
+  outline-offset: 2px;
+}
+
+/* Subtle animation for search icon */
+@keyframes searchPulse {
+  0%, 100% { transform: translateY(-50%) scale(1); }
+  50% { transform: translateY(-50%) scale(1.05); }
+}
+
+.search-bar:focus-within::before {
+  animation: searchPulse 2s ease-in-out infinite;
 }
 
 .courses-content h1 {
-  margin-bottom: 1.5rem;
-  font-size: 2rem;
+  margin-bottom: 2rem;
+  font-size: 2.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #1d1d1f, #86868b);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  letter-spacing: -0.02em;
 }
 
 .add-course-btn {
-  margin-bottom: 2rem;
-  color: #2296f3;
+  margin-bottom: 2.5rem;
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 1rem 0;
+  padding: 1.5rem 0;
   background-color: transparent;
 }
 
 .add-course-btn .btn {
-  display: inline-block;
-  background-color: #2296f3;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #007AFF, #5856D6);
   color: #fff;
-  padding: 10px 28px;
-  border-radius: 4px;
+  padding: 14px 32px;
+  border-radius: 12px;
   font-weight: 600;
-  font-size: 1rem;
+  font-size: 16px;
   text-decoration: none;
-  transition: background 0.2s, box-shadow 0.2s;
-  box-shadow: 0 2px 8px rgba(34, 150, 243, 0.08);
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  box-shadow: 0 8px 24px rgba(0, 122, 255, 0.25);
   border: none;
   cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.add-course-btn .btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
+  opacity: 0;
+  transition: opacity 0.3s;
 }
 
 .add-course-btn .btn:hover,
 .add-course-btn .btn:focus {
-  background-color: #1d76be;
-  color: #fff;
-  box-shadow: 0 4px 16px rgba(34, 150, 243, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(0, 122, 255, 0.35);
   text-decoration: none;
 }
 
+.add-course-btn .btn:hover::before {
+  opacity: 1;
+}
+
+.add-course-btn .btn:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 16px rgba(0, 122, 255, 0.3);
+}
+
 .no-courses {
-  padding: 3rem;
-  background-color: white;
-  border-radius: 8px;
+  padding: 4rem 3rem;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
   text-align: center;
-  color: #777;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  color: #86868b;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08);
+  font-size: 17px;
+  font-weight: 400;
 }
 
 .courses-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
 }
 
 .courses-container .course-controls {
   display: flex;
-  gap: 0.75rem;
+  gap: 12px;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .courses-container .course-controls select {
-  padding: 0 2.5rem 0 1rem;
+  padding: 0 40px 0 16px;
   text-align: left;
-  text-indent: 0.5rem;
-  border-radius: 20px;
-  border: 1px solid #e4e6eb;
-  font-size: 0.9rem;
-  color: #555;
-  height: 38px;
-  background-color: #f8f9fa;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  font-size: 15px;
+  font-weight: 400;
+  color: #1d1d1f;
+  height: 40px;
+  min-width: 140px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
   cursor: pointer;
-  transition: all 0.2s;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   -webkit-appearance: none;
   -moz-appearance: none;
   appearance: none;
-  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%232a2f35'%3E%3Cpath d='M4.646 6.146a.5.5 0 01.708 0L8 8.793l2.646-2.647a.5.5 0 01.708.708l-3 3a.5.5 0 01-.708 0l-3-3a.5.5 0 010-.708z'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%231d1d1f'%3E%3Cpath d='M4.646 6.146a.5.5 0 01.708 0L8 8.793l2.646-2.647a.5.5 0 01.708.708l-3 3a.5.5 0 01-.708 0l-3-3a.5.5 0 010-.708z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 1rem center;
+  background-position: right 12px center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+
+.courses-container .course-controls select:hover {
+  border-color: rgba(0, 0, 0, 0.2);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 1);
 }
 
 .courses-container .course-controls select:focus {
   outline: none;
-  border-color: #2296f3;
-  box-shadow: 0 0 0 3px rgba(34, 150, 243, 0.1);
+  border-color: #007AFF;
+  box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.2), 0 4px 16px rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 1);
 }
 
 .courses-container .sort-order-btn {
-  height: 38px;
-  width: 38px;
-  border-radius: 20px;
-  border: 1px solid #e4e6eb;
-  background: #f8f9fa;
+  height: 40px;
+  width: 40px;
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
   cursor: pointer;
-  transition: all 0.2s;
-  color: #555;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  color: #1d1d1f;
   display: flex;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+  flex-shrink: 0;
 }
 
 .sort-order-btn:hover {
-  background-color: #f5f5f5;
-  border-color: #c5c9d3;
+  background: rgba(255, 255, 255, 1);
+  border-color: rgba(0, 0, 0, 0.2);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 }
 
 .sort-order-btn:focus {
   outline: none;
-  border-color: #2296f3;
-  box-shadow: 0 0 0 3px rgba(34, 150, 243, 0.1);
+  border-color: #007AFF;
+  box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.2), 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+/* macOS-inspired enhancements */
+.courses-container *,
+.courses-container *::before,
+.courses-container *::after {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Glass morphism effect for cards */
+.course-card {
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 16px;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.course-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+/* Removed fade-in animation for better performance */
+.courses-grid > * {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* System colors for better integration */
+:root {
+  --system-blue: #007AFF;
+  --system-purple: #5856D6;
+  --system-text-primary: #1d1d1f;
+  --system-text-secondary: #86868b;
+  --system-background: rgba(255, 255, 255, 0.8);
+  --system-border: rgba(0, 0, 0, 0.1);
+  --system-shadow: rgba(0, 0, 0, 0.1);
+}
+
+/* Enhanced focus states for accessibility */
+.courses-container button:focus-visible,
+.courses-container input:focus-visible,
+.courses-container select:focus-visible {
+  outline: 2px solid var(--system-blue);
+  outline-offset: 2px;
+}
+
+/* Improved scrollbar styling */
+.courses-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.courses-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.courses-container::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.courses-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.3);
 }
 
 @media (max-width: 768px) {
   .courses-content {
-    padding: 1rem;
+    padding: 1.5rem;
   }
   
   .courses-grid {
     grid-template-columns: 1fr;
+    gap: 20px;
   }
   
   .courses-header {
     flex-direction: column;
     align-items: stretch;
-    gap: 1rem;
+    gap: 16px;
+    padding: 20px;
   }
   
-  .search-bar,
-  .search-bar:hover,
-  .search-bar:focus-within {
+  .search-section {
+    max-width: none;
+    order: 1;
+  }
+  
+  .search-bar {
     width: 100%;
-    margin-right: 0;
   }
   
   .search-bar input {
     width: 100%;
   }
   
-  .search-bar::after,
-  .search-bar:hover::after,
-  .search-bar:focus-within::after {
-    border-radius: 20px;
-  }
-  
   .course-controls {
-    width: 100%;
+    width: 100% !important;
+    gap: 8px !important;
+    order: 2;
+    flex-wrap: nowrap !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between;
+    flex-direction: row !important;
   }
   
   .course-controls select {
-    flex: 1;
-    border-radius: 20px;
+    flex: 1 !important;
+    margin-right: 8px;
+    min-width: 0 !important;
+    height: 36px;
+    font-size: 14px;
+    padding: 0 32px 0 12px;
+    border-radius: 10px;
+  }
+
+  .sort-order-btn {
+    flex-shrink: 0 !important;
+    width: 36px !important;
+    height: 36px !important;
+    border-radius: 10px;
+  }
+
+  .courses-content h1 {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .add-course-btn {
+    padding: 1rem 0;
+    margin-bottom: 2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .courses-content {
+    padding: 1rem;
+  }
+  
+  .courses-header {
+    padding: 12px;
+    gap: 10px;
+  }
+  
+  .search-bar {
+    height: 36px;
+  }
+  
+  .search-bar input {
+    height: 36px;
+    font-size: 16px; /* Prevent zoom on iOS */
+    padding: 0 14px 0 40px;
+  }
+  
+  .search-bar::before {
+    left: 12px;
+    font-size: 14px;
+  }
+  
+  .course-controls {
+    gap: 6px !important;
+    display: flex !important;
+    align-items: center !important;
+    flex-wrap: nowrap !important;
+    justify-content: space-between;
+  }
+  
+  .course-controls select {
+    height: 32px;
+    font-size: 16px; /* Prevent zoom on iOS */
+    padding: 0 28px 0 10px;
+    min-width: 0 !important;
+    flex: 1 !important;
+    border-radius: 8px;
+    max-width: calc(100% - 38px); /* Leave space for button + gap */
+  }
+  
+  .sort-order-btn {
+    width: 32px !important;
+    height: 32px !important;
+    border-radius: 8px;
+    flex-shrink: 0 !important;
+  }
+  
+  .courses-content h1 {
+    font-size: 1.75rem;
+    margin-bottom: 1.25rem;
   }
 }

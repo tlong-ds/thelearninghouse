@@ -75,7 +75,7 @@
 }
 
 .add-lecture-btn {
-  background-color: #2296f3;
+  background-color: #007AFF;
   color: white;
   border: none;
   padding: 0.75rem 1.5rem;
@@ -206,7 +206,7 @@
   width: 2.5rem;
   height: 2.5rem;
   border-radius: 50%;
-  background-color: #2296f3;
+  background-color: #007AFF;
   color: white;
   font-weight: bold;
   flex-shrink: 0;
@@ -280,7 +280,7 @@
 .stat-value {
   font-size: 2.5rem;
   font-weight: bold;
-  color: #2296f3;
+  color: #007AFF;
   margin-bottom: 0.5rem;
 }
 

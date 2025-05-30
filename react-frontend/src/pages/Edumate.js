@@ -18,9 +18,73 @@ const Edumate = () => {
   const [inputMessage, setInputMessage] = useState('');
   const [loading, setLoading] = useState(false);
   const [lectureId, setLectureId] = useState(null);
+  const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+  const [isKeyboardVisible, setIsKeyboardVisible] = useState(false);
   const messagesEndRef = useRef(null);
+  const inputRef = useRef(null);
   const location = useLocation();
   const navigate = useNavigate();
+
+  // Handle window resize and mobile detection
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    const handleViewportChange = () => {
+      // Detect virtual keyboard on mobile
+      if (window.innerWidth <= 768) {
+        const viewportHeight = window.visualViewport ? window.visualViewport.height : window.innerHeight;
+        const windowHeight = window.innerHeight;
+        setIsKeyboardVisible(viewportHeight < windowHeight * 0.8);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+    
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', handleViewportChange);
+    }
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', handleViewportChange);
+      }
+    };
+  }, []);
+
+  // Enhanced mobile scroll behavior
+  const scrollToBottom = () => {
+    if (messagesEndRef.current) {
+      // Use different scroll behavior for mobile vs desktop
+      const behavior = isMobile ? 'auto' : 'smooth';
+      messagesEndRef.current.scrollIntoView({ 
+        behavior, 
+        block: 'end', 
+        inline: 'nearest' 
+      });
+    }
+  };
+
+  // Auto scroll with mobile optimization
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      scrollToBottom();
+    }, isMobile ? 100 : 300);
+
+    return () => clearTimeout(timeoutId);
+  }, [messages, isMobile]);
+
+  // Handle mobile keyboard visibility
+  useEffect(() => {
+    if (isKeyboardVisible && inputRef.current) {
+      // Small delay to ensure keyboard is fully visible
+      setTimeout(() => {
+        scrollToBottom();
+      }, 200);
+    }
+  }, [isKeyboardVisible]);
 
   // Extract lectureId from URL query parameters and load chat history
   useEffect(() => {
@@ -79,22 +143,31 @@ const Edumate = () => {
     loadChatHistory();
   }, [location.search]);
 
-  // Auto scroll to bottom when new messages come in
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
+  // Enhanced message addition with mobile optimization
   const addMessage = (content, isUser = false) => {
-    setMessages(prev => [...prev, {
+    const newMessage = {
       id: Date.now(),
       content,
       isUser,
       timestamp: new Date().toLocaleTimeString()
-    }]);
+    };
+    
+    setMessages(prev => [...prev, newMessage]);
+    
+    // Immediate scroll for mobile, delayed for desktop
+    if (isMobile) {
+      setTimeout(scrollToBottom, 50);
+    }
   };
 
+  // Enhanced message handling with better mobile UX
   const handleSendMessage = async (message) => {
     if (!message.trim()) return;
+
+    // Blur input on mobile to hide keyboard
+    if (isMobile && inputRef.current) {
+      inputRef.current.blur();
+    }
 
     // Create user message with proper formatting
     const userMessage = {
@@ -143,6 +216,11 @@ const Edumate = () => {
     setInputMessage('');
     setLoading(true);
 
+    // Blur input on mobile to hide keyboard
+    if (isMobile && inputRef.current) {
+      inputRef.current.blur();
+    }
+
     // Create message object with exact formatting
     const newUserMessage = {
       id: Date.now(),
@@ -154,6 +232,11 @@ const Edumate = () => {
     try {
       // Add user message immediately for better UX
       setMessages(prev => [...prev, newUserMessage]);
+      
+      // Mobile-specific scroll timing
+      if (isMobile) {
+        setTimeout(scrollToBottom, 100);
+      }
       
       // Get response without reloading full history
       const response = await sendChatMessage(userMessage, lectureId);
@@ -191,6 +274,16 @@ const Edumate = () => {
       timestamp: new Date().toLocaleTimeString()
     }]);
     
+    // Scroll to top on mobile after clearing
+    if (isMobile) {
+      setTimeout(() => {
+        const messagesContainer = document.querySelector('.messages-container');
+        if (messagesContainer) {
+          messagesContainer.scrollTop = 0;
+        }
+      }, 100);
+    }
+    
     // Clear backend cache without waiting
     import('../services/chatbotAPI').then(({ clearChatHistory }) => {
       console.log(`Clearing chat history for ${lectureId ? `lecture ${lectureId}` : 'general chat'}`);
@@ -200,12 +293,33 @@ const Edumate = () => {
     });
   };
 
+  // Enhanced navigation for mobile
+  const handleReturnToLecture = () => {
+    if (isMobile) {
+      // Use replace on mobile for better navigation
+      navigate(`/lecture/${lectureId}`, { replace: true });
+    } else {
+      navigate(`/lecture/${lectureId}`);
+    }
+  };
+
+  const handleExitLectureMode = () => {
+    setLectureId(null);
+    navigate('/edumate', { replace: true });
+    setMessages([{
+      id: Date.now(),
+      content: `# Switched to General Mode\n\nI'm now in general mode and can answer questions about any topic in your courses. How can I help you?`,
+      isUser: false,
+      timestamp: new Date().toLocaleTimeString()
+    }]);
+  };
+
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
 
   return (
-    <div className="edumate-container">
+    <div className={`edumate-container ${isMobile ? 'mobile' : ''} ${isKeyboardVisible ? 'keyboard-visible' : ''}`}>
       <Header username={currentUser?.username} role={currentUser?.role} onLogout={logout} />
       
       <div className="edumate-content">
@@ -217,22 +331,13 @@ const Edumate = () => {
                 <span>Lecture Mode</span>
                 <div className="lecture-mode-buttons">
                   <button 
-                    onClick={() => navigate(`/lecture/${lectureId}`)} 
+                    onClick={handleReturnToLecture} 
                     className="return-to-lecture-btn"
                   >
                     Return to Lecture
                   </button>
                   <button 
-                    onClick={() => {
-                      setLectureId(null);
-                      navigate('/edumate', { replace: true });
-                      setMessages([{
-                        id: Date.now(),
-                        content: `# Switched to General Mode\n\nI'm now in general mode and can answer questions about any topic in your courses. How can I help you?`,
-                        isUser: false,
-                        timestamp: new Date().toLocaleTimeString()
-                      }]);
-                    }} 
+                    onClick={handleExitLectureMode} 
                     className="exit-lecture-mode-btn"
                   >
                     Exit Lecture Mode
@@ -268,7 +373,15 @@ const Edumate = () => {
                         li: ({node, ...props}) => <li className="md-list-item" {...props} />,
                         code: ({node, inline, ...props}) => 
                           inline ? <code className="md-inline-code" {...props} /> : <code className="md-block-code" {...props} />,
-                        pre: ({node, ...props}) => <pre className="md-pre" {...props} />
+                        pre: ({node, ...props}) => <pre className="md-pre" {...props} />,
+                        table: ({node, ...props}) => (
+                          <div className="table-wrapper">
+                            <table className="md-table" {...props} />
+                          </div>
+                        ),
+                        img: ({node, ...props}) => (
+                          <img className="md-image" loading="lazy" {...props} />
+                        )
                       }}
                     >
                       {msg.content}
@@ -292,14 +405,23 @@ const Edumate = () => {
 
           <form onSubmit={handleSubmit} className="chat-input-form">
             <input
+              ref={inputRef}
               type="text"
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               placeholder={lectureId ? "Ask me about this lecture..." : "Ask me anything about your courses..."}
               disabled={loading}
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="off"
+              spellCheck="false"
             />
             <button type="submit" disabled={loading || !inputMessage.trim()}>
-              {loading ? 'Thinking...' : 'Send'}
+              {loading ? (
+                <i className="fas fa-spinner fa-spin"></i>
+              ) : (
+                <i className="fas fa-paper-plane"></i>
+              )}
             </button>
           </form>
         </div>

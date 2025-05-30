@@ -38,7 +38,7 @@
   width: 60px;
   height: 60px;
   border-radius: 50%;
-  background-color: #2296f3;
+  background-color: #007AFF;
   color: white;
   display: flex;
   align-items: center;
@@ -88,7 +88,7 @@
 
 .nav-item.active {
   background-color: #f0f8ff;
-  color: #2296f3;
+  color: #007AFF;
   font-weight: 500;
 }
 
@@ -188,7 +188,7 @@
 .form-group input[type="text"]:focus,
 .form-group input[type="email"]:focus,
 .form-group input[type="password"]:focus {
-  border-color: #2296f3;
+  border-color: #007AFF;
   box-shadow: 0 0 0 3px rgba(61, 106, 255, 0.1);
   outline: none;
 }
@@ -214,8 +214,8 @@
 
 .change-password-btn {
   background-color: transparent;
-  border: 1px solid #2296f3;
-  color: #2296f3;
+  border: 1px solid #007AFF;
+  color: #007AFF;
   padding: 8px 16px;
   border-radius: 6px;
   font-weight: bold;
@@ -254,7 +254,7 @@
 }
 
 .save-btn {
-  background-color: #2296f3;
+  background-color: #007AFF;
   color: white;
   border: none;
   padding: 10px 20px;

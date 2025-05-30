@@ -30,7 +30,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 a {
-  color: #2296f3;
+  color: #007AFF;
   text-decoration: none;
 }
 
@@ -79,20 +79,20 @@ button {
 }
 
 .primary-btn {
-  background-color: #2296f3;
+  background-color: #007AFF;
   color: white;
-  border: 1px solid #2296f3;
+  border: 1px solid #007AFF;
 }
 
 .primary-btn:hover {
-  background-color: #2296f3;
+  background-color: #007AFF;
   text-decoration: none;
 }
 
 .secondary-btn {
   background-color: transparent;
-  color: #2296f3;
-  border: 1px solid #2296f3;
+  color: #007AFF;
+  border: 1px solid #007AFF;
 }
 
 .secondary-btn:hover {

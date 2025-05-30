@@ -11,9 +11,11 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.98); /* Increased opacity to reduce flickering */
   z-index: 10000; /* Higher than header to ensure it's on top */
-  backdrop-filter: blur(2px);
+  backdrop-filter: blur(5px); /* Increased blur for smoother transitions */
+  transition: opacity 0.3s ease; /* Add transition for smoother appearance/disappearance */
+  will-change: opacity; /* Optimize for animations */
 }
 
 .loading-content {
@@ -24,9 +26,23 @@
   background: white;
   padding: 2.5rem;
   border-radius: 16px;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
   max-width: 400px;
   width: 90%;
+  transform: translateY(0); /* Set initial position */
+  animation: fadeInUp 0.3s ease-out; /* Add animation */
+  will-change: transform, opacity; /* Optimize for animations */
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .loading-spinner {

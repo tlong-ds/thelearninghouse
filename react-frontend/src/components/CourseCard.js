@@ -18,7 +18,7 @@ const CourseCard = ({ course }) => {
   };
 
   return (
-    <div className="browse-course-card">
+    <Link to={getCourseUrl()} className="browse-course-card clickable-card">
       <div className="browse-course-image">
         <img 
           src={course.image_url || images.logoCourse} 
@@ -37,11 +37,8 @@ const CourseCard = ({ course }) => {
           <span className="browse-course-duration">⏱️ {formatDuration(course.duration)}</span>
           <span className="browse-course-rating">★ {course.rating ? parseFloat(course.rating).toFixed(1) : '0.0'}</span>
         </div>
-        <Link to={getCourseUrl()} className="browse-course-button">
-          <span>View Course</span>
-        </Link>
       </div>
-    </div>
+    </Link>
   );
 };
 

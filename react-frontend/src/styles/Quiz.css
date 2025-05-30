@@ -310,13 +310,13 @@
 
 .option:has(input[type="radio"]:checked) {
   background-color: #e3f2fd;
-  border-color: #2296f3;
+  border-color: #007AFF;
   border-width: 2px;
   box-shadow: 0 2px 4px rgba(33, 150, 243, 0.2);
 }
 
 .submit-button {
-  background-color: #2296f3;
+  background-color: #007AFF;
   color: white;
   border: none;
   padding: 1rem 2rem;

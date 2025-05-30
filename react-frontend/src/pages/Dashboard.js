@@ -9,15 +9,40 @@ import '../styles/Dashboard.css';
 // Line chart component for statistics
 const StatisticsChart = ({ data, title, yAxisLabel, color }) => {
   const chartRef = useRef(null);
+  const [chartDimensions, setChartDimensions] = useState({ width: 500, height: 280 });
+  
+  useEffect(() => {
+    const updateDimensions = () => {
+      if (chartRef.current) {
+        const containerWidth = chartRef.current.parentElement.offsetWidth;
+        const isMobile = window.innerWidth <= 768;
+        const isSmallMobile = window.innerWidth <= 480;
+        
+        const width = Math.min(containerWidth - 32, isSmallMobile ? 340 : isMobile ? 450 : 500);
+        const height = isSmallMobile ? 240 : isMobile ? 260 : 280;
+        
+        setChartDimensions({ width, height });
+      }
+    };
+
+    updateDimensions();
+    window.addEventListener('resize', updateDimensions);
+    return () => window.removeEventListener('resize', updateDimensions);
+  }, []);
   
   if (!data || data.length === 0) {
     return <div className="no-data-message">No data available for this chart.</div>;
   }
 
   // Calculate chart dimensions
-  const chartWidth = 500;
-  const chartHeight = 280;
-  const padding = { top: 20, right: 30, bottom: 40, left: 50 };
+  const chartWidth = chartDimensions.width;
+  const chartHeight = chartDimensions.height;
+  const padding = { 
+    top: 20, 
+    right: window.innerWidth <= 480 ? 20 : 30, 
+    bottom: window.innerWidth <= 480 ? 35 : 40, 
+    left: window.innerWidth <= 480 ? 40 : 50 
+  };
   const chartInnerWidth = chartWidth - padding.left - padding.right;
   const chartInnerHeight = chartHeight - padding.top - padding.bottom;
   
@@ -40,7 +65,14 @@ const StatisticsChart = ({ data, title, yAxisLabel, color }) => {
   return (
     <div className="statistics-chart">
       <h3>{title}</h3>
-      <svg width={chartWidth} height={chartHeight} ref={chartRef}>
+      <div className="chart-svg-container">
+        <svg 
+          width="100%" 
+          height="100%" 
+          viewBox={`0 0 ${chartWidth} ${chartHeight}`} 
+          preserveAspectRatio="xMidYMid meet"
+          ref={chartRef}
+        >
         {/* Y-axis */}
         <line 
           x1={padding.left} 
@@ -129,8 +161,8 @@ const StatisticsChart = ({ data, title, yAxisLabel, color }) => {
             />
             <title>{`Date: ${point.date}, ${yAxisLabel}: ${point.value}`}</title>
           </g>
-        ))}
-      </svg>
+        ))}        </svg>
+      </div>
     </div>
   );
 };
@@ -177,101 +209,96 @@ const Dashboard = () => {
     loadDashboardData();
   }, [startLoading, stopLoading]);
   
-  if (error || !dashboardData) {
+  // Handle course card navigation
+  const handleCourseClick = (courseId) => {
+    navigate(`/course/${courseId}`);
+  };
+
+  // Prepare data for charts and sorting (only when dashboardData exists)
+  const renderDashboardContent = () => {
+    if (!dashboardData) return null;
+    
+    // Format data for charts
+    const filterDataByTime = (data) => {
+      if (timeFilter === 'all') return data;
+      
+      const now = new Date();
+      const filterDate = new Date();
+      
+      if (timeFilter === 'day') {
+        filterDate.setDate(now.getDate() - 1);
+      } else if (timeFilter === 'week') {
+        filterDate.setDate(now.getDate() - 7);
+      } else if (timeFilter === 'month') {
+        filterDate.setMonth(now.getMonth() - 1);
+      }
+      
+      return data.filter(item => {
+        const itemDate = new Date(item.date);
+        return itemDate >= filterDate;
+      });
+    };
+    
+    const sortData = (data) => {
+      const sortedData = [...data];
+      
+      sortedData.sort((a, b) => {
+        if (sortBy === 'date') {
+          return sortOrder === 'asc' 
+            ? new Date(a.date) - new Date(b.date) 
+            : new Date(b.date) - new Date(a.date);
+        } else {
+          return sortOrder === 'asc' 
+            ? a.value - b.value 
+            : b.value - a.value;
+        }
+      });
+      
+      return sortedData;
+    };
+    
+    const lecturesPassedData = sortData(filterDataByTime(dashboardData.statistics.lecturesPassed.map(item => ({
+      date: item.date,
+      value: item.count
+    }))));
+    
+    const averageScoresData = filterDataByTime(dashboardData.statistics.averageScores.map(item => ({
+      date: item.date,
+      value: item.score
+    })));
+    
+    // Sort enrolled courses
+    const sortCourses = (courses) => {
+      return [...courses].sort((a, b) => {
+        let comparison = 0;
+        
+        switch (sortBy) {
+          case 'name':
+            comparison = a.name.localeCompare(b.name);
+            break;
+          case 'instructor':
+            comparison = a.instructor.localeCompare(b.instructor);
+            break;
+          case 'progress':
+            comparison = (a.percentage || 0) - (b.percentage || 0);
+            break;
+          default:
+            comparison = 0;
+        }
+        
+        return sortOrder === 'asc' ? comparison : -comparison;
+      });
+    };
+    
+    const handleSortChange = (e) => {
+      setSortBy(e.target.value);
+    };
+    
+    const toggleSortOrder = () => {
+      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+    };
+    
     return (
-      <div className="dashboard-container">
-        <Header username={currentUser?.username} role={currentUser?.role} onLogout={logout} />
-        <div className="error">{error || 'Dashboard data not found'}</div>
-      </div>
-    );
-  }
-  
-  // Format data for charts
-  const filterDataByTime = (data) => {
-    if (timeFilter === 'all') return data;
-    
-    const now = new Date();
-    const filterDate = new Date();
-    
-    if (timeFilter === 'day') {
-      filterDate.setDate(now.getDate() - 1);
-    } else if (timeFilter === 'week') {
-      filterDate.setDate(now.getDate() - 7);
-    } else if (timeFilter === 'month') {
-      filterDate.setMonth(now.getMonth() - 1);
-    }
-    
-    return data.filter(item => {
-      const itemDate = new Date(item.date);
-      return itemDate >= filterDate;
-    });
-  };
-  
-  const sortData = (data) => {
-    const sortedData = [...data];
-    
-    sortedData.sort((a, b) => {
-      if (sortBy === 'date') {
-        return sortOrder === 'asc' 
-          ? new Date(a.date) - new Date(b.date) 
-          : new Date(b.date) - new Date(a.date);
-      } else {
-        return sortOrder === 'asc' 
-          ? a.value - b.value 
-          : b.value - a.value;
-      }
-    });
-    
-    return sortedData;
-  };
-  
-  const lecturesPassedData = sortData(filterDataByTime(dashboardData.statistics.lecturesPassed.map(item => ({
-    date: item.date,
-    value: item.count
-  }))));
-  
-  const averageScoresData = filterDataByTime(dashboardData.statistics.averageScores.map(item => ({
-    date: item.date,
-    value: item.score
-  })));
-  
-  // Sort enrolled courses
-  const sortCourses = (courses) => {
-    return [...courses].sort((a, b) => {
-      let comparison = 0;
-      
-      switch (sortBy) {
-        case 'name':
-          comparison = a.name.localeCompare(b.name);
-          break;
-        case 'instructor':
-          comparison = a.instructor.localeCompare(b.instructor);
-          break;
-        case 'progress':
-          comparison = (a.percentage || 0) - (b.percentage || 0);
-          break;
-        default:
-          comparison = 0;
-      }
-      
-      return sortOrder === 'asc' ? comparison : -comparison;
-    });
-  };
-  
-  const handleSortChange = (e) => {
-    setSortBy(e.target.value);
-  };
-  
-  const toggleSortOrder = () => {
-    setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
-  };
-  
-  const sortedEnrolledCourses = sortCourses(dashboardData.enrolledCourses);
-  
-  return (
-    <div className="dashboard-container">
-      <Header username={currentUser?.username} role={currentUser?.role} onLogout={logout} />
-      
       <div className="dashboard-content">
         <h1>Learning Dashboard</h1>
         <p className="greeting">Hello <span className="username">{dashboardData.learnerName}</span> - here's your progress overview.</p>
@@ -428,7 +455,19 @@ const Dashboard = () => {
                     </div>
                     <div className="courses-list">
                       {sortCourses(dashboardData.enrolledCourses).map(course => (
-                        <div key={course.id} className="course-card">
+                        <div 
+                          key={course.id} 
+                          className="course-card"
+                          onClick={() => handleCourseClick(course.id)}
+                          role="button"
+                          tabIndex={0}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' || e.key === ' ') {
+                              e.preventDefault();
+                              handleCourseClick(course.id);
+                            }
+                          }}
+                        >
                           <div className="course-info">
                             <h3>{course.name}</h3>
                             <p className="instructor">{course.instructor}</p>
@@ -436,11 +475,6 @@ const Dashboard = () => {
                               <p>Progress: {course.percentage || 0}%</p>
                               <ProgressBar percentage={course.percentage || 0} />
                             </div>
-                          </div>
-                          <div className="course-actions">
-                            <Link to={`/course/${course.id}`} className="student-view-course-btn">
-                              View Course
-                            </Link>
                           </div>
                         </div>
                       ))}
@@ -452,6 +486,25 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+    );
+  };
+  
+  // Single return statement for the entire component
+  return (
+    <div className="dashboard-container">
+      <Header username={currentUser?.username} role={currentUser?.role} onLogout={logout} />
+      
+      {error ? (
+        <div className="error-container">
+          <div className="error-message">{error}</div>
+        </div>
+      ) : !dashboardData ? (
+        <div className="dashboard-placeholder">
+          {/* Empty placeholder that takes space but shows nothing */}
+        </div>
+      ) : (
+        renderDashboardContent()
+      )}
     </div>
   );
 };
