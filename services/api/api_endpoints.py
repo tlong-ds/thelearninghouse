@@ -2404,3 +2404,108 @@ async def debug_my_courses(
     finally:
         if 'conn' in locals():
             conn.close()
+
+# Get enrolled learners for a specific course (instructor only)
+@router.get("/instructor/courses/{course_id}/enrollments")
+async def get_course_enrollments(
+    course_id: int,
+    request: Request,
+    auth_token: str = Cookie(None)
+):
+    try:
+        # Get token from header if not in cookie
+        if not auth_token:
+            auth_header = request.headers.get('Authorization')
+            if auth_header and auth_header.startswith('Bearer '):
+                auth_token = auth_header.split(' ')[1]
+            else:
+                raise HTTPException(status_code=401, detail="No authentication token provided")
+        
+        # Verify token and get user data
+        user_data = decode_token(auth_token)
+        username = user_data['username']
+        role = user_data['role']
+        instructor_id = user_data.get('user_id')
+        
+        # Verify user is an instructor
+        if role != "Instructor":
+            raise HTTPException(status_code=403, detail="Only instructors can access this endpoint")
+        
+        conn = connect_db()
+        
+        with conn.cursor(pymysql.cursors.DictCursor) as cursor:
+            # Get instructor ID if not in token
+            if not instructor_id:
+                cursor.execute("""
+                    SELECT InstructorID 
+                    FROM Instructors 
+                    WHERE AccountName = %s
+                """, (username,))
+                
+                instructor = cursor.fetchone()
+                if not instructor:
+                    raise HTTPException(status_code=404, detail="Instructor not found")
+                
+                instructor_id = instructor['InstructorID']
+            
+            # Verify the course belongs to this instructor
+            cursor.execute("""
+                SELECT CourseID, CourseName
+                FROM Courses 
+                WHERE CourseID = %s AND InstructorID = %s
+            """, (course_id, instructor_id))
+            
+            course = cursor.fetchone()
+            if not course:
+                raise HTTPException(status_code=404, detail="Course not found or you don't have permission to access it")
+            
+            # Get enrolled learners with their enrollment details
+            cursor.execute("""
+                SELECT 
+                    l.LearnerID,
+                    l.LearnerName,
+                    l.Email,
+                    e.EnrollmentDate,
+                    COALESCE(e.Percentage, 0) as progress,
+                    COALESCE(e.Rating, 0) as rating
+                FROM Enrollments e
+                JOIN Learners l ON e.LearnerID = l.LearnerID
+                WHERE e.CourseID = %s
+                ORDER BY e.EnrollmentDate DESC
+            """, (course_id,))
+            
+            enrollments = cursor.fetchall()
+            
+            # Calculate completion rate
+            total_enrollments = len(enrollments)
+            completed_enrollments = sum(1 for e in enrollments if e['progress'] == 100)
+            completion_rate = (completed_enrollments / total_enrollments * 100) if total_enrollments > 0 else 0
+            
+            # Format the data for the frontend
+            formatted_enrollments = []
+            for enrollment in enrollments:
+                formatted_enrollments.append({
+                    'learner_id': enrollment['LearnerID'],
+                    'learner_name': enrollment['LearnerName'],
+                    'email': enrollment['Email'],
+                    'enrollment_date': enrollment['EnrollmentDate'].strftime('%b %d, %Y') if enrollment['EnrollmentDate'] else 'N/A',
+                    'progress': enrollment['progress'],
+                    'rating': enrollment['rating']
+                })
+            
+            return {
+                'course_id': course_id,
+                'course_name': course['CourseName'],
+                'total_enrollments': total_enrollments,
+                'completion_rate': round(completion_rate, 1),
+                'enrollments': formatted_enrollments
+            }
+            
+    except HTTPException as he:
+        raise he
+    except Exception as e:
+        print(f"Error fetching course enrollments: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error fetching course enrollments: {str(e)}")
+    finally:
+        if 'conn' in locals():
+            conn.close()

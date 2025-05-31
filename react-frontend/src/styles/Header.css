@@ -1,118 +1,381 @@
-/* Static Header Styles */
-.static-header {
-  position: static;
-  top: 0;
-  left: 0;
-  right: 0;
-  width: 100%;
-  background: white;
-  border-bottom: 1px solid #dee2e6;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  position: static;
-  z-index: 9000;
+/* Modern floating dock-style header */
+.app-header {
+  position: fixed !important;
+  top: 12px;
+  left: 12px;
+  right: calc(12px + var(--scrollbar-width, 0px));
+  z-index: 999999 !important; /* Increased z-index for better layering */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  height: 60px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Ensure header is at viewport level and creates its own stacking context */
+  will-change: transform;
+  contain: layout style paint;
+  /* Prevent any interference from other elements */
+  isolation: isolate;
+  /* Force the header to always be visible */
+  visibility: visible !important;
+  opacity: 1 !important;
+  display: flex !important;
+  /* Prevent any transforms that might hide the header */
+  transform: none !important;
+  /* Ensure no clip-path or mask interferes */
+  clip-path: none !important;
+  mask: none !important;
+  /* Prevent overflow hidden from parent containers */
+  position: fixed !important;
+  /* SF Pro Display font stack */
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
-.static-header .navbar {
+.app-header:hover {
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  transform: translateY(-1px);
+}
+
+.header-logo {
+  display: flex;
+  align-items: center;
   margin: 0;
-  padding: 0.5rem 0;
+  flex-shrink: 0;
 }
 
-.static-header .navbar-brand {
-  transition: opacity 0.2s ease;
-}
-
-.static-header .navbar-brand:hover {
-  opacity: 0.8;
-}
-
-.static-header .cursor-pointer {
-  cursor: pointer;
-}
-
-.static-header .nav-link {
-  color: #6c757d !important;
-  font-weight: 500;
-  padding: 0.5rem 1rem !important;
-  margin: 0 0.25rem;
-  border-radius: 0.375rem;
+.header-logo a {
+  display: flex;
+  align-items: center;
+  color: #1d1d1f;
+  text-decoration: none;
   transition: all 0.2s ease;
+  padding: 8px 12px;
+  border-radius: 12px;
 }
 
-.static-header .nav-link:hover {
-  color: #0d6efd !important;
-  background-color: rgba(13, 110, 253, 0.1);
+.header-logo a:hover {
+  background: rgba(0, 0, 0, 0.05);
+  transform: scale(1.02);
 }
 
-.static-header .nav-link.active {
-  color: #0d6efd !important;
-  background-color: rgba(13, 110, 253, 0.15);
+.header-logo img {
+  height: 28px;
+  margin-right: 8px;
+}
+
+.header-logo span {
+  font-size: 16px;
   font-weight: 600;
+  letter-spacing: -0.01em;
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
-.static-header .dropdown-toggle {
-  border: 1px solid #0d6efd;
-  color: #0d6efd;
-  background: white;
-  padding: 0.375rem 0.75rem;
+.header-nav {
+  margin: 0;
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  max-width: 600px;
+}
+
+.header-nav ul {
+  display: flex;
+  list-style: none;
+  gap: 4px;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 12px;
+  padding: 4px;
+}
+
+.header-nav li {
+  position: relative;
+}
+
+.header-nav a {
+  display: block;
+  color: #1d1d1f;
+  text-decoration: none;
   font-weight: 500;
-  transition: all 0.2s ease;
+  font-size: 14px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  letter-spacing: -0.01em;
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
-.static-header .dropdown-toggle:hover,
-.static-header .dropdown-toggle:focus {
-  background-color: #0d6efd;
-  color: white;
-  border-color: #0d6efd;
+.header-nav a:hover {
+  background: rgba(255, 255, 255, 0.8);
+  color: #0066cc;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.static-header .dropdown-toggle::after {
-  margin-left: 0.5rem;
+.header-nav a:active {
+  transform: translateY(0);
 }
 
-.static-header .dropdown-menu {
-  border: 1px solid #dee2e6;
-  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-  border-radius: 0.375rem;
-  padding: 0.5rem 0;
+.header-nav a.active {
+  background: rgba(0, 123, 255, 0.09);
+  color: #0066cc;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.2);
 }
 
-.static-header .dropdown-item {
-  padding: 0.5rem 1rem;
+.header-user {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  height: 100%;
+  justify-content: flex-end;
+  flex-shrink: 0;
+}
+
+.header-user-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 2px;
+  text-align: right;
+  white-space: nowrap;
+  min-width: 80px;
+  margin-bottom: 1px;
+  height: 100%;
+}
+
+.header-username {
+  font-size: 14px;
+  font-weight: 600;
+  color: #1d1d1f;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  margin: 0;
+  padding: 0;
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+.header-role {
+  font-size: 12px;
+  color: #8e8e93;
   font-weight: 500;
-  transition: all 0.2s ease;
+  line-height: 1.1;
+  margin: 0;
+  padding: 0;
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
 
-.static-header .dropdown-item:hover {
-  background-color: #f8f9fa;
-}
-
-.static-header .dropdown-item.text-danger:hover {
-  background-color: rgba(220, 53, 69, 0.1);
-  color: #dc3545 !important;
-}
-
-/* Responsive adjustments */
-@media (max-width: 991.98px) {
-  .static-header .navbar-nav {
-    margin-top: 1rem;
-  }
-  
-  .static-header .nav-link {
-    margin: 0.25rem 0;
-  }
-  
-  .static-header .ms-auto {
-    margin-top: 1rem !important;
-  }
-}
-
-/* Logo styling */
-.static-header .navbar-brand img {
+.logout-btn {
+  width: 36px;
+  height: 36px;
+  border: none;
   border-radius: 50%;
-  object-fit: cover;
+  background: linear-gradient(135deg, #ff6b6b, #ff5252);
+  cursor: pointer;
+  position: relative;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
 }
 
-/* Icon styling */
-.static-header .bi {
-  font-size: 1rem;
+.logout-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 16px rgba(255, 107, 107, 0.4);
+}
+
+.logout-btn:active {
+  transform: scale(0.95);
+}
+
+.logout-btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 16px;
+  height: 16px;
+  background: white;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.59L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z'/%3E%3C/svg%3E") no-repeat center;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M17 7l-1.41 1.41L18.17 11H8v2h10.17l-2.58 2.59L17 17l5-5zM4 5h8V3H4c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h8v-2H4V5z'/%3E%3C/svg%3E") no-repeat center;
+}
+
+/* Additional safeguards for header visibility */
+.app-header {
+  /* Additional visibility safeguards */
+  visibility: visible !important;
+  opacity: 1 !important;
+  display: flex !important;
+}
+
+/* Reset z-index for specific high-priority elements but keep them below header */
+.lecture-preview-container,
+.lecture-preview-layout,
+.course-sidebar,
+.sidebar-toggle {
+  z-index: 100 !important;
+}
+
+/* Loading component should be below header */
+.loading-overlay {
+  z-index: 998000 !important;
+}
+
+/* Mobile responsive design */
+/* Tablet optimization */
+@media (max-width: 992px) {
+  .header-nav ul {
+    gap: 3px;
+    padding: 3px;
+  }
+  
+  .header-nav a {
+    font-size: 13px;
+    padding: 7px 14px;
+  }
+  
+  .header-user-info {
+    gap: 1px;
+  }
+  
+  .header-username {
+    font-size: 13px;
+    max-width: 100px;
+  }
+  
+  .header-role {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 768px) {
+  .app-header {
+    top: 8px;
+    left: 8px;
+    right: 8px;
+    padding: 8px 16px 8px 12px; /* Adjusted padding to be asymmetric, less on left, more on right */
+    height: 52px;
+    justify-content: space-between;
+  }
+  
+  .header-logo {
+    display: none; /* Completely hide logo on mobile */
+  }
+  
+  .header-nav {
+    max-width: none;
+    flex: 1;
+    justify-content: center;
+  }
+  
+  .header-nav ul {
+    gap: 2px;
+    padding: 3px;
+  }
+  
+  .header-nav a {
+    font-size: 13px;
+    padding: 6px 10px;
+  }
+  
+  .header-user {
+    gap: 16px; /* Increased gap between nav and logout button */
+    margin-left: 12px; /* Added margin to create more separation */
+  }
+  
+  .header-user-info {
+    display: none; /* Hide user info text on mobile for space */
+  }
+  
+  .logout-btn {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .logout-btn::before {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-header {
+    top: 6px;
+    left: 6px;
+    right: 6px;
+    padding: 6px 12px;
+    height: 48px;
+  }
+  
+  .header-logo {
+    display: none; /* Keep logo hidden */
+  }
+  
+  .header-nav ul {
+    gap: 1px;
+    padding: 2px;
+  }
+  
+  .header-nav a {
+    font-size: 12px;
+    padding: 5px 8px;
+  }
+  
+  .header-user {
+    gap: 14px; /* Maintain good spacing even on smaller screens */
+    margin-left: 10px; /* Slightly reduced but still maintain separation */
+  }
+  
+  .logout-btn {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .logout-btn::before {
+    width: 12px;
+    height: 12px;
+  }
+}
+
+/* Extra small screens - ensure navigation stays functional */
+@media (max-width: 360px) {
+  .app-header {
+    padding: 4px 8px;
+    height: 44px;
+  }
+  
+  .header-logo {
+    display: none; /* Keep logo hidden */
+  }
+  
+  .header-nav a {
+    font-size: 11px;
+    padding: 4px 6px;
+  }
+  
+  .header-user {
+    gap: 12px; /* Still maintain good gap on very small screens */
+    margin-left: 8px; /* Smaller margin but still provide separation */
+  }
+  
+  .logout-btn {
+    width: 24px;
+    height: 24px;
+  }
+  
+  .logout-btn::before {
+    width: 10px;
+    height: 10px;
+  }
 }

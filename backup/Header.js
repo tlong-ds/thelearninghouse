@@ -1,11 +1,13 @@
 import React, { useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import ReactDOM from 'react-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { images } from '../react-frontend/src/utils/images';
 import { updateHeaderForScrollbar } from '../react-frontend/src/utils/scrollbar';
 import '../styles/Header.css';
 
 const Header = ({ username, role, onLogout }) => {
   const location = useLocation();
+  const navigate = useNavigate();
   
   // Debug logging to ensure header is rendering
   console.log('Header rendering:', { username, role, pathname: location.pathname });
@@ -15,6 +17,11 @@ const Header = ({ username, role, onLogout }) => {
     console.warn('Header: Missing required props', { username, role });
     // Still render header with fallback values to prevent disappearing
   }
+
+  const handleLogout = () => {
+    onLogout();
+    navigate('/login');
+  };
   
   // Update header positioning based on scrollbar presence
   useEffect(() => {
@@ -80,7 +87,7 @@ const Header = ({ username, role, onLogout }) => {
     if (path === '/instructor/dashboard' && location.pathname.startsWith('/instructor')) return true;
     return location.pathname === path || location.pathname.startsWith(path + '/');
   };
-  return (
+  return ReactDOM.createPortal(
     <header className="app-header">
       <div className="header-logo">
         <Link to="/">
@@ -121,9 +128,10 @@ const Header = ({ username, role, onLogout }) => {
           <span className="header-username">{username || 'User'}</span>
           <span className="header-role">{role || 'Guest'}</span>
         </div>
-        <button className="logout-btn" onClick={onLogout} aria-label="Logout" />
+        <button className="logout-btn" onClick={handleLogout} aria-label="Logout" />
       </div>
-    </header>
+    </header>,
+    document.body.parentNode
   );
 };
 

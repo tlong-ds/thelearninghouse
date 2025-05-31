@@ -1,10 +1,37 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../services/AuthContext';
 import { useLoading } from '../services/LoadingContext';
+import { fetchCourseEnrollments } from '../services/api';
 import config from '../config';
 import { images } from '../utils/images';
 import '../styles/ManageCourse.css';
+
+// Helper function to generate learner initials
+const generateInitials = (name) => {
+  if (!name) return 'U';
+  const words = name.split(' ');
+  if (words.length >= 2) {
+    return (words[0][0] + words[1][0]).toUpperCase();
+  }
+  return words[0][0].toUpperCase();
+};
+
+// Helper function to render star rating
+const renderStars = (rating) => {
+  const stars = [];
+  const validRating = Math.max(0, Math.min(5, rating || 0));
+  
+  for (let i = 1; i <= 5; i++) {
+    stars.push(
+      <i 
+        key={i}
+        className={`fas fa-star ${i <= validRating ? 'filled' : ''}`}
+      ></i>
+    );
+  }
+  return stars;
+};
 
 const ManageCourse = () => {
   const { courseId } = useParams();
@@ -13,8 +40,21 @@ const ManageCourse = () => {
   const { startLoading, stopLoading } = useLoading();
   const [course, setCourse] = useState(null); 
   const [lectures, setLectures] = useState([]);
+  const [enrollments, setEnrollments] = useState([]);
+  const [enrollmentData, setEnrollmentData] = useState(null);
   const [error, setError] = useState('');
   const [activeTab, setActiveTab] = useState('learners');
+  const tableContainerRef = useRef(null);
+
+  // Handle scroll events for the learners table
+  const handleTableScroll = (e) => {
+    const container = e.target;
+    if (container.scrollTop > 0) {
+      container.classList.add('scrolled');
+    } else {
+      container.classList.remove('scrolled');
+    }
+  };
 
   useEffect(() => {
     // Redirect if not an instructor
@@ -56,6 +96,18 @@ const ManageCourse = () => {
 
         const lecturesData = await lecturesResponse.json();
         setLectures(lecturesData);
+
+        // Fetch enrollment data for this course
+        try {
+          const enrollmentData = await fetchCourseEnrollments(courseId);
+          setEnrollmentData(enrollmentData);
+          setEnrollments(enrollmentData.enrollments || []);
+        } catch (enrollmentErr) {
+          console.error('Failed to load enrollment data:', enrollmentErr);
+          // Don't throw error here, just log it - course details are more important
+          setEnrollments([]);
+          setEnrollmentData(null);
+        }
       } catch (err) {
         setError('Failed to load course details. Please try again later.');
         console.error('Error:', err);
@@ -141,7 +193,7 @@ const ManageCourse = () => {
           <div className="analytics-metrics-grid">
             <div className="analytics-metric-card">
               <h3>Students Enrolled</h3>
-              <div className="analytics-metric-value">{course.enrolled || 0}</div>
+              <div className="analytics-metric-value">{enrollmentData?.total_enrollments || course.enrolled || 0}</div>
             </div>
             
             <div className="analytics-metric-card">
@@ -156,7 +208,7 @@ const ManageCourse = () => {
             
             <div className="analytics-metric-card">
               <h3>Completion Rate</h3>
-              <div className="analytics-metric-value">87%</div>
+              <div className="analytics-metric-value">{enrollmentData?.completion_rate ? `${enrollmentData.completion_rate}%` : 'N/A'}</div>
             </div>
           </div>
         </div>
@@ -183,10 +235,10 @@ const ManageCourse = () => {
               <div className="learners-tab">
                 <div className="learners-header">
                   <h3>Enrolled Students</h3>
-                  <p>{course.enrolled || 0} students currently enrolled</p>
+                  <p>{enrollmentData?.total_enrollments || 0} students currently enrolled</p>
                 </div>
                 
-                <div className="learners-table-container">
+                <div className="learners-table-container" ref={tableContainerRef} onScroll={handleTableScroll}>
                   <table className="learners-table">
                     <thead>
                       <tr>
@@ -197,88 +249,45 @@ const ManageCourse = () => {
                       </tr>
                     </thead>
                     <tbody>
-                      {/* Sample data - replace with real data later */}
-                      <tr>
-                        <td>
-                          <div className="learner-info">
-                            <div className="learner-avatar">JD</div>
-                            <span>John Doe</span>
-                          </div>
-                        </td>
-                        <td>Oct 15, 2024</td>
-                        <td>
-                          <div className="progress-cell">
-                            <div className="progress-bar-container">
-                              <div className="progress-bar" style={{width: '75%'}}></div>
-                            </div>
-                          </div>
-                        </td>
-                        <td>
-                          <div className="rating-cell">
-                            <div className="stars">
-                              <i className="fas fa-star filled"></i>
-                              <i className="fas fa-star filled"></i>
-                              <i className="fas fa-star filled"></i>
-                              <i className="fas fa-star filled"></i>
-                              <i className="fas fa-star"></i>
-                            </div>
-                          </div>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <div className="learner-info">
-                            <div className="learner-avatar">AS</div>
-                            <span>Alice Smith</span>
-                          </div>
-                        </td>
-                        <td>Oct 12, 2024</td>
-                        <td>
-                          <div className="progress-cell">
-                            <div className="progress-bar-container">
-                              <div className="progress-bar" style={{width: '92%'}}></div>
-                            </div>
-                          </div>
-                        </td>
-                        <td>
-                          <div className="rating-cell">
-                            <div className="stars">
-                              <i className="fas fa-star filled"></i>
-                              <i className="fas fa-star filled"></i>
-                              <i className="fas fa-star filled"></i>
-                              <i className="fas fa-star filled"></i>
-                              <i className="fas fa-star filled"></i>
-                            </div>
-                          </div>
-                        </td>
-                      </tr>
-                      <tr>
-                        <td>
-                          <div className="learner-info">
-                            <div className="learner-avatar">MB</div>
-                            <span>Mike Brown</span>
-                          </div>
-                        </td>
-                        <td>Oct 8, 2024</td>
-                        <td>
-                          <div className="progress-cell">
-                            <div className="progress-bar-container">
-                              <div className="progress-bar" style={{width: '45%'}}></div>
-                            </div>
-                          </div>
-                        </td>
-                        <td>
-                          <div className="rating-cell">
-                            <div className="stars">
-                              <i className="fas fa-star filled"></i>
-                              <i className="fas fa-star filled"></i>
-                              <i className="fas fa-star filled"></i>
-                              <i className="fas fa-star"></i>
-                              <i className="fas fa-star"></i>
-                            </div>
-                          </div>
-                        </td>
-                      </tr>
+                      {enrollments.length === 0 ? (
+                        <tr>
+                          <td colSpan="4" style={{ textAlign: 'center', padding: '2rem', color: '#666' }}>
+                            No students enrolled yet
+                          </td>
+                        </tr>
+                      ) : (
+                        enrollments.map((enrollment) => (
+                          <tr key={enrollment.learner_id}>
+                            <td>
+                              <div className="learner-info">
+                                <div className="learner-avatar">
+                                  {generateInitials(enrollment.learner_name)}
+                                </div>
+                                <span>{enrollment.learner_name}</span>
+                              </div>
+                            </td>
+                            <td>{enrollment.enrollment_date}</td>
+                            <td>
+                              <div className="progress-cell">
+                                <div className="progress-bar-container">
+                                  <div 
+                                    className="progress-bar" 
+                                    style={{width: `${enrollment.progress}%`}}
+                                  ></div>
+                                </div>
+                                <span className="progress-text">{enrollment.progress}%</span>
+                              </div>
+                            </td>
+                            <td>
+                              <div className="rating-cell">
+                                <div className="stars">
+                                  {renderStars(enrollment.rating)}
+                                </div>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      )}
                     </tbody>
                   </table>
                 </div>

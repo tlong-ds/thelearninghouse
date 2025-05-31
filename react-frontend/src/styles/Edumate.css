@@ -38,7 +38,8 @@ html, body {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding-top: 84px; /* Space for floating header (60px + 24px gap) */
   position: relative;
-  overflow: hidden; /* Prevent container from scrolling */
+  overflow-x: hidden; /* Only hide horizontal overflow */
+  overflow-y: auto; /* Allow vertical scrolling */
 }
 
 .edumate-container::before {
@@ -728,10 +729,6 @@ html, body {
 
 /* Mobile Responsive Design */
 @media (max-width: 768px) {
-  .edumate-container {
-    padding-top: 70px; /* Reduced for mobile */
-  }
-  
   .edumate-content {
     padding: 0.75rem;
     gap: 1rem;

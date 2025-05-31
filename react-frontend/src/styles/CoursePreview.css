@@ -1,6 +1,4 @@
 /* CoursePreview.css - Hero Background Design */
-@import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&display=swap');
-
 :root {
   --primary-color: #0066cc;
   --primary-hover: #5ac8fa;
@@ -32,6 +30,9 @@ body {
   margin: 0;
   padding: 0;
   color: var(--text-primary);
+  /* Ensure body doesn't create stacking context that interferes with header */
+  position: relative;
+  z-index: auto;
 }
 
 .course-preview-container {

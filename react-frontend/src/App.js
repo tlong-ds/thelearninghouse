@@ -66,10 +66,10 @@ const AppContent = () => {
 
   return (
     <Router basename="/thelearninghouse">
+      {/* Static Header */}
+      <ConditionalHeader />
+
       <div className="app-layout">
-        {/* Static Header */}
-        <ConditionalHeader />
-        
         {/* Main Content Area */}
         <main className="main-content">
           {loading && (

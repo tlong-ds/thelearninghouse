@@ -5,6 +5,8 @@
   min-height: 100vh;
   position: relative;
   overflow-x: hidden;
+  /* Header is now rendered outside body via React Portal, no padding needed */
+  isolation: auto; /* Prevent stacking context issues */
 }
 
 /* Frosted Glass Background */
@@ -14,48 +16,46 @@
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: -1;
+  z-index: -2; /* Keep well below header */
   background-color: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
 }
 
 .macos-gradient-overlay {
-  position: absolute;
+  position: absolute; 
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
   background: linear-gradient(135deg, rgba(226, 227, 239, 0.4) 0%, rgba(255, 255, 255, 0.1) 100%);
-  z-index: -1;
+  z-index: -2; /* Keep well below header */
 }
 
 /* Main Content */
 .macos-main {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 2rem 2rem; /* Changed from padding: 2rem; to remove top padding */
+  padding: 0 2rem 2rem; /* Remove top padding since container now has it */
 }
 
 /* Hero Section */
 .macos-hero {
   text-align: center;
-  padding: 8rem 1rem 10rem; /* Increased bottom padding */
+  padding: 6rem 1rem 8rem;
   position: relative;
   overflow: hidden;
   border-radius: 0;
   margin-bottom: 0;
-  margin-top: 0;
-  background: linear-gradient(135deg, rgba(0, 102, 204, 0.05) 0%, rgba(90, 200, 250, 0.1) 100%); /* Will be replaced by video */
+  margin-top: 0; /* Remove negative margin to eliminate gap */
+  background: linear-gradient(135deg, rgba(0, 102, 204, 0.05) 0%, rgba(90, 200, 250, 0.1) 100%);
   width: 100vw;
   margin-left: calc(-50vw + 50%);
-  min-height: 105vh; 
+  min-height: 110vh;
   display: flex;
   flex-direction: column;
-  justify-content: center; /* Center content vertically */
-  /* Move this up to connect with the top of the page */
-  position: relative;
-  top: -2rem; /* Pull the hero section up to eliminate gap */
+  justify-content: center;
+  isolation: auto;
 }
 
 /* Add video background for hero section */
@@ -112,7 +112,7 @@
   width: 100%;
   height: 100%;
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.3) 100%);
-  z-index: 1;
+  z-index: 1; /* Keep below header but above video */
 }
 
 .macos-hero h1 {
@@ -188,7 +188,7 @@
   flex-direction: column;
   align-items: center;
   gap: 2rem;
-  margin: -2rem 0 0 0; /* Added negative top margin to pull up */
+  margin: 0 0 0 0; /* Added negative top margin to pull up */
   text-align: center;
   position: relative;
   padding: 3rem;
@@ -197,7 +197,7 @@
   background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%230066cc' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM36 0V4h-2V0h-4v4h4v4h2V4h4V0h-4zM0 34v-4H2v4h4v2H2v4H0v-4H2v-2H0zM0 0V4h2V0h4v4H4v4H2V4H0z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
   width: 100vw;
   margin-left: calc(-50vw + 50%);
-  z-index: 1; /* Ensure metrics section is above hero */
+  z-index: 2; /* Ensure metrics section is above hero but below header */
 }
 
 .macos-metrics h2 {

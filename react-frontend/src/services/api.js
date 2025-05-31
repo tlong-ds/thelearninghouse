@@ -256,3 +256,14 @@ export const changePassword = async ({ currentPassword, newPassword }) => {
     throw error;
   }
 };
+
+// Get course enrollments for instructors
+export const fetchCourseEnrollments = async (courseId) => {
+  try {
+    const response = await apiClient.get(`/api/instructor/courses/${courseId}/enrollments`);
+    return response.data;
+  } catch (error) {
+    console.error(`Error fetching course enrollments for course ID ${courseId}:`, error);
+    throw error;
+  }
+};

@@ -25,6 +25,7 @@
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   backdrop-filter: blur(20px);
   padding: 0;
+  padding-top: 84px; /* Space for floating header (60px + 24px gap) */
   font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 
@@ -393,6 +394,57 @@
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+  max-height: 600px; /* Set maximum height for scrolling */
+  overflow-y: auto; /* Enable vertical scrolling */
+  position: relative; /* Required for sticky positioning */
+}
+
+/* Custom scrollbar for learners table container */
+.learners-table-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.learners-table-container::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.05);
+  border-radius: 4px;
+}
+
+.learners-table-container::-webkit-scrollbar-thumb {
+  background: rgba(0, 122, 255, 0.3);
+  border-radius: 4px;
+  transition: background 0.2s ease;
+}
+
+.learners-table-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 122, 255, 0.5);
+}
+
+/* Enhanced sticky header effect */
+.learners-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 15;
+}
+
+.learners-table th::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0, 122, 255, 0.3), transparent);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Smooth scrolling */
+.learners-table-container {
+  scroll-behavior: smooth;
+}
+
+/* Shadow effect when scrolling */
+.learners-table-container.scrolled .learners-table th {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .learners-table {
@@ -429,6 +481,10 @@
   color: var(--text-primary);
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   white-space: nowrap;
+  position: sticky; /* Make header sticky */
+  top: 0; /* Stick to top */
+  z-index: 10; /* Ensure header stays above content */
+  backdrop-filter: blur(10px); /* Maintain blur effect while floating */
 }
 
 .learners-table th:nth-child(2),
@@ -500,25 +556,6 @@
   color: var(--text-primary);
   font-size: 0.875rem;
   min-width: 35px;
-}
-
-.status-badge {
-  padding: 0.25rem 0.75rem;
-  border-radius: 12px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.status-badge.active {
-  background: rgba(52, 199, 89, 0.2);
-  color: var(--success-color);
-}
-
-.status-badge.inactive {
-  background: rgba(255, 149, 0, 0.2);
-  color: var(--warning-color);
 }
 
 /* Content Tab Styles */

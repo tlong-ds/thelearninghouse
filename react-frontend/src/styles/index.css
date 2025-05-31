@@ -1,13 +1,4 @@
-/* Import fonts */
-@font-face {
-  font-family: "SF-Pro-Display-Regular";
-  src: url('../fonts/SF-Pro-Display-Medium.otf') format('opentype');
-}
-
-@font-face {
-  font-family: "SF-Pro-Display-Bold";
-  src: url('../fonts/SF-Pro-Display-Bold.otf') format('opentype');
-}
+/* Header is now rendered outside body via React Portal, no main-content margin needed */
 
 /* Base styles */
 * {
@@ -49,6 +40,7 @@ button {
   display: flex;
   flex-direction: column;
 }
+
 
 /* Loading and error states */
 .loading, .error {
@@ -101,4 +93,28 @@ button {
 .secondary-btn:hover {
   background-color: rgba(61, 106, 255, 0.1);
   text-decoration: none;
+}
+
+/* Header positioning fixes */
+.static-header,
+.header-wrapper,
+.app-header {
+  position: fixed !important;
+  top: 0 !important;
+  z-index: 999999 !important;
+  isolation: isolate !important;
+  transform: translateZ(0) !important;
+  will-change: auto !important;
+}
+
+/* Ensure no container can clip the header */
+* {
+  /* Prevent any element from creating a stacking context that could hide the header */
+  isolation: auto;
+}
+
+/* Override any transform that might affect header positioning */
+.static-header * {
+  transform: none !important;
+  will-change: auto !important;
 }

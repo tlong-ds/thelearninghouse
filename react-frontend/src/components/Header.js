@@ -1,108 +1,137 @@
-import React from 'react';
-import { Navbar, Nav, Container, Dropdown } from 'react-bootstrap';
-import { useNavigate, useLocation } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import ReactDOM from 'react-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { images } from '../utils/images';
+import { updateHeaderForScrollbar } from '../utils/scrollbar';
 import '../styles/Header.css';
 
 const Header = ({ username, role, onLogout }) => {
-  const navigate = useNavigate();
   const location = useLocation();
-
-  const handleNavigation = (path) => {
-    navigate(path);
-  };
+  const navigate = useNavigate();
+  
+  // Debug logging to ensure header is rendering
+  console.log('Header rendering:', { username, role, pathname: location.pathname });
+  
+  // Ensure we have required props
+  if (!username || !role) {
+    console.warn('Header: Missing required props', { username, role });
+    // Still render header with fallback values to prevent disappearing
+  }
 
   const handleLogout = () => {
     onLogout();
     navigate('/login');
   };
-
-  const getActiveClass = (path) => {
-    return location.pathname === path ? 'active' : '';
+  
+  // Update header positioning based on scrollbar presence
+  useEffect(() => {
+    // Ensure header is visible
+    const ensureHeaderVisibility = () => {
+      const headerElement = document.querySelector('.app-header');
+      if (headerElement) {
+        headerElement.style.display = 'flex';
+        headerElement.style.visibility = 'visible';
+        headerElement.style.opacity = '1';
+        headerElement.style.zIndex = '999999';
+        headerElement.style.position = 'fixed';
+      }
+    };
+    
+    // Initial update
+    updateHeaderForScrollbar();
+    ensureHeaderVisibility();
+    
+    // Update on window resize
+    const handleResize = () => {
+      updateHeaderForScrollbar();
+      ensureHeaderVisibility();
+    };
+    
+    // Update when content changes (might affect scrollbar)
+    const handleContentChange = () => {
+      // Use setTimeout to ensure DOM updates are complete
+      setTimeout(() => {
+        updateHeaderForScrollbar();
+        ensureHeaderVisibility();
+      }, 100);
+    };
+    
+    // Continuous visibility check
+    const visibilityInterval = setInterval(ensureHeaderVisibility, 2000);
+    
+    window.addEventListener('resize', handleResize);
+    
+    // Listen for route changes that might affect content height
+    handleContentChange();
+    
+    // Also listen for when images load (might change content height)
+    const images = document.querySelectorAll('img');
+    images.forEach(img => {
+      if (!img.complete) {
+        img.addEventListener('load', handleContentChange);
+      }
+    });
+    
+    return () => {
+      window.removeEventListener('resize', handleResize);
+      clearInterval(visibilityInterval);
+      images.forEach(img => {
+        img.removeEventListener('load', handleContentChange);
+      });
+    };
+  }, [location.pathname]); // Re-run when route changes
+  
+  // Helper function to determine if a link is active
+  const isActive = (path) => {
+    if (path === '/courses' && location.pathname === '/courses') return true;
+    if (path === '/instructor/dashboard' && location.pathname.startsWith('/instructor')) return true;
+    return location.pathname === path || location.pathname.startsWith(path + '/');
   };
-
-  return (
-    <header className="static-header">
-      <Navbar bg="light" expand="lg" className="border-bottom">
-        <Container fluid>
-          <Navbar.Brand 
-            onClick={() => handleNavigation('/')} 
-            className="d-flex align-items-center cursor-pointer"
-          >
-            <img
-              src="/thelearninghouse/assets/light_logo.webp"
-              width="40"
-              height="40"
-              className="d-inline-block align-top me-2"
-              alt="The Learning House"
-            />
-            <span className="fw-bold text-primary">The Learning House</span>
-          </Navbar.Brand>
-
-          <Navbar.Toggle aria-controls="basic-navbar-nav" />
+  return ReactDOM.createPortal(
+    <header className="app-header">
+      <div className="header-logo">
+        <Link to="/">
+          <img src={images.lightLogo} alt="The Learning House" />
+          <span>The Learning House</span>
+        </Link>
+      </div>
+      
+      <nav className="header-nav">
+        <ul>
+          <li>
+            <Link to="/courses" className={isActive('/courses') ? 'active' : ''}>Courses</Link>
+          </li>
           
-          <Navbar.Collapse id="basic-navbar-nav">
-            <Nav className="me-auto">
-              <Nav.Link 
-                onClick={() => handleNavigation('/dashboard')}
-                className={getActiveClass('/dashboard')}
-              >
-                Dashboard
-              </Nav.Link>
-              
-              <Nav.Link 
-                onClick={() => handleNavigation('/courses')}
-                className={getActiveClass('/courses')}
-              >
-                Courses
-              </Nav.Link>
-              
-              <Nav.Link 
-                onClick={() => handleNavigation('/edumate')}
-                className={getActiveClass('/edumate')}
-              >
-                Edumate AI
-              </Nav.Link>
-
-              {role === 'Instructor' && (
-                <Nav.Link 
-                  onClick={() => handleNavigation('/instructor/dashboard')}
-                  className={getActiveClass('/instructor/dashboard')}
-                >
-                  Instructor
-                </Nav.Link>
-              )}
-            </Nav>
-
-            <Nav className="ms-auto">
-              <Dropdown align="end">
-                <Dropdown.Toggle 
-                  variant="outline-primary" 
-                  id="dropdown-user"
-                  className="d-flex align-items-center"
-                >
-                  <i className="bi bi-person-circle me-2"></i>
-                  {username}
-                </Dropdown.Toggle>
-
-                <Dropdown.Menu>
-                  <Dropdown.Item onClick={() => handleNavigation('/settings')}>
-                    <i className="bi bi-gear me-2"></i>
-                    Settings
-                  </Dropdown.Item>
-                  
-                  <Dropdown.Divider />
-                  
-                  <Dropdown.Item onClick={handleLogout} className="text-danger">
-                    <i className="bi bi-box-arrow-right me-2"></i>
-                    Logout
-                  </Dropdown.Item>
-                </Dropdown.Menu>
-              </Dropdown>
-            </Nav>
-          </Navbar.Collapse>
-        </Container>
-      </Navbar>
-    </header>
+          {role === 'Learner' && (
+            <>
+              <li>
+                <Link to="/dashboard" className={isActive('/dashboard') ? 'active' : ''}>Dashboard</Link>
+              </li>
+              <li>
+                <Link to="/edumate" className={isActive('/edumate') ? 'active' : ''}>Edumate</Link>
+              </li>
+            </>
+          )}
+          {role === 'Instructor' && (
+            <li>
+              <Link to="/instructor/dashboard" className={isActive('/instructor/dashboard') ? 'active' : ''}>Instructor Dashboard</Link>
+            </li>
+          )}
+          <li>
+            <Link to="/settings" className={isActive('/settings') ? 'active' : ''}>Settings</Link>
+          </li>
+        </ul>
+      </nav>
+      
+      <div className="header-user">
+        <div className="header-user-info">
+          <span className="header-username">{username || 'User'}</span>
+          <span className="header-role">{role || 'Guest'}</span>
+        </div>
+        <button className="logout-btn" onClick={handleLogout} aria-label="Logout" />
+      </div>
+    </header>,
+    document.body.parentNode
   );
 };
 
