@@ -18,7 +18,7 @@ import QuizPage from './pages/QuizPage';
 import Settings from './pages/Settings';
 import Dashboard from './pages/Dashboard';
 import InstructorDashboard from './pages/InstructorDashboard';
-import About from './pages/About';
+import Home from './pages/Home';
 import { setScrollbarWidth } from './utils/scrollbar';
 import './styles/App.css';
 
@@ -172,7 +172,7 @@ const AppContent = () => {
                   </ProtectedRoute>
                 } 
               />
-              <Route path="/" element={<About />} />
+              <Route path="/" element={<Home />} />
             </Routes>
           </div>
         </main>

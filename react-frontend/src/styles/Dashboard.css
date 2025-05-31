@@ -29,7 +29,7 @@
   flex-direction: column;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   backdrop-filter: blur(20px);
-  /* Header now rendered outside body via React Portal, no padding needed */
+  padding-top: 84px; /* Space for floating header (60px + 24px gap) */
   }
 
 .dashboard-content {
@@ -38,6 +38,14 @@
   max-width: 1200px;
   margin: 0 auto;
   padding: var(--spacing-xl);
+}
+
+.dashboard-content h1 {
+  margin-bottom: var(--spacing-lg);
+  color: var(--text-dark);
+  font-weight: 700;
+  font-size: 2rem;
+  letter-spacing: -0.02em;
 }
 
 .dashboard-greeting {

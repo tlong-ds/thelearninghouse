@@ -248,7 +248,7 @@ const LecturePreview = () => {
                       </div>
                       <button 
                         className="start-quiz-btn"
-                        onClick={() => navigate(`/quiz/${displayLecture.quiz.id}`, {
+                        onClick={() => navigate(`/quiz/${displayLecture.id}`, {
                           state: { 
                             lectureId: displayLecture.id,
                             lectureTitle: displayLecture.title,

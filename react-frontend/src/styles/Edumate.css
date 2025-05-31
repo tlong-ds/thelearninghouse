@@ -36,7 +36,7 @@ html, body {
   display: flex;
   flex-direction: column;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  /* Header now rendered outside body via React Portal, no padding needed */
+  padding-top: 84px; /* Space for floating header (60px + 24px gap) */
   position: relative;
   overflow-x: hidden; /* Only hide horizontal overflow */
   overflow-y: auto; /* Allow vertical scrolling */
@@ -729,6 +729,10 @@ html, body {
 
 /* Mobile Responsive Design */
 @media (max-width: 768px) {
+  .edumate-container {
+    padding-top: 70px; /* Reduced for mobile */
+  }
+  
   .edumate-content {
     padding: 0.75rem;
     gap: 1rem;

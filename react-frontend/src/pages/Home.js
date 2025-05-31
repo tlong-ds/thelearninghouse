@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../services/AuthContext';
 import axios from 'axios';
 import config from '../config';
-import '../styles/About.css';
+import '../styles/Home.css';
 import { images } from '../utils/images';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion'; // You'll need to install this: npm install framer-motion
@@ -78,7 +78,7 @@ const itemVariants = {
     }
 };
 
-const About = () => {
+const Home = () => {
     const { currentUser, logout } = useAuth();
     const navigate = useNavigate();
 
@@ -349,4 +349,4 @@ const About = () => {
     );
 };
 
-export default About;
+export default Home;

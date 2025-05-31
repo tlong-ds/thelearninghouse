@@ -30,7 +30,7 @@
   flex-direction: column;
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   backdrop-filter: blur(20px);
-  /* Header now rendered outside body via React Portal, no padding needed */
+  padding-top: 84px; /* Space for floating header (60px + 24px gap) */
   }
 
 .instructor-dashboard-content {

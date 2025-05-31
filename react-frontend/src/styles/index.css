@@ -99,7 +99,7 @@ button {
 .header-wrapper,
 .app-header {
   position: fixed !important;
-  top: 0 !important;
+  top: 12 !important;
   z-index: 999999 !important;
   isolation: isolate !important;
   transform: translateZ(0) !important;

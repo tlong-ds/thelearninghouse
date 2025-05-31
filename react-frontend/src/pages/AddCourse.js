@@ -282,7 +282,7 @@ const AddCourse = () => {
                   <button 
                     type="button" 
                     className="btn secondary-btn"
-                    onClick={() => navigate('/')}
+                    onClick={() => navigate('/courses')}
                   >
                     Cancel
                   </button>

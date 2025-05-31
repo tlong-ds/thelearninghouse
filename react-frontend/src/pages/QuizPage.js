@@ -4,6 +4,7 @@ import { fetchLectureDetails } from '../services/api';
 import Quiz from '../components/Quiz';
 import { useAuth } from '../services/AuthContext';
 import { useLoading } from '../services/LoadingContext';
+import { updateHeaderForScrollbar } from '../utils/scrollbar';
 import '../styles/QuizPage.css';
 
 const QuizPage = () => {
@@ -50,6 +51,23 @@ const QuizPage = () => {
     loadData();
   }, [lectureId, startLoading, stopLoading]);
 
+  // Update header positioning for scrollbar
+  useEffect(() => {
+    // Initial update
+    updateHeaderForScrollbar();
+    
+    // Update on window resize
+    const handleResize = () => {
+      updateHeaderForScrollbar();
+    };
+    
+    window.addEventListener('resize', handleResize);
+    
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
   const handleBack = () => {
     navigate(`/lecture/${lectureId}`);
   };
@@ -57,11 +75,13 @@ const QuizPage = () => {
   if (error || !lecture) {
     return (
       <div className="quiz-page">
-        <div className="quiz-error-container">
-          <div className="error">{error || 'Quiz not found'}</div>
-          <button className="back-button" onClick={handleBack} title="Back to Lecture">
-            <i className="fas fa-arrow-left"></i>
-          </button>
+        <div className="quiz-page-content">
+          <div className="quiz-error-container">
+            <div className="error">{error || 'Quiz not found'}</div>
+            <button className="back-button" onClick={handleBack} title="Back to Lecture">
+              <i className="fas fa-arrow-left"></i>
+            </button>
+          </div>
         </div>
       </div>
     );

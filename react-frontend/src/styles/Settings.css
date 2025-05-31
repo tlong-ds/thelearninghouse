@@ -400,13 +400,13 @@
 .settings-form {
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap: 20px; /* Reduced from 32px */
 }
 
 .form-group {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px; /* Reduced from 12px */
   position: relative;
 }
 
@@ -415,7 +415,7 @@
   font-weight: 600;
   color: var(--settings-text-primary);
   line-height: 1.2;
-  margin-bottom: 4px;
+  margin-bottom: 2px; /* Reduced from 4px */
   position: relative;
   text-align: left;
 }
@@ -437,7 +437,7 @@
 
 .form-input,
 .form-select {
-  padding: 16px 20px;
+  padding: 12px 20px; /* Reduced from 16px 20px */
   border: 2px solid var(--settings-border-light);
   border-radius: var(--settings-radius-lg);
   font-size: 16px;
@@ -544,8 +544,8 @@
 .form-actions {
   display: flex;
   justify-content: flex-end;
-  padding-top: 24px;
-  margin-top: 8px;
+  padding-top: 16px; /* Reduced from 24px */
+  margin-top: 4px; /* Reduced from 8px */
   border-top: 2px solid transparent;
 }
 
@@ -735,11 +735,11 @@
   
   .form-input,
   .form-select {
-    padding: 14px 18px;
+    padding: 12px 16px; /* More compact for mobile */
   }
   
   .btn-primary {
-    padding: 14px 28px;
+    padding: 12px 24px; /* More compact button */
     width: 100%;
   }
 }

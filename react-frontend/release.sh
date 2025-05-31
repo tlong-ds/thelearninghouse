@@ -11,7 +11,7 @@ GIT_HASH=$(git rev-parse --short HEAD)
 API_URL="http://localhost:8503"
 
 # Ask for confirmation about the backend URL
-echo "About to prepare a release with backend URL: ${API_URL}"
+echo "Home to prepare a release with backend URL: ${API_URL}"
 echo "Is this correct? (y/n)"
 read -r response
 if [[ "$response" != "y" ]]; then

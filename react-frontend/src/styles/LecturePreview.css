@@ -37,6 +37,7 @@
   background: linear-gradient(180deg, #f8f9fa 0%, #f1f3f4 100%);
   font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui, sans-serif;
   color: #1d1d1f;
+  padding-top: 60px; /* Space for floating header (60px + 24px gap) */
 }
 /* Main content area with YouTube-like layout */
 .lecture-main-content {
@@ -447,6 +448,14 @@
 /* Content tab styling */
 .content-tab {
   text-align: left;
+  height: 100%;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  scrollbar-width: thin; /* Thin scrollbar for Firefox */
+  scrollbar-gutter: stable; /* Prevent layout shift when scrollbar appears */
+  scroll-behavior: smooth; /* Smooth scrolling for better UX */
+  overscroll-behavior: contain; /* Prevent scroll chaining on mobile */
+  padding-right: 8px; /* Add padding for scrollbar */
 }
 
 .content-tab h3 {
@@ -456,6 +465,13 @@
   margin: 0 0 16px 0;
   text-align: left;
   letter-spacing: -0.02em;
+  position: sticky; /* Keep the heading visible when scrolling */
+  top: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 8px 0;
+  z-index: 5;
 }
 
 .lecture-content {
@@ -463,6 +479,7 @@
   color: #1d1d1f;
   line-height: 1.6;
   letter-spacing: -0.01em;
+  padding-bottom: 16px; /* Add bottom padding for better scrolling */
 }
 
 .lecture-nav-item {
@@ -793,6 +810,19 @@
     height: 100% !important; /* Fill the entire tab-content */
   }
   
+  /* Make content tab properly scrollable on mobile */
+  .content-tab {
+    height: 100% !important;
+    max-height: 550px !important; /* Set a reasonable max height for mobile */
+    overflow-y: auto !important; /* Force scrolling on mobile */
+    padding: 16px !important;
+    padding-right: 20px !important; /* Add extra padding for scrollbar */
+    -webkit-overflow-scrolling: touch !important; /* Smooth scrolling on iOS */
+    scrollbar-width: thin !important; /* Thin scrollbar for Firefox */
+    scroll-behavior: smooth !important;
+    overscroll-behavior: contain !important;
+  }
+  
   /* Fix chatbot-tab height to match tab-content exactly */
   .chatbot-tab {
     height: 100% !important; /* Take full height of parent */
@@ -904,6 +934,24 @@
     border-radius: 4px !important; /* Match input border radius */
     box-sizing: border-box !important;
   }
+  
+  /* Further optimize content tab for small screens */
+  .content-tab {
+    padding: 12px !important;
+    padding-right: 16px !important;
+    max-height: 500px !important;
+  }
+  
+  .content-tab h3 {
+    font-size: 16px !important;
+    padding: 6px 0 !important;
+    margin-bottom: 12px !important;
+  }
+  
+  .lecture-content {
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+  }
 }
 
 /* Custom scrollbar for WebKit browsers */
@@ -946,5 +994,28 @@
 }
 
 .navigation-tab-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 102, 204, 0.6);
+}
+
+/* Content tab scrollbar styling */
+.content-tab::-webkit-scrollbar {
+  width: 6px;
+  background: transparent;
+}
+
+.content-tab::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 4px;
+  margin: 4px 0;
+}
+
+.content-tab::-webkit-scrollbar-thumb {
+  background: rgba(0, 102, 204, 0.4);
+  border-radius: 4px;
+  transition: background 0.3s ease;
+  min-height: 30px;
+}
+
+.content-tab::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 102, 204, 0.6);
 }

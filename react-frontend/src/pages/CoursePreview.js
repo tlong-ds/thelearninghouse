@@ -92,6 +92,14 @@ const CoursePreview = () => {
         <div className="hero-content">
           <div className="hero-main">
             <div className="hero-info">
+              {/* Breadcrumb */}
+              <div className="course-breadcrumb">
+                <Link to="/courses" className="breadcrumb-link">
+                  <i className="fas fa-arrow-left"></i>
+                  <span>Back to Courses</span>
+                </Link>
+              </div>
+              
               <h1 className="hero-title">{course.name}</h1>
               <p className="hero-instructor">by {course.instructor}</p>
               
