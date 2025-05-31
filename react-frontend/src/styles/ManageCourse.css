@@ -25,7 +25,6 @@
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   backdrop-filter: blur(20px);
   padding: 0;
-  padding-top: 84px; /* Space for floating header (60px + 24px gap) */
   font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
 }
 

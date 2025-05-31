@@ -36,7 +36,7 @@ html, body {
   display: flex;
   flex-direction: column;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding-top: 84px; /* Space for floating header (60px + 24px gap) */
+  /* Header now rendered outside body via React Portal, no padding needed */
   position: relative;
   overflow-x: hidden; /* Only hide horizontal overflow */
   overflow-y: auto; /* Allow vertical scrolling */

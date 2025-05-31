@@ -23,7 +23,7 @@
 }
 
 .macos-gradient-overlay {
-  position: absolute; 
+  position: absolute;
   top: 0;
   left: 0;
   right: 0;
@@ -36,26 +36,27 @@
 .macos-main {
   max-width: 1200px;
   margin: 0 auto;
-  padding: 0 2rem 2rem; /* Remove top padding since container now has it */
+  padding: 0 2rem; /* Remove top padding since container now has it */
 }
 
 /* Hero Section */
 .macos-hero {
   text-align: center;
-  padding: 6rem 1rem 8rem;
+  padding: 6rem 1rem 8rem; /* Reduced padding to compensate for container padding */
   position: relative;
   overflow: hidden;
   border-radius: 0;
   margin-bottom: 0;
-  margin-top: 0; /* Remove negative margin to eliminate gap */
-  background: linear-gradient(135deg, rgba(0, 102, 204, 0.05) 0%, rgba(90, 200, 250, 0.1) 100%);
+  margin-top: -80px; /* Negative margin to pull up but not interfere with header */
+  background: linear-gradient(135deg, rgba(0, 102, 204, 0.05) 0%, rgba(90, 200, 250, 0.1) 100%); /* Will be replaced by video */
   width: 100vw;
   margin-left: calc(-50vw + 50%);
-  min-height: 110vh;
+  min-height: 110vh; /* Reduced from 105vh to prevent overflow issues */
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  isolation: auto;
+  justify-content: center; /* Center content vertically */
+  /* Removed problematic top: -2rem that interfered with header */
+  isolation: auto; /* Prevent stacking context issues */
 }
 
 /* Add video background for hero section */

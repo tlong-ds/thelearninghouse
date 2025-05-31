@@ -41,7 +41,6 @@ button {
   flex-direction: column;
 }
 
-
 /* Loading and error states */
 .loading, .error {
   text-align: center;
