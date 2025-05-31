@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Request, Cookie, UploadFile, File, Form
 from typing import List, Optional, Dict, Any, Callable
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from services.api.db.token_utils import decode_token
 from dotenv import load_dotenv
 import os
@@ -2256,7 +2256,8 @@ async def get_course_preview_data(course_id: int, request: Request, auth_token: 
                         i.InstructorID as instructor_id,
                         COALESCE(enrollment_stats.enrolled, 0) as enrolled,
                         COALESCE(rating_stats.avg_rating, NULL) as rating,
-                        CASE WHEN user_enrollment.LearnerID IS NOT NULL THEN TRUE ELSE FALSE END as is_enrolled
+                        CASE WHEN user_enrollment.LearnerID IS NOT NULL THEN TRUE ELSE FALSE END as is_enrolled,
+                        user_enrollment.Rating as user_rating
                     FROM Courses c
                     JOIN Instructors i ON c.InstructorID = i.InstructorID
                     LEFT JOIN (
@@ -2268,7 +2269,7 @@ async def get_course_preview_data(course_id: int, request: Request, auth_token: 
                         FROM Enrollments WHERE Rating IS NOT NULL GROUP BY CourseID
                     ) rating_stats ON c.CourseID = rating_stats.CourseID
                     LEFT JOIN (
-                        SELECT e2.CourseID, e2.LearnerID
+                        SELECT e2.CourseID, e2.LearnerID, e2.Rating
                         FROM Enrollments e2
                         JOIN Learners l ON e2.LearnerID = l.LearnerID
                         WHERE l.LearnerID = %s
@@ -2317,7 +2318,8 @@ async def get_course_preview_data(course_id: int, request: Request, auth_token: 
                             'instructor_id': course['instructor_id'],
                             'enrolled': course['enrolled'],
                             'rating': float(course['rating']) if course['rating'] else None,
-                            'is_enrolled': course['is_enrolled']
+                            'is_enrolled': course['is_enrolled'],
+                            'user_rating': int(course['user_rating']) if course['user_rating'] else None
                         },
                         'lectures': [
                             {
@@ -2506,6 +2508,97 @@ async def get_course_enrollments(
     except Exception as e:
         print(f"Error fetching course enrollments: {str(e)}")
         raise HTTPException(status_code=500, detail=f"Error fetching course enrollments: {str(e)}")
+    finally:
+        if 'conn' in locals():
+            conn.close()
+
+# Rating submission model
+class RatingSubmission(BaseModel):
+    rating: int = Field(..., ge=1, le=5, description="Rating value between 1 and 5")
+
+# Submit rating for a course
+@router.put("/courses/{course_id}/rating")
+async def submit_course_rating(
+    course_id: int,
+    rating_data: RatingSubmission,
+    request: Request,
+    auth_token: str = Cookie(None)
+):
+    try:
+        # Get token from header if not in cookie
+        if not auth_token:
+            auth_header = request.headers.get('Authorization')
+            if auth_header and auth_header.startswith('Bearer '):
+                auth_token = auth_header.split(' ')[1]
+            else:
+                raise HTTPException(status_code=401, detail="No authentication token provided")
+        
+        # Verify token and get user data
+        try:
+            user_data = decode_token(auth_token)
+            learner_id = user_data.get('user_id')
+            
+            if not learner_id:
+                # Fallback for old tokens without user_id - do database lookup
+                conn = connect_db()
+                with conn.cursor(pymysql.cursors.DictCursor) as cursor:
+                    cursor.execute("""
+                        SELECT LearnerID 
+                        FROM Learners 
+                        WHERE AccountName = %s
+                    """, (user_data['username'],))
+                    learner = cursor.fetchone()
+                    if not learner:
+                        raise HTTPException(status_code=404, detail="Learner not found")
+                    learner_id = learner['LearnerID']
+            else:
+                # Use user_id from token
+                conn = connect_db()
+        except Exception as e:
+            print(f"Token/user verification error: {str(e)}")
+            raise HTTPException(status_code=401, detail="Invalid authentication token or user not found")
+
+        # Check if the course exists and user is enrolled
+        with conn.cursor(pymysql.cursors.DictCursor) as cursor:
+            cursor.execute("""
+                SELECT e.EnrollmentID 
+                FROM Enrollments e
+                JOIN Courses c ON e.CourseID = c.CourseID
+                WHERE e.CourseID = %s AND e.LearnerID = %s
+            """, (course_id, learner_id))
+            enrollment = cursor.fetchone()
+            if not enrollment:
+                raise HTTPException(status_code=404, detail="Course not found or you are not enrolled")
+            
+            # Update the rating in the Enrollments table
+            try:
+                cursor.execute("""
+                    UPDATE Enrollments
+                    SET Rating = %s
+                    WHERE CourseID = %s AND LearnerID = %s
+                """, (rating_data.rating, course_id, learner_id))
+                
+                conn.commit()
+                
+                # Invalidate cache for course rating data
+                redis_client = get_redis_client()
+                pattern_course = f"courses:id:{course_id}:*"
+                pattern_preview = f"course:preview:{course_id}:*"
+                print(f"Invalidating cache patterns: {pattern_course}, {pattern_preview}")
+                invalidate_cache_pattern(pattern_course)
+                invalidate_cache_pattern(pattern_preview)
+                
+                return {"message": "Rating submitted successfully", "rating": rating_data.rating}
+            except Exception as e:
+                conn.rollback()
+                print(f"Error updating rating: {str(e)}")
+                raise HTTPException(status_code=500, detail=f"Failed to submit rating: {str(e)}")
+        
+    except HTTPException as he:
+        raise he
+    except Exception as e:
+        print(f"Error submitting rating: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Error submitting rating: {str(e)}")
     finally:
         if 'conn' in locals():
             conn.close()

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { fetchCoursePreviewData, enrollInCourse } from '../services/api';
+import { fetchCoursePreviewData, enrollInCourse, submitCourseRating } from '../services/api';
 import { useAuth } from '../services/AuthContext';
 import { useLoading } from '../services/LoadingContext';
 import { images } from '../utils/images';  // Update this import
@@ -14,6 +14,10 @@ const CoursePreview = () => {
   const [error, setError] = useState('');
   const [isEnrolled, setIsEnrolled] = useState(false);
   const [enrolling, setEnrolling] = useState(false);
+  const [userRating, setUserRating] = useState(null);
+  const [hoveredRating, setHoveredRating] = useState(0);
+  const [submittingRating, setSubmittingRating] = useState(false);
+  const [ratingMessage, setRatingMessage] = useState('');
   
   const { currentUser, logout } = useAuth();
   const { startLoading, stopLoading } = useLoading();
@@ -30,6 +34,7 @@ const CoursePreview = () => {
         setCourse(previewData.course);
         setLectures(previewData.lectures);
         setIsEnrolled(previewData.course.is_enrolled);
+        setUserRating(previewData.course.user_rating);
       } catch (err) {
         console.error('Failed to fetch course data:', err);
         setError('Failed to load course. Please try again later.');
@@ -76,6 +81,36 @@ const CoursePreview = () => {
       console.error('Failed to enroll in course:', err);
       setError('Failed to enroll in course. Please try again later.');
       setEnrolling(false);
+    }
+  };
+
+  const handleRatingSubmit = async (rating) => {
+    if (!isEnrolled) return;
+    
+    try {
+      setSubmittingRating(true);
+      setRatingMessage('');
+      
+      await submitCourseRating(id, rating);
+      setUserRating(rating);
+      setRatingMessage('Thank you for your rating!');
+      
+      // Refresh course data to get updated average rating
+      try {
+        const previewData = await fetchCoursePreviewData(id);
+        setCourse(previewData.course);
+      } catch (refreshError) {
+        console.warn('Failed to refresh course data after rating:', refreshError);
+      }
+      
+      // Clear success message after 3 seconds
+      setTimeout(() => setRatingMessage(''), 3000);
+    } catch (err) {
+      console.error('Failed to submit rating:', err);
+      setRatingMessage('Failed to submit rating. Please try again.');
+      setTimeout(() => setRatingMessage(''), 3000);
+    } finally {
+      setSubmittingRating(false);
     }
   };
   
@@ -246,6 +281,60 @@ const CoursePreview = () => {
           )}
         </div>
       </div>
+
+      {/* Rating Section - Only for enrolled learners */}
+      {isEnrolled && currentUser?.role === 'Learner' && (
+        <div className="rating-section">
+          <div className="rating-container">
+            <div className="rating-header">
+              <h2 className="section-title">
+                <i className="section-icon fas fa-star"></i>
+                Rate this Course
+              </h2>
+              <p className="rating-description">
+                Share your experience to help other learners
+              </p>
+            </div>
+
+            <div className="rating-content">
+              <div className="star-rating">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    className={`star-button ${star <= (hoveredRating || userRating || 0) ? 'filled' : ''}`}
+                    onClick={() => handleRatingSubmit(star)}
+                    onMouseEnter={() => setHoveredRating(star)}
+                    onMouseLeave={() => setHoveredRating(0)}
+                    disabled={submittingRating}
+                    title={`Rate ${star} star${star > 1 ? 's' : ''}`}
+                  >
+                    <i className="fas fa-star"></i>
+                  </button>
+                ))}
+              </div>
+
+              <div className="rating-labels">
+                <span className="rating-label">Poor</span>
+                <span className="rating-label">Excellent</span>
+              </div>
+
+              {ratingMessage && (
+                <div className={`rating-message ${ratingMessage.includes('Failed') ? 'error' : 'success'}`}>
+                  <i className={`fas ${ratingMessage.includes('Failed') ? 'fa-exclamation-circle' : 'fa-check-circle'}`}></i>
+                  {ratingMessage}
+                </div>
+              )}
+
+              {submittingRating && (
+                <div className="rating-loading">
+                  <i className="fas fa-spinner fa-spin"></i>
+                  Submitting your rating...
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

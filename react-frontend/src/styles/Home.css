@@ -705,3 +705,38 @@
     background: linear-gradient(135deg, rgba(0, 102, 204, 0.08) 0%, rgba(90, 200, 250, 0.15) 100%);
   }
 }
+
+/* Add mobile padding-top to account for the floating header */
+@media (max-width: 768px) {
+  .macos-container {
+    padding-top: 68px; /* 52px header height + 16px gap */
+  }
+  
+  .macos-main {
+    padding-top: 0; /* Remove any existing top padding */
+  }
+  
+  .macos-hero {
+    padding-top: 20px; /* Add some spacing for the hero section */
+  }
+}
+
+@media (max-width: 480px) {
+  .macos-container {
+    padding-top: 60px; /* 48px header height + 12px gap */
+  }
+  
+  .macos-hero {
+    padding-top: 16px; /* Smaller spacing on smaller screens */
+  }
+}
+
+@media (max-width: 360px) {
+  .macos-container {
+    padding-top: 56px; /* 44px header height + 12px gap */
+  }
+  
+  .macos-hero {
+    padding-top: 12px; /* Minimal spacing on very small screens */
+  }
+}

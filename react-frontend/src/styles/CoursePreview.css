@@ -281,19 +281,8 @@ body {
 
 /* Enhanced Skills Section */
 .skills-section {
-  padding: 60px 0;
-  border-bottom: 1px solid var(--border-color-light);
+  padding: 60px 0 30px 0;
   position: relative;
-}
-
-.skills-section::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(90deg, var(--primary-color), var(--success-color));
 }
 
 .skills-container {
@@ -304,7 +293,6 @@ body {
   backdrop-filter: blur(20px);
   border-radius: 20px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
 .skills-grid {
@@ -401,19 +389,8 @@ body {
 
 /* Course Outline Section */
 .course-outline {
-  padding: 60px 0;
-  border-bottom: 1px solid var(--border-color-light);
+  padding: 30px 0 60px 0;
   position: relative;
-}
-
-.course-outline::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 2px;
-  background: linear-gradient(90deg, var(--primary-color), var(--success-color));
 }
 
 .outline-container {
@@ -425,7 +402,6 @@ body {
   backdrop-filter: blur(20px);
   border-radius: 20px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
-  border: 1px solid rgba(255, 255, 255, 0.4);
 }
 
 .section-header {
@@ -434,14 +410,12 @@ body {
   justify-content: space-between;
   margin-bottom: 32px;
   padding: 20px 24px 16px;
-  border-bottom: 1px solid var(--border-color-light);
   flex-wrap: wrap;
   gap: 16px;
   background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(20px);
   border-radius: 16px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
 .section-header .section-title {
@@ -455,12 +429,39 @@ body {
   flex: none;
 }
 
-.skills-section .section-header {
-  justify-content: flex-start;
+.rating-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Changed from flex-start to space-between */
+  margin-bottom: 32px;
+  padding: 20px 24px 16px;
+  flex-wrap: wrap;
+  gap: 16px;
+  border-radius: 16px;
 }
 
-.skills-section .section-title {
+.rating-header .section-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--text-primary);
   flex: none;
+}
+
+.rating-header .section-icon {
+  font-size: 24px;
+  color: var(--primary-color);
+}
+
+.rating-header .section-subtitle {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin: 0;
+  text-align: right;
+  flex-shrink: 0;
 }
 
 .section-icon {
@@ -477,7 +478,6 @@ body {
   padding: 8px 16px;
   background: var(--background-secondary);
   border-radius: 20px;
-  border: 1px solid var(--border-color);
 }
 
 .stat-item {
@@ -1712,4 +1712,198 @@ body {
 .action-btn:focus {
   outline: 2px solid var(--primary-color);
   outline-offset: 2px;
+}
+
+/* Rating Section Styles */
+.rating-section {
+  background: var(--background-primary);
+  padding: 2rem 0;
+  margin-top: 2rem;
+}
+
+.rating-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+}
+
+.rating-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Changed from flex-start to space-between */
+  margin-bottom: 32px;
+  padding: 20px 24px 16px;
+  flex-wrap: wrap;
+  gap: 16px;
+  border-radius: 16px;
+}
+
+.rating-header .section-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  flex: none;
+}
+
+.rating-header .section-icon {
+  font-size: 24px;
+  color: var(--primary-color);
+}
+
+.rating-header .section-subtitle {
+  font-size: 1rem;
+  color: var(--text-secondary);
+  margin: 0;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.rating-content {
+  max-width: 600px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.star-rating {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 2rem 0 1rem;
+}
+
+.star-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0.5rem;
+  transition: var(--transition);
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.star-button:hover {
+  background: rgba(0, 102, 204, 0.1);
+  transform: scale(1.1);
+}
+
+.star-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.star-button .fas {
+  font-size: 2rem;
+  color: var(--text-tertiary);
+  transition: var(--transition);
+}
+
+.star-button.filled .fas {
+  color: #FFD700;
+  text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+}
+
+.rating-labels {
+  display: flex;
+  justify-content: space-between;
+  margin: 0 1rem 2rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.current-rating {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: var(--background-secondary);
+  border-radius: var(--border-radius);
+  font-weight: 500;
+}
+
+.user-rating-display {
+  display: flex;
+  gap: 0.25rem;
+}
+
+.user-rating-display .fas {
+  color: #FFD700;
+  font-size: 1rem;
+}
+
+.user-rating-display .fas:not(.filled) {
+  color: var(--text-tertiary);
+}
+
+.rating-text {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.rating-message {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 1rem 0;
+  padding: 0.75rem 1rem;
+  border-radius: var(--border-radius);
+  font-weight: 500;
+}
+
+.rating-message.success {
+  background: rgba(52, 199, 89, 0.1);
+  color: var(--success-color);
+  border: 1px solid rgba(52, 199, 89, 0.2);
+}
+
+.rating-message.error {
+  background: rgba(255, 59, 48, 0.1);
+  color: var(--error-color);
+  border: 1px solid rgba(255, 59, 48, 0.2);
+}
+
+.rating-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin: 1rem 0;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.rating-description {
+  color: var(--text-secondary);
+  margin-bottom: 0;
+  font-size: 1rem;
+}
+
+/* Mobile responsiveness for rating section */
+@media (max-width: 768px) {
+  .rating-container {
+    padding: 0 1rem;
+  }
+  
+  .star-button {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .star-button .fas {
+    font-size: 1.5rem;
+  }
+  
+  .rating-labels {
+    margin: 0 0.5rem 1.5rem;
+  }
 }

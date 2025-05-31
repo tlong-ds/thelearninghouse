@@ -267,3 +267,14 @@ export const fetchCourseEnrollments = async (courseId) => {
     throw error;
   }
 };
+
+// Submit course rating
+export const submitCourseRating = async (courseId, rating) => {
+  try {
+    const response = await apiClient.put(`/api/courses/${courseId}/rating`, { rating });
+    return response.data;
+  } catch (error) {
+    console.error(`Error submitting rating for course ID ${courseId}:`, error);
+    throw error;
+  }
+};

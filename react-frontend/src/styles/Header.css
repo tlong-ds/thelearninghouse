@@ -8,7 +8,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 24px;
+  padding: 12px 16px;
   background: rgba(255, 255, 255, 0.8);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
@@ -19,7 +19,7 @@
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   /* Ensure header is at viewport level and creates its own stacking context */
   will-change: transform;
-  contain: layout style paint;
+  contain: layout style;
   /* Prevent any interference from other elements */
   isolation: isolate;
   /* Force the header to always be visible */
@@ -33,6 +33,8 @@
   mask: none !important;
   /* Prevent overflow hidden from parent containers */
   position: fixed !important;
+  /* Allow dropdown to overflow header bounds */
+  overflow: visible !important;
   /* SF Pro Display font stack */
   font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 }
@@ -56,7 +58,7 @@
   color: #1d1d1f;
   text-decoration: none;
   transition: all 0.2s ease;
-  padding: 8px 12px;
+  padding: 8px 12px 8px 4px;
   border-radius: 12px;
 }
 
@@ -137,23 +139,170 @@
 .header-user {
   display: flex;
   align-items: center;
-  gap: 16px;
   height: 100%;
   justify-content: flex-end;
   flex-shrink: 0;
+  position: relative;
+  /* Allow dropdown to overflow */
+  overflow: visible !important;
+  /* Ensure proper stacking context */
+  z-index: 1000001;
+}
+
+.header-user-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0066cc 0%, #5ac8fa 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+  position: relative;
+  box-shadow: 0 2px 8px rgba(0, 102, 204, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.header-user-avatar::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0066cc 0%, #5ac8fa 100%);
+  z-index: -1;
+  filter: blur(4px);
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .header-user-info {
   display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 12px 4px 6px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background: transparent; /* Changed from rgba(255, 255, 255, 0.8) to transparent */
+  backdrop-filter: none; /* Removed backdrop filter */
+  border: 1px solid transparent; /* Made border transparent */
+  color: inherit;
+  text-decoration: none;
+  position: relative;
+  z-index: 1000001;
+}
+
+.header-user-info:hover {
+  background: rgba(0, 0, 0, 0.06); /* Keep subtle hover effect */
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.header-user-info.active {
+  background: rgba(0, 123, 255, 0.09); /* Keep active state background */
+  border-color: rgba(0, 123, 255, 0.2);
+  box-shadow: 0 2px 8px rgba(0, 122, 255, 0.2);
+}
+
+.header-user-info:focus {
+  outline: none;
+  background: rgba(0, 123, 255, 0.09); /* Keep focus state background */
+  border-color: rgba(0, 123, 255, 0.3);
+  box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+}
+
+.header-user-text {
+  display: flex;
   flex-direction: column;
-  align-items: flex-end;
+  align-items: flex-start;
   justify-content: center;
   gap: 2px;
-  text-align: right;
+  text-align: left;
   white-space: nowrap;
-  min-width: 80px;
-  margin-bottom: 1px;
-  height: 100%;
+  min-width: 60px;
+}
+
+.user-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+  padding: 8px;
+  min-width: 160px;
+  z-index: 1000002 !important;
+  animation: dropdownFadeIn 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  /* Ensure dropdown is not clipped */
+  overflow: visible !important;
+  /* Create new stacking context */
+  isolation: isolate;
+  /* Prevent any containment issues */
+  contain: none !important;
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.dropdown-content {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  color: #1d1d1f;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: left;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+.dropdown-item:hover {
+  background: rgba(0, 0, 0, 0.05);
+  transform: translateX(2px);
+}
+
+.dropdown-item.logout {
+  color: #ff6b6b;
+}
+
+.dropdown-item.logout:hover {
+  background: rgba(255, 107, 107, 0.1);
+  color: #ff5252;
+}
+
+.dropdown-item svg {
+  flex-shrink: 0;
+  opacity: 0.7;
+}
+
+.dropdown-item:hover svg {
+  opacity: 1;
 }
 
 .header-username {
@@ -270,7 +419,20 @@
   }
   
   .header-logo {
-    display: none; /* Completely hide logo on mobile */
+    display: flex; /* Show logo on mobile */
+  }
+  
+  .header-logo a {
+    padding: 8px 4px 8px 0px; /* Reduce padding for mobile */
+  }
+  
+  .header-logo span {
+    display: none; /* Hide logo text on mobile */
+  }
+  
+  .header-logo img {
+    height: 24px; /* Slightly smaller logo */
+    margin-right: 0; /* Remove margin since text is hidden */
   }
   
   .header-nav {
@@ -290,22 +452,37 @@
   }
   
   .header-user {
-    gap: 16px; /* Increased gap between nav and logout button */
+    gap: 16px; /* Increased gap between nav and user toggle */
     margin-left: 12px; /* Added margin to create more separation */
   }
   
   .header-user-info {
-    display: none; /* Hide user info text on mobile for space */
+    display: flex; /* Keep user toggle visible on mobile */
+    gap: 6px; /* Smaller gap for mobile */
+    padding: 4px 8px 4px 4px; /* Reduced padding for mobile */
+  }
+  
+  .header-user-avatar {
+    width: 24px; /* Smaller avatar for mobile */
+    height: 24px;
+    font-size: 11px; /* Smaller font */
+  }
+  
+  .header-user-text {
+    min-width: 50px; /* Smaller minimum width */
+  }
+  
+  .header-username {
+    font-size: 12px; /* Smaller username text */
+    max-width: 80px; /* Limit width */
+  }
+  
+  .header-role {
+    font-size: 10px; /* Smaller role text */
   }
   
   .logout-btn {
-    width: 32px;
-    height: 32px;
-  }
-  
-  .logout-btn::before {
-    width: 14px;
-    height: 14px;
+    display: none; /* Hide old logout button if it exists */
   }
 }
 
@@ -319,7 +496,20 @@
   }
   
   .header-logo {
-    display: none; /* Keep logo hidden */
+    display: flex; /* Keep logo visible */
+  }
+  
+  .header-logo a {
+    padding: 6px 2px 6px 0px; /* Even smaller padding */
+  }
+  
+  .header-logo span {
+    display: none; /* Keep text hidden */
+  }
+  
+  .header-logo img {
+    height: 22px; /* Even smaller logo */
+    margin-right: 0;
   }
   
   .header-nav ul {
@@ -333,18 +523,37 @@
   }
   
   .header-user {
-    gap: 14px; /* Maintain good spacing even on smaller screens */
-    margin-left: 10px; /* Slightly reduced but still maintain separation */
+    gap: 12px; /* Maintain good spacing even on smaller screens */
+    margin-left: 8px; /* Slightly reduced but still maintain separation */
+  }
+  
+  .header-user-info {
+    display: flex; /* Keep toggle visible */
+    gap: 5px; /* Even smaller gap */
+    padding: 3px 6px 3px 3px; /* Smaller padding */
+  }
+  
+  .header-user-avatar {
+    width: 22px; /* Smaller avatar */
+    height: 22px;
+    font-size: 10px;
+  }
+  
+  .header-user-text {
+    min-width: 45px; /* Smaller minimum width */
+  }
+  
+  .header-username {
+    font-size: 11px;
+    max-width: 70px;
+  }
+  
+  .header-role {
+    font-size: 9px;
   }
   
   .logout-btn {
-    width: 28px;
-    height: 28px;
-  }
-  
-  .logout-btn::before {
-    width: 12px;
-    height: 12px;
+    display: none; /* Hide old logout button */
   }
 }
 
@@ -356,7 +565,20 @@
   }
   
   .header-logo {
-    display: none; /* Keep logo hidden */
+    display: flex; /* Keep logo visible */
+  }
+  
+  .header-logo a {
+    padding: 4px 2px 4px 0px; /* Minimal padding */
+  }
+  
+  .header-logo span {
+    display: none; /* Keep text hidden */
+  }
+  
+  .header-logo img {
+    height: 20px; /* Smallest logo size */
+    margin-right: 0;
   }
   
   .header-nav a {
@@ -365,17 +587,36 @@
   }
   
   .header-user {
-    gap: 12px; /* Still maintain good gap on very small screens */
-    margin-left: 8px; /* Smaller margin but still provide separation */
+    gap: 10px; /* Still maintain good gap on very small screens */
+    margin-left: 6px; /* Smaller margin but still provide separation */
+  }
+  
+  .header-user-info {
+    display: flex; /* Keep toggle visible */
+    gap: 4px; /* Minimal gap */
+    padding: 2px 4px 2px 2px; /* Minimal padding */
+  }
+  
+  .header-user-avatar {
+    width: 20px; /* Smallest avatar */
+    height: 20px;
+    font-size: 9px;
+  }
+  
+  .header-user-text {
+    min-width: 40px; /* Smallest minimum width */
+  }
+  
+  .header-username {
+    font-size: 10px;
+    max-width: 60px;
+  }
+  
+  .header-role {
+    font-size: 8px;
   }
   
   .logout-btn {
-    width: 24px;
-    height: 24px;
-  }
-  
-  .logout-btn::before {
-    width: 10px;
-    height: 10px;
+    display: none; /* Hide old logout button */
   }
 }
