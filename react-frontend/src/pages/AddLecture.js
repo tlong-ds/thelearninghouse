@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../services/AuthContext';
 import { useLoading } from '../services/LoadingContext';
-import Header from '../components/Header';
 import config from '../config';
 import '../styles/AddLecture.css';
 
@@ -259,7 +258,6 @@ const AddLecture = () => {
   if (!course) {
     return (
       <div className="add-lecture-container">
-        <Header username={currentUser?.username} role={currentUser?.role} onLogout={logout} />
         <div className="loading">Loading course details...</div>
       </div>
     );
@@ -267,8 +265,6 @@ const AddLecture = () => {
 
   return (
     <div className="add-lecture-container">
-      <Header username={currentUser?.username} role={currentUser?.role} onLogout={logout} />
-      
       <div className="add-lecture-content">
         <div className="add-lecture-header">
           <h1>Add New Lecture</h1>

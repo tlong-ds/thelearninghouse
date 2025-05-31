@@ -14,16 +14,28 @@ const EdumateChat = forwardRef(({ lectureId = null, className = '', isEmbedded =
   const [loading, setLoading] = useState(false);
   const messagesEndRef = useRef(null);
 
-  // Load chat history on component mount
+  // Load chat history on component mount (only for general usage, not lecture mode)
   useEffect(() => {
     const loadChatHistory = async () => {
       setLoading(true);
       try {
-        // Import dynamically to avoid circular dependencies
-        const { getChatHistory } = await import('../services/chatbotAPI');
-        console.log(`Fetching chat history for ${lectureId ? `lecture ${lectureId}` : 'general chat'}`);
+        // For lecture mode, always start fresh without loading cache
+        if (lectureId) {
+          console.log(`Lecture mode detected for lecture ${lectureId} - starting fresh without cache`);
+          setMessages([{
+            id: Date.now(),
+            content: `# Welcome to Lecture Mode\n\nI'm ready to answer questions about this lecture. What would you like to know?`,
+            isUser: false,
+            timestamp: new Date().toLocaleTimeString()
+          }]);
+          return;
+        }
         
-        const response = await getChatHistory(lectureId);
+        // Only load cache for general usage (when lectureId is null)
+        const { getChatHistory } = await import('../services/chatbotAPI');
+        console.log('Fetching chat history for general chat');
+        
+        const response = await getChatHistory(null); // Always pass null for general usage
         console.log('Chat history response:', response);
         
         if (response?.history && Array.isArray(response.history) && response.history.length > 0) {
@@ -42,9 +54,7 @@ const EdumateChat = forwardRef(({ lectureId = null, className = '', isEmbedded =
           console.log('No cached history found, showing welcome message');
           setMessages([{
             id: Date.now(),
-            content: lectureId 
-              ? `# Welcome to Lecture Mode\n\nI'm ready to answer questions about this lecture. What would you like to know?`
-              : `# Welcome to Edumate\n\nI'm your learning assistant. Feel free to ask me anything about your learning!`,
+            content: `# Welcome to Edumate\n\nI'm your learning assistant. Feel free to ask me anything about your learning!`,
             isUser: false,
             timestamp: new Date().toLocaleTimeString()
           }]);
@@ -92,8 +102,16 @@ const EdumateChat = forwardRef(({ lectureId = null, className = '', isEmbedded =
       // Add user message immediately for better UX
       setMessages(prev => [...prev, newUserMessage]);
       
-      // Get response without reloading full history
-      const response = await sendChatMessage(userMessage, lectureId);
+      // For lecture mode, don't use cache; for general usage, use cache
+      if (lectureId) {
+        console.log(`🚫 Lecture mode: Sending message WITHOUT cache for lecture ${lectureId}`);
+      } else {
+        console.log(`💾 General mode: Sending message WITH cache`);
+      }
+      
+      const response = lectureId 
+        ? await sendChatMessage(userMessage, lectureId, false) // Don't cache for lecture mode
+        : await sendChatMessage(userMessage, null, true); // Use cache for general usage
       
       // Add just the bot response
       const botMessage = {
@@ -128,13 +146,17 @@ const EdumateChat = forwardRef(({ lectureId = null, className = '', isEmbedded =
       timestamp: new Date().toLocaleTimeString()
     }]);
     
-    // Clear backend cache without waiting
-    import('../services/chatbotAPI').then(({ clearChatHistory }) => {
-      console.log(`Clearing chat history for ${lectureId ? `lecture ${lectureId}` : 'general chat'}`);
-      clearChatHistory(lectureId)
-        .then(() => console.log('Chat history cleared successfully'))
-        .catch(err => console.error('Failed to clear chat history:', err));
-    });
+    // Only clear backend cache for general usage, not lecture mode
+    if (!lectureId) {
+      import('../services/chatbotAPI').then(({ clearChatHistory }) => {
+        console.log('Clearing chat history for general chat');
+        clearChatHistory(null) // Always pass null for general usage
+          .then(() => console.log('Chat history cleared successfully'))
+          .catch(err => console.error('Failed to clear chat history:', err));
+      });
+    } else {
+      console.log('Lecture mode - not clearing cache (UI only clear)');
+    }
   };
 
   // Expose clear function to parent components
@@ -210,7 +232,7 @@ const EdumateChat = forwardRef(({ lectureId = null, className = '', isEmbedded =
           type="text"
           value={inputMessage}
           onChange={(e) => setInputMessage(e.target.value)}
-          placeholder={lectureId ? "Ask me about this lecture..." : "Ask me anything about your courses..."}
+          placeholder={"Ask me something..."}
           disabled={loading}
           className="chat-input"
         />

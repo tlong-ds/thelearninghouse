@@ -231,7 +231,9 @@ html, body {
   word-wrap: break-word;
   word-break: break-word; /* Add word-break for better text wrapping */
   white-space: pre-wrap; /* Preserve whitespace but wrap text */
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
 }
 
 @keyframes slideInMessage {
@@ -252,6 +254,7 @@ html, body {
   color: white !important;
   margin-left: auto;
   border-bottom-right-radius: 8px;
+  box-shadow: 0 8px 30px rgba(102, 126, 234, 0.35);
 }
 
 .user-message::after {
@@ -273,6 +276,7 @@ html, body {
   color: #2d3748;
   border: 1px solid rgba(226, 232, 240, 0.5);
   border-bottom-left-radius: 8px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
 }
 
 .message-content {
@@ -303,9 +307,14 @@ html, body {
 
 .message-timestamp {
   font-size: 0.75rem;
-  margin-top: 0.75rem;
-  opacity: 0.6;
+  margin-top: 0.25rem;
+  opacity: 0.8;
   font-weight: 500;
+  text-align: right;
+  width: 100%;
+  display: block;
+  clear: both;
+  line-height: 1.2;
 }
 
 .chat-input-form {
@@ -361,7 +370,7 @@ html, body {
   min-width: 120px;
   box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
   position: relative;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .chat-input-form button::before {
@@ -457,40 +466,6 @@ html, body {
   justify-content: center;
 }
 
-.exit-lecture-mode-btn,
-.return-to-lecture-btn {
-  border: none;
-  padding: 0.75rem 1.25rem;
-  border-radius: 10px;
-  cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 600;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  position: relative;
-  overflow: hidden;
-}
-
-.exit-lecture-mode-btn {
-  background: linear-gradient(135deg, #718096 0%, #4a5568 100%);
-  color: white;
-  box-shadow: 0 4px 15px rgba(113, 128, 150, 0.3);
-}
-
-.exit-lecture-mode-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(113, 128, 150, 0.4);
-}
-
-.return-to-lecture-btn {
-  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
-  color: white;
-  box-shadow: 0 4px 15px rgba(72, 187, 120, 0.3);
-}
-
-.return-to-lecture-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(72, 187, 120, 0.4);
-}
 
 /* Markdown content styles */
 .markdown-wrapper {
@@ -713,11 +688,14 @@ html, body {
   margin: 1rem 0;
 }
 
-/* Fix user message spacing and ensure white text */
-.user-message p {
-  margin: 0;
-  line-height: 1.5;
-  color: white !important;
+.user-message .message-timestamp {
+  color: rgba(255, 255, 255, 0.9) !important;
+  text-align: right;
+}
+
+.assistant-message .message-timestamp {
+  color: rgba(45, 55, 72, 0.7);
+  text-align: left;
 }
 
 .user-message .markdown-content,
@@ -840,7 +818,7 @@ html, body {
     color: white;
     margin-left: auto;
     margin-right: 0;
-    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
   }
   
   .assistant-message {

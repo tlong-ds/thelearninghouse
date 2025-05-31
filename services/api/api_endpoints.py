@@ -1258,6 +1258,7 @@ async def get_learner_dashboard(
             dashboard_data["lecturesPassed"] = passed_data['count'] if passed_data else 0
             
             # Get statistics data - passed lectures over time
+            # Fix the learner dashboard query around line 1270
             cursor.execute("""
                 SELECT Date, Score, 
                         DATE_FORMAT(Date, '%%Y-%%m-%%d') as formatted_date
@@ -1326,218 +1327,342 @@ async def get_learner_dashboard(
 @router.get("/instructor/dashboard")
 async def get_instructor_dashboard(
     request: Request,
+    course_id: Optional[int] = None,
     auth_token: str = Cookie(None)
 ):
+    conn = None
     try:
-        # Get token from header if not in cookie
+        # 1) Auth token via cookie or header
         if not auth_token:
-            auth_header = request.headers.get('Authorization')
-            if auth_header and auth_header.startswith('Bearer '):
-                auth_token = auth_header.split(' ')[1]
+            auth_header = request.headers.get("Authorization")
+            if auth_header and auth_header.startswith("Bearer "):
+                auth_token = auth_header.split(" ", 1)[1]
             else:
                 raise HTTPException(status_code=401, detail="No authentication token provided")
-        
-        # Verify token and get user data
-        try:
-            user_data = decode_token(auth_token)
-            username = user_data.get('username')
-            role = user_data.get('role')
-            instructor_id = user_data.get('user_id')
-            
-            if not username or not role:
-                raise HTTPException(status_code=401, detail="Invalid token data")
-            
-            # Verify user is an instructor
-            if role != "Instructor":
-                raise HTTPException(status_code=403, detail="Only instructors can access this endpoint")
-            
-            # Connect to database
-            conn = connect_db()
-            
-            with conn.cursor(pymysql.cursors.DictCursor) as cursor:
-                # Get instructor ID from token or fallback to database lookup
-                if not instructor_id:
-                    # Fallback for old tokens without user_id
-                    cursor.execute("""
-                        SELECT InstructorID 
-                        FROM Instructors 
-                        WHERE AccountName = %s
-                    """, (username,))
-                    
-                    instructor = cursor.fetchone()
-                    if not instructor:
-                        raise HTTPException(status_code=404, detail="Instructor not found")
-                    
-                    instructor_id = instructor['InstructorID']
-                
-                try:
-                    # Get total courses
-                    cursor.execute("""
-                        SELECT COUNT(*) as total_courses
-                        FROM Courses
-                        WHERE InstructorID = %s
-                    """, (instructor_id,))
-                    total_courses = cursor.fetchone()['total_courses']
-                    
-                    # Get total students and stats
-                    cursor.execute("""
-                        SELECT 
-                            COUNT(DISTINCT e.LearnerID) as total_students,
-                            COALESCE(AVG(e.Rating), 0) as average_rating,
-                            COUNT(*) as total_enrollments,
-                            SUM(CASE WHEN e.Percentage = 100 THEN 1 ELSE 0 END) as completed_enrollments
-                        FROM Courses c
-                        LEFT JOIN Enrollments e ON c.CourseID = e.CourseID
-                        WHERE c.InstructorID = %s
-                    """, (instructor_id,))
-                    
-                    stats = cursor.fetchone()
-                    if not stats:
-                        stats = {
-                            'total_students': 0,
-                            'average_rating': 0,
-                            'total_enrollments': 0,
-                            'completed_enrollments': 0
-                        }
-                    
-                    completion_rate = round((stats['completed_enrollments'] / stats['total_enrollments'] * 100)
-                                         if stats['total_enrollments'] > 0 else 0, 1)
-                    
-                    # Get student growth
-                    cursor.execute("""
-                        SELECT 
-                            DATE_FORMAT(EnrollmentDate, '%%Y-%%m') as month,
-                            COUNT(DISTINCT LearnerID) as students
-                        FROM Courses c
-                        JOIN Enrollments e ON c.CourseID = e.CourseID
-                        WHERE c.InstructorID = %s
-                        AND EnrollmentDate >= DATE_SUB(CURRENT_DATE, INTERVAL 2 MONTH)
-                        GROUP BY DATE_FORMAT(EnrollmentDate, '%%Y-%%m')
-                        ORDER BY month DESC
-                        LIMIT 2
-                    """, (instructor_id,))
-                    
-                    growth_data = cursor.fetchall()
-                    
-                    current_month = growth_data[0]['students'] if growth_data else 0
-                    prev_month = growth_data[1]['students'] if len(growth_data) > 1 else 0
-                    student_growth = round(((current_month - prev_month) / prev_month * 100)
-                                        if prev_month > 0 else 0, 1)
-                    
-                    # Get courses
-                    cursor.execute("""
-                        SELECT 
-                            c.CourseID as id,
-                            c.CourseName as name,
-                            c.Descriptions as description,
-                            c.AverageRating as rating,
-                            COUNT(DISTINCT e.LearnerID) as enrollments,
-                            AVG(e.Percentage) as completionRate
-                        FROM Courses c
-                        LEFT JOIN Enrollments e ON c.CourseID = e.CourseID
-                        WHERE c.InstructorID = %s
-                        GROUP BY c.CourseID, c.CourseName, c.Descriptions, c.AverageRating
-                        ORDER BY c.CreatedAt DESC
-                    """, (instructor_id,))
-                    
-                    courses = cursor.fetchall() or []
-                    
-                    # Get enrollment trends
-                    cursor.execute("""
-                        SELECT 
-                            DATE_FORMAT(e.EnrollmentDate, '%%Y-%%m-%%d') as date,
-                            COUNT(*) as value
-                        FROM Courses c
-                        JOIN Enrollments e ON c.CourseID = e.CourseID
-                        WHERE c.InstructorID = %s
-                        AND e.EnrollmentDate >= DATE_SUB(CURRENT_DATE, INTERVAL 30 DAY)
-                        GROUP BY DATE_FORMAT(e.EnrollmentDate, '%%Y-%%m-%%d')
-                        ORDER BY date
-                    """, (instructor_id,))
-                    
-                    enrollment_trends = cursor.fetchall() or []
-                    
-                    # Get rating trends
-                    cursor.execute("""
-                        SELECT 
-                            DATE_FORMAT(e.EnrollmentDate, '%%Y-%%m-%%d') as date,
-                            AVG(e.Rating) as value
-                        FROM Courses c
-                        JOIN Enrollments e ON c.CourseID = e.CourseID
-                        WHERE c.InstructorID = %s
-                        AND e.EnrollmentDate >= DATE_SUB(CURRENT_DATE, INTERVAL 30 DAY)
-                        AND e.Rating IS NOT NULL
-                        GROUP BY DATE_FORMAT(e.EnrollmentDate, '%%Y-%%m-%%d')
-                        ORDER BY date
-                    """, (instructor_id,))
-                    
-                    rating_trends = cursor.fetchall() or []
-                    
-                    # Format the data
-                    formatted_courses = [
-                        {
-                            'id': course['id'],
-                            'name': course['name'],
-                            'description': course['description'] or "",
-                            'enrollments': course['enrollments'] or 0,
-                            'rating': round(float(course['rating']), 1) if course['rating'] else 0.0,
-                            'completionRate': round(float(course['completionRate']), 1) if course['completionRate'] else 0.0
-                        } for course in courses
-                    ]
-                    
-                    formatted_enrollment_trends = [
-                        {
-                            'date': trend['date'],
-                            'value': int(trend['value'])
-                        } for trend in enrollment_trends
-                    ]
-                    
-                    formatted_rating_trends = [
-                        {
-                            'date': trend['date'],
-                            'value': round(float(trend['value']), 1)
-                        } for trend in rating_trends if trend['value'] is not None
-                    ]
-                    
-                    dashboard_data = {
-                        "metrics": {
-                            "totalCourses": total_courses,
-                            "totalStudents": stats['total_students'],
-                            "averageRating": round(float(stats['average_rating']), 1),
-                            "completionRate": completion_rate,
-                            "studentGrowth": student_growth
-                        },
-                        "courses": formatted_courses,
-                        "enrollmentTrends": formatted_enrollment_trends,
-                        "ratingTrends": formatted_rating_trends,
-                        "courseEnrollments": [
-                            {
-                                "courseName": course['name'],
-                                "enrollments": course['enrollments'] or 0
-                            } for course in courses
-                        ]
+
+        # 2) Decode and verify
+        user_data = decode_token(auth_token)
+        username = user_data.get("username")
+        role = user_data.get("role")
+        instructor_id = user_data.get("user_id")
+        if role != "Instructor":
+            raise HTTPException(status_code=403, detail="Only instructors can access this endpoint")
+        if not username:
+            raise HTTPException(status_code=401, detail="Invalid token payload")
+
+        # 3) DB connection
+        conn = connect_db()
+        with conn.cursor(pymysql.cursors.DictCursor) as cursor:
+
+            # Fallback for old tokens without user_id
+            if not instructor_id:
+                cursor.execute(
+                    "SELECT InstructorID FROM Instructors WHERE AccountName = %s",
+                    (username,)
+                )
+                row = cursor.fetchone()
+                if not row:
+                    raise HTTPException(status_code=404, detail="Instructor not found")
+                instructor_id = row["InstructorID"]
+
+            # --- General metrics ---
+            cursor.execute("""
+                SELECT COUNT(*) AS total_courses
+                FROM Courses
+                WHERE InstructorID = %s
+            """, (instructor_id,))
+            total_courses = cursor.fetchone()["total_courses"]
+
+            cursor.execute("""
+                SELECT
+                    COUNT(DISTINCT e.LearnerID) AS total_students,
+                    COALESCE(AVG(e.Rating), 0) AS average_rating,
+                    COUNT(*) AS total_enrollments,
+                    SUM(CASE WHEN e.Percentage = 100 THEN 1 ELSE 0 END) AS completed_enrollments
+                FROM Courses c
+                LEFT JOIN Enrollments e ON c.CourseID = e.CourseID
+                WHERE c.InstructorID = %s
+            """, (instructor_id,))
+            stats = cursor.fetchone() or {}
+
+            completion_rate = (
+                round(
+                    stats.get("completed_enrollments", 0)
+                    / stats.get("total_enrollments", 1)
+                    * 100,
+                    1
+                )
+                if stats.get("total_enrollments") else 0.0
+            )
+
+            # --- Student growth (last 2 months) ---
+            cursor.execute("""
+                SELECT
+                    DATE_FORMAT(EnrollmentDate, '%%Y-%%m') AS month,
+                    COUNT(DISTINCT LearnerID) AS students
+                FROM Courses c
+                JOIN Enrollments e ON c.CourseID = e.CourseID
+                WHERE c.InstructorID = %s
+                  AND EnrollmentDate >= DATE_SUB(CURRENT_DATE, INTERVAL 2 MONTH)
+                GROUP BY month
+                ORDER BY month DESC
+                LIMIT 2
+            """, (instructor_id,))
+            growth = cursor.fetchall()
+            current = growth[0]["students"] if len(growth) > 0 else 0
+            previous = growth[1]["students"] if len(growth) > 1 else 0
+            student_growth = (
+                round((current - previous) / previous * 100, 1)
+                if previous else 0.0
+            )
+
+            # --- Course list summary ---
+            cursor.execute("""
+                SELECT
+                    c.CourseID   AS id,
+                    c.CourseName AS name,
+                    c.Descriptions     AS description,
+                    c.AverageRating    AS rating,
+                    COUNT(DISTINCT e.LearnerID) AS enrollments,
+                    AVG(e.Percentage)  AS completionRate
+                FROM Courses c
+                LEFT JOIN Enrollments e ON c.CourseID = e.CourseID
+                WHERE c.InstructorID = %s
+                GROUP BY c.CourseID
+                ORDER BY c.CreatedAt DESC
+            """, (instructor_id,))
+            raw_courses = cursor.fetchall()
+            formatted_courses = [
+                {
+                    "id": c["id"],
+                    "name": c["name"],
+                    "description": c["description"] or "",
+                    "enrollments": c["enrollments"] or 0,
+                    "rating": round(float(c["rating"]), 1) if c["rating"] else 0.0,
+                    "completionRate": round(float(c["completionRate"]), 1) if c["completionRate"] else 0.0
+                }
+                for c in raw_courses
+            ]
+
+            # --- Enrollment trends (last 30 days) ---
+            cursor.execute("""
+                SELECT
+                    DATE_FORMAT(e.EnrollmentDate, '%%Y-%%m-%%d') AS date,
+                    COUNT(*)                              AS value
+                FROM Courses c
+                JOIN Enrollments e ON c.CourseID = e.CourseID
+                WHERE c.InstructorID = %s
+                  AND e.EnrollmentDate >= DATE_SUB(CURRENT_DATE, INTERVAL 30 DAY)
+                GROUP BY date
+                ORDER BY date
+            """, (instructor_id,))
+            enroll_trends = cursor.fetchall()
+
+            # --- Rating trends (last 30 days) ---
+            cursor.execute("""
+                SELECT
+                    DATE_FORMAT(e.EnrollmentDate, '%%Y-%%m-%%d') AS date,
+                    AVG(e.Rating)                         AS value
+                FROM Courses c
+                JOIN Enrollments e ON c.CourseID = e.CourseID
+                WHERE c.InstructorID = %s
+                  AND e.Rating IS NOT NULL
+                  AND e.EnrollmentDate >= DATE_SUB(CURRENT_DATE, INTERVAL 30 DAY)
+                GROUP BY date
+                ORDER BY date
+            """, (instructor_id,))
+            rating_trends = cursor.fetchall()
+
+            # --- Build base payload ---
+            dashboard_data = {
+                "metrics": {
+                    "totalCourses": total_courses,
+                    "totalStudents": stats.get("total_students", 0),
+                    "averageRating": round(stats.get("average_rating", 0), 1),
+                    "completionRate": completion_rate,
+                    "studentGrowth": student_growth
+                },
+                "courses": formatted_courses,
+                "enrollmentTrends": [
+                    {"date": r["date"], "value": r["value"]} for r in enroll_trends
+                ],
+                "ratingTrends": [
+                    {"date": r["date"], "value": round(r["value"], 1)}
+                    for r in rating_trends if r["value"] is not None
+                ],
+                "courseEnrollments": [
+                    {"courseName": c["name"], "enrollments": c["enrollments"]}
+                    for c in formatted_courses
+                ],
+                "courseAnalytics": {}
+            }
+
+            # --- Detailed courseAnalytics if course_id given ---
+            if course_id:
+                # Ownership check
+                cursor.execute("""
+                    SELECT CourseID, CourseName
+                    FROM Courses
+                    WHERE CourseID = %s AND InstructorID = %s
+                """, (course_id, instructor_id))
+                course_row = cursor.fetchone()
+                if not course_row:
+                    raise HTTPException(status_code=404, detail="Course not found or not owned")
+                course_name = course_row["CourseName"]
+
+                # Basic course metrics
+                cursor.execute("""
+                    SELECT
+                        COUNT(DISTINCT e.LearnerID) AS total_enrollments,
+                        COALESCE(AVG(e.Rating), 0)   AS average_rating,
+                        SUM(CASE WHEN e.Percentage = 100 THEN 1 ELSE 0 END) AS completed_enrollments,
+                        COUNT(*) AS all_with_progress
+                    FROM Enrollments e
+                    WHERE e.CourseID = %s
+                """, (course_id,))
+                cm = cursor.fetchone() or {}
+                total_enr = cm.get("total_enrollments", 0)
+                total_with = cm.get("all_with_progress", 0)
+                comp_rate = (
+                    round(cm.get("completed_enrollments", 0) / total_with * 100, 1)
+                    if total_with else 0.0
+                )
+
+                # Enroll/Ratings trends (60 days)
+                cursor.execute("""
+                    SELECT
+                        DATE_FORMAT(EnrollmentDate, '%%Y-%%m-%%d') AS date,
+                        COUNT(*)                               AS value
+                    FROM Enrollments
+                    WHERE CourseID = %s
+                      AND EnrollmentDate >= DATE_SUB(CURRENT_DATE, INTERVAL 60 DAY)
+                    GROUP BY date
+                    ORDER BY date
+                """, (course_id,))
+                ce_trends = cursor.fetchall()
+
+                cursor.execute("""
+                    SELECT
+                        DATE_FORMAT(EnrollmentDate, '%%Y-%%m-%%d') AS date,
+                        AVG(Rating)                          AS value
+                    FROM Enrollments
+                    WHERE CourseID = %s
+                      AND Rating IS NOT NULL
+                      AND EnrollmentDate >= DATE_SUB(CURRENT_DATE, INTERVAL 60 DAY)
+                    GROUP BY date
+                    ORDER BY date
+                """, (course_id,))
+                cr_trends = cursor.fetchall()
+
+                # Completion via LectureResults (30 days)
+                cursor.execute("""
+                    SELECT
+                        DATE_FORMAT(lr.Date, '%%Y-%%m-%%d') AS date,
+                        COUNT(DISTINCT CASE WHEN e.Percentage = 100 THEN e.LearnerID END) AS completed,
+                        COUNT(DISTINCT lr.LearnerID)                           AS total
+                    FROM LectureResults lr
+                    JOIN Enrollments e
+                      ON lr.LearnerID = e.LearnerID AND lr.CourseID = e.CourseID
+                    WHERE lr.CourseID = %s
+                      AND lr.Date >= DATE_SUB(CURRENT_DATE, INTERVAL 30 DAY)
+                    GROUP BY date
+                    ORDER BY date
+                """, (course_id,))
+                comp_rows = cursor.fetchall()
+                completion_trends = [
+                    {
+                        "date": r["date"],
+                        "value": round(r["completed"] / r["total"] * 100, 1) if r["total"] else 0.0
                     }
-                    
-                    return dashboard_data
-                    
-                except Exception as e:
-                    print(f"Error processing dashboard data: {str(e)}")
-                    raise HTTPException(status_code=500, detail="Error processing dashboard data")
-                
-        except HTTPException as he:
-            raise he
-        except Exception as e:
-            print(f"Database error: {str(e)}")
-            raise HTTPException(status_code=500, detail=f"Database error: {str(e)}")
-            
-    except HTTPException as he:
-        raise he
+                    for r in comp_rows
+                ]
+
+                # Lecture-level analytics
+                cursor.execute("""
+                    SELECT
+                        l.LectureID                           AS lectureId,
+                        l.Title                               AS lecture_title,
+                        COUNT(DISTINCT lr.LearnerID)         AS total_attempts,
+                        SUM(lr.State = 'passed')             AS passed_count,
+                        COALESCE(AVG(lr.Score), 0)           AS average_score
+                    FROM Lectures l
+                    LEFT JOIN LectureResults lr
+                      ON l.LectureID = lr.LectureID
+                    WHERE l.CourseID = %s
+                    GROUP BY l.LectureID, l.Title
+                    ORDER BY l.LectureID
+                """, (course_id,))
+                lects = cursor.fetchall()
+                lecture_analytics = [
+                    {
+                        "lectureId": l["lectureId"],
+                        "title": l["lecture_title"],
+                        "totalAttempts": l["total_attempts"],
+                        "passedCount": l["passed_count"],
+                        "passRate": round(l["passed_count"] / l["total_attempts"] * 100, 1)
+                            if l["total_attempts"] else 0.0,
+                        "averageScore": round(float(l["average_score"]), 1)
+                    }
+                    for l in lects
+                ]
+
+                # Student progress distribution
+                cursor.execute("""
+                    SELECT
+                        CASE
+                          WHEN Percentage = 0 THEN 'Not Started'
+                          WHEN Percentage < 25 THEN '0-25%%'
+                          WHEN Percentage < 50 THEN '25-50%%'
+                          WHEN Percentage < 75 THEN '50-75%%'
+                          WHEN Percentage < 100 THEN '75-99%%'
+                          ELSE 'Completed'
+                        END AS progress_range,
+                        COUNT(*) AS student_count
+                    FROM Enrollments
+                    WHERE CourseID = %s
+                    GROUP BY progress_range
+                    ORDER BY
+                      FIELD(progress_range,
+                            'Not Started','0-25%%','25-50%%',
+                            '50-75%%','75-99%%','Completed')
+                """, (course_id,))
+                pd = cursor.fetchall()
+                progress = [
+                    {"range": p["progress_range"], "count": p["student_count"]}
+                    for p in pd
+                ]
+
+                dashboard_data["courseAnalytics"] = {
+                    "courseId": course_id,
+                    "courseName": course_name,
+                    "totalEnrollments": total_enr,
+                    "averageRating": round(float(cm.get("average_rating", 0)), 1),
+                    "completionRate": comp_rate,
+                    "enrollmentTrends": [
+                        {"date": r["date"], "value": int(r["value"])}
+                        for r in ce_trends
+                    ],
+                    "ratingTrends": [
+                        {"date": r["date"], "value": round(float(r["value"]), 1)}
+                        for r in cr_trends if r["value"] is not None
+                    ],
+                    "completionTrends": completion_trends,
+                    "lectureAnalytics": lecture_analytics,
+                    "studentProgress": progress
+                }
+
+            # 4) Return final payload
+            return dashboard_data
+
+    except HTTPException:
+        raise
     except Exception as e:
-        print(f"Error fetching instructor dashboard: {str(e)}")
-        raise HTTPException(status_code=500, detail=str(e))
+        print(f"[ERROR] get_instructor_dashboard: {e}")
+        raise HTTPException(status_code=500, detail="Internal server error")
     finally:
-        if 'conn' in locals():
+        if conn:
             conn.close()
+
 
 # Quiz submission model
 class QuizSubmission(BaseModel):
@@ -1870,6 +1995,7 @@ async def get_instructor_course_details(
             conn.close()
 
 
+
 # CreateLecture model and create_lecture endpoint to handle lecture creation with video upload and quiz
 class CreateLecture(BaseModel):
     title: str
@@ -1934,6 +2060,8 @@ async def create_lecture(
                     FROM Courses 
                     WHERE CourseID = %s AND InstructorID = %s
                 """, (course_id, instructor_id))
+                
+
                 
                 if not cursor.fetchone():
                     raise HTTPException(status_code=403, detail="Not authorized to modify this course")
@@ -2216,3 +2344,63 @@ async def get_course_preview_data(course_id: int, request: Request, auth_token: 
     except Exception as e:
         print(f"Error in get_course_preview_data: {str(e)}")
         raise HTTPException(status_code=500, detail=str(e))
+
+# Debug endpoint for instructor to list their courses - no caching, direct DB access
+@router.get("/instructor/debug/my-courses")
+async def debug_my_courses(
+    request: Request,
+    auth_token: str = Cookie(None)
+):
+    try:
+        if not auth_token:
+            auth_header = request.headers.get('Authorization')
+            if auth_header and auth_header.startswith('Bearer '):
+                auth_token = auth_header.split(' ')[1]
+            else:
+                raise HTTPException(status_code=401, detail="No authentication token provided")
+        
+        user_data = decode_token(auth_token)
+        username = user_data['username']
+        role = user_data['role']
+        instructor_id = user_data.get('user_id')
+        
+        if role != "Instructor":
+            raise HTTPException(status_code=403, detail="Only instructors can access this endpoint")
+        
+        conn = connect_db()
+        with conn.cursor(pymysql.cursors.DictCursor) as cursor:
+            if not instructor_id:
+                cursor.execute("""
+                    SELECT InstructorID 
+                    FROM Instructors 
+                    WHERE AccountName = %s
+                """, (username,))
+                
+                instructor = cursor.fetchone()
+                if not instructor:
+                    raise HTTPException(status_code=404, detail="Instructor not found")
+                
+                instructor_id = instructor['InstructorID']
+            
+            cursor.execute("""
+                SELECT CourseID, CourseName, InstructorID
+                FROM Courses 
+                WHERE InstructorID = %s
+                ORDER BY CourseID
+            """, (instructor_id,))
+            
+            courses = cursor.fetchall()
+            
+            return {
+                "instructor_id": instructor_id,
+                "username": username,
+                "courses": courses,
+                "course_count": len(courses)
+            }
+            
+    except Exception as e:
+        print(f"Debug error: {str(e)}")
+        raise HTTPException(status_code=500, detail=str(e))
+    finally:
+        if 'conn' in locals():
+            conn.close()

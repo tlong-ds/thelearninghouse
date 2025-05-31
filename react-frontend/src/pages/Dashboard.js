@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { fetchDashboardData } from '../services/api';
 import { useAuth } from '../services/AuthContext';
 import { useLoading } from '../services/LoadingContext';
-import Header from '../components/Header';
 import '../styles/Dashboard.css';
 
 // Line chart component for statistics
@@ -31,7 +30,7 @@ const StatisticsChart = ({ data, title, yAxisLabel, color }) => {
   }, []);
   
   if (!data || data.length === 0) {
-    return <div className="no-data-message">No data available for this chart.</div>;
+    return <div className="dashboard-no-data-message">No data available for this chart.</div>;
   }
 
   // Calculate chart dimensions
@@ -63,9 +62,9 @@ const StatisticsChart = ({ data, title, yAxisLabel, color }) => {
   const linePath = `M ${points.map(p => `${p.x},${p.y}`).join(' L ')}`;
   
   return (
-    <div className="statistics-chart">
+    <div className="dashboard-statistics-chart">
       <h3>{title}</h3>
-      <div className="chart-svg-container">
+      <div className="dashboard-chart-svg-container">
         <svg 
           width="100%" 
           height="100%" 
@@ -150,7 +149,7 @@ const StatisticsChart = ({ data, title, yAxisLabel, color }) => {
         
         {/* Points */}
         {points.map((point, i) => (
-          <g key={i} className="data-point">
+          <g key={i} className="dashboard-data-point">
             <circle
               cx={point.x}
               cy={point.y}
@@ -170,8 +169,8 @@ const StatisticsChart = ({ data, title, yAxisLabel, color }) => {
 // Progress bar component
 const ProgressBar = ({ percentage }) => {
   return (
-    <div className="progress-container">
-      <div className="progress-bar" style={{ width: `${percentage}%` }}>
+    <div className="dashboard-progress-container">
+      <div className="dashboard-progress-bar" style={{ width: `${percentage}%` }}>
       </div>
     </div>
   );
@@ -301,54 +300,54 @@ const Dashboard = () => {
     return (
       <div className="dashboard-content">
         <h1>Learning Dashboard</h1>
-        <p className="greeting">Hello <span className="username">{dashboardData.learnerName}</span> - here's your progress overview.</p>
+        <p className="dashboard-greeting">Hello <span className="dashboard-username">{dashboardData.learnerName}</span> - here's your progress overview.</p>
         
-        <div className="metrics-container">
-          <div className="metric-card">
+        <div className="dashboard-metrics-container">
+          <div className="dashboard-metric-card">
             <h3>Courses Enrolled</h3>
-            <div className="metric-value">{dashboardData.enrolled}</div>
+            <div className="dashboard-metric-value">{dashboardData.enrolled}</div>
           </div>
           
-          <div className="metric-card">
+          <div className="dashboard-metric-card">
             <h3>Courses Completed</h3>
-            <div className="metric-value">{dashboardData.completed}</div>
+            <div className="dashboard-metric-value">{dashboardData.completed}</div>
           </div>
           
-          <div className="metric-card">
+          <div className="dashboard-metric-card">
             <h3>Completion Rate</h3>
-            <div className="metric-value">{dashboardData.completionRate}</div>
+            <div className="dashboard-metric-value">{dashboardData.completionRate}</div>
           </div>
           
-          <div className="metric-card">
+          <div className="dashboard-metric-card">
             <h3>Lectures Passed</h3>
-            <div className="metric-value">{dashboardData.lecturesPassed}</div>
+            <div className="dashboard-metric-value">{dashboardData.lecturesPassed}</div>
           </div>
         </div>
         
-        <div className="tabs-container">
-          <div className="tabs">
+        <div className="dashboard-tabs-container">
+          <div className="dashboard-tabs">
             <button 
-              className={`tab ${activeTab === 'statistics' ? 'active' : ''}`}
+              className={`dashboard-tab ${activeTab === 'statistics' ? 'active' : ''}`}
               onClick={() => setActiveTab('statistics')}
             >
               Statistics
             </button>
             <button 
-              className={`tab ${activeTab === 'courses' ? 'active' : ''}`}
+              className={`dashboard-tab ${activeTab === 'courses' ? 'active' : ''}`}
               onClick={() => setActiveTab('courses')}
             >
               Enrolled Courses
             </button>
           </div>
           
-          <div className="tab-content">
+          <div className="dashboard-tab-content">
             {activeTab === 'statistics' && (
-              <div className="statistics-tab">
+              <div className="dashboard-statistics-tab">
                 {(dashboardData.statistics.lecturesPassed.length === 0 && dashboardData.statistics.averageScores.length === 0) ? (
-                  <div className="no-data-message">
+                  <div className="dashboard-no-data-message">
                     <p>You haven't passed any lecture quizzes yet. Complete quizzes to see your statistics.</p>
                     <button 
-                      className="view-courses-btn"
+                      className="dashboard-view-courses-btn"
                       onClick={() => setActiveTab('courses')}
                     >
                       View Your Courses
@@ -356,10 +355,10 @@ const Dashboard = () => {
                   </div>
                 ) : (
                   <>
-                    <div className="time-filter-controls">
+                    <div className="dashboard-time-filter-controls">
                       <span>Time Range:</span>
                       <button 
-                        className={`time-filter-btn ${timeFilter === 'all' ? 'active' : ''}`}
+                        className={`dashboard-time-filter-btn ${timeFilter === 'all' ? 'active' : ''}`}
                         onClick={() => {
                           setIsAnimating(true);
                           setTimeFilter('all');
@@ -369,7 +368,7 @@ const Dashboard = () => {
                         All Time
                       </button>
                       <button 
-                        className={`time-filter-btn ${timeFilter === 'month' ? 'active' : ''}`}
+                        className={`dashboard-time-filter-btn ${timeFilter === 'month' ? 'active' : ''}`}
                         onClick={() => {
                           setIsAnimating(true);
                           setTimeFilter('month');
@@ -379,7 +378,7 @@ const Dashboard = () => {
                         Last Month
                       </button>
                       <button 
-                        className={`time-filter-btn ${timeFilter === 'week' ? 'active' : ''}`}
+                        className={`dashboard-time-filter-btn ${timeFilter === 'week' ? 'active' : ''}`}
                         onClick={() => {
                           setIsAnimating(true);
                           setTimeFilter('week');
@@ -389,7 +388,7 @@ const Dashboard = () => {
                         Last Week
                       </button>
                       <button 
-                        className={`time-filter-btn ${timeFilter === 'day' ? 'active' : ''}`}
+                        className={`dashboard-time-filter-btn ${timeFilter === 'day' ? 'active' : ''}`}
                         onClick={() => {
                           setIsAnimating(true);
                           setTimeFilter('day');
@@ -400,7 +399,7 @@ const Dashboard = () => {
                       </button>
                     </div>
                     
-                    <div className={`charts-container ${isAnimating ? 'animating' : ''}`}>
+                    <div className={`dashboard-charts-container ${isAnimating ? 'animating' : ''}`}>
                       <StatisticsChart 
                         data={lecturesPassedData} 
                         title="Lectures Passed Over Time" 
@@ -421,43 +420,40 @@ const Dashboard = () => {
             )}
             
             {activeTab === 'courses' && (
-              <div className="courses-tab">
+              <div className="dashboard-courses-tab">
                 {dashboardData.enrolledCourses.length === 0 ? (
-                  <div className="no-data-message">
+                  <div className="dashboard-no-data-message">
                     <p>You are not enrolled in any courses yet.</p>
                     <button 
-                      className="browse-courses-btn"
+                      className="dashboard-browse-courses-btn"
                       onClick={() => navigate('/courses')}
                     >
                       Browse Courses
                     </button>
                   </div>
                 ) : (
-                  <div className="enrolled-courses">
-                    <div className="courses-header">
-                      <h2>Your Courses</h2>
-                      <div className="course-controls">
-                        <select 
-                          value={sortBy}
-                          onChange={handleSortChange}
-                        >
-                          <option value="name">Sort by Name</option>
-                          <option value="instructor">Sort by Instructor</option>
-                          <option value="progress">Sort by Progress</option>
-                        </select>
-                        <button 
-                          className="sort-order-btn"
-                          onClick={toggleSortOrder}
-                        >
-                          {sortOrder === 'asc' ? '↑' : '↓'}
-                        </button>
-                      </div>
+                  <>
+                    <div className="dashboard-course-controls">
+                      <select 
+                        value={sortBy}
+                        onChange={handleSortChange}
+                      >
+                        <option value="name">Name</option>
+                        <option value="instructor">Instructor</option>
+                        <option value="progress">Progress</option>
+                      </select>
+                      <button 
+                        className="dashboard-sort-order-btn"
+                        onClick={toggleSortOrder}
+                      >
+                        {sortOrder === 'asc' ? '↑' : '↓'}
+                      </button>
                     </div>
-                    <div className="courses-list">
+                    <div className="dashboard-courses-list">
                       {sortCourses(dashboardData.enrolledCourses).map(course => (
                         <div 
                           key={course.id} 
-                          className="course-card"
+                          className="dashboard-course-card"
                           onClick={() => handleCourseClick(course.id)}
                           role="button"
                           tabIndex={0}
@@ -468,10 +464,10 @@ const Dashboard = () => {
                             }
                           }}
                         >
-                          <div className="course-info">
+                          <div className="dashboard-course-info">
                             <h3>{course.name}</h3>
-                            <p className="instructor">{course.instructor}</p>
-                            <div className="progress-info">
+                            <p className="dashboard-instructor">{course.instructor}</p>
+                            <div className="dashboard-progress-info">
                               <p>Progress: {course.percentage || 0}%</p>
                               <ProgressBar percentage={course.percentage || 0} />
                             </div>
@@ -479,7 +475,7 @@ const Dashboard = () => {
                         </div>
                       ))}
                     </div>
-                  </div>
+                  </>
                 )}
               </div>
             )}
@@ -492,8 +488,6 @@ const Dashboard = () => {
   // Single return statement for the entire component
   return (
     <div className="dashboard-container">
-      <Header username={currentUser?.username} role={currentUser?.role} onLogout={logout} />
-      
       {error ? (
         <div className="error-container">
           <div className="error-message">{error}</div>

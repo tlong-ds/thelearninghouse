@@ -1,9 +1,10 @@
+/* Modern macOS-inspired Loading Screen */
 .loading-container {
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 2rem;
-}
+  }
 
 .loading-container.fullscreen {
   position: fixed;
@@ -11,53 +12,44 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(255, 255, 255, 0.98); /* Increased opacity to reduce flickering */
-  z-index: 10000; /* Higher than header to ensure it's on top */
-  backdrop-filter: blur(5px); /* Increased blur for smoother transitions */
-  transition: opacity 0.3s ease; /* Add transition for smoother appearance/disappearance */
-  will-change: opacity; /* Optimize for animations */
+  backdrop-filter: blur(20px) saturate(180%);
+  z-index: 10000;
+  animation: loadingFadeIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .loading-content {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1.5rem;
-  background: white;
-  padding: 2.5rem;
-  border-radius: 16px;
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+  gap: 2rem;
+  backdrop-filter: blur(20px);
+  padding: 3rem 2.5rem;
+  border-radius: 24px;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  box-shadow: 
+    0 32px 64px rgba(0, 0, 0, 0.08),
+    0 16px 32px rgba(0, 0, 0, 0.04),
+    inset 0 1px 0 rgba(59, 130, 246, 0.3);
   max-width: 400px;
   width: 90%;
-  transform: translateY(0); /* Set initial position */
-  animation: fadeInUp 0.3s ease-out; /* Add animation */
-  will-change: transform, opacity; /* Optimize for animations */
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  position: relative;
+  overflow: hidden;
+  animation: loadingContentFloat 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.2s both;
 }
 
 .loading-spinner {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  display: none;
 }
 
 .loading-text {
-  color: #0d6efd;
+  color: #1e293b;
   font-size: 1.1rem;
-  margin: 0;
-  font-weight: 500;
+  font-weight: 600;
   text-align: center;
-  line-height: 1.4;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+  margin: 0;
+  animation: textFade 1.5s ease-in-out infinite alternate;
 }
 
 .loading-progress {
@@ -65,51 +57,151 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 0.75rem;
+  gap: 1rem;
 }
 
 .progress-bar {
   width: 100%;
-  height: 8px;
-  background-color: #e9ecef;
-  border-radius: 4px;
+  height: 6px;
+  background: rgba(59, 130, 246, 0.1);
+  border-radius: 6px;
   overflow: hidden;
+  position: relative;
+}
+
+.progress-bar::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 100%;
+  width: 100%;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(59, 130, 246, 0.3) 50%,
+    transparent 100%
+  );
+  animation: progressShimmer 1.5s ease-in-out infinite;
 }
 
 .progress-fill {
   height: 100%;
-  background: linear-gradient(90deg, #0d6efd, #0b5ed7);
-  border-radius: 4px;
-  transition: width 0.3s ease;
+  background: linear-gradient(90deg, 
+    #3b82f6 0%,
+    #6366f1 50%,
+    #8b5cf6 100%
+  );
+  border-radius: 6px;
+  transition: width 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg,
+    transparent 0%,
+    rgba(59, 130, 246, 0.3) 50%,
+    transparent 100%
+  );
+  animation: progressGlow 1.5s ease-in-out infinite;
 }
 
 .progress-text {
-  font-size: 0.9rem;
-  color: #6c757d;
+  font-size: 0.875rem;
+  color: #64748b;
   font-weight: 500;
+  letter-spacing: 0.025em;
 }
 
-.spinner-border {
-  width: 3rem;
-  height: 3rem;
-}
-
-/* Ensure loading doesn't interfere with header */
-.loading-container.fullscreen {
-  /* Header has z-index of 1000, loading should be above it */
-  z-index: 10000;
-}
-
-/* Animation for smooth appearance */
-.loading-container.fullscreen {
-  animation: fadeIn 0.2s ease-out;
-}
-
-@keyframes fadeIn {
+/* Animations */
+@keyframes loadingFadeIn {
   from {
     opacity: 0;
+    backdrop-filter: blur(0px);
   }
   to {
     opacity: 1;
+    backdrop-filter: blur(20px) saturate(180%);
+  }
+}
+
+@keyframes loadingContentFloat {
+  from {
+    opacity: 0;
+    transform: translateY(32px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes textFade {
+  0% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes progressShimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes progressGlow {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 480px) {
+  .loading-content {
+    padding: 2rem 1.5rem;
+    gap: 1.5rem;
+    border-radius: 20px;
+  }
+  
+  .loading-text {
+    font-size: 1rem;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .loading-container.fullscreen {
+    background: linear-gradient(135deg, 
+      rgba(15, 23, 42, 0.95) 0%,
+      rgba(30, 41, 59, 0.95) 50%,
+      rgba(51, 65, 85, 0.95) 100%
+    );
+  }
+  
+  .loading-content {
+    background: rgba(30, 41, 59, 0.8);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+  }
+  
+  .loading-text {
+    color: #e2e8f0;
+  }
+  
+  .progress-text {
+    color: #94a3b8;
   }
 }

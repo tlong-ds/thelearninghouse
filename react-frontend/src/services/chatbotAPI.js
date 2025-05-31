@@ -25,14 +25,15 @@ const getHeaders = () => ({
 });
 
 // Send a chat message and get response 
-export const sendChatMessage = async (message, lectureId = null) => {
+export const sendChatMessage = async (message, lectureId = null, useCache = true) => {
   try {
     const endpoint = lectureId 
       ? `${API_URL}/api/chat/lecture/${lectureId}`
       : `${API_URL}/api/chat`;
 
     const response = await axios.post(endpoint, {
-      message
+      message,
+      use_cache: useCache
     }, {
       withCredentials: true,
       headers: getHeaders()

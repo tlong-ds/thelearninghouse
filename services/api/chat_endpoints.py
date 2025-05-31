@@ -9,6 +9,7 @@ router = APIRouter()
 
 class ChatMessage(BaseModel):
     message: str
+    use_cache: bool = True
 
 @router.post("/chat")
 async def chat_endpoint(message: ChatMessage, request: Request, auth_token: str = Cookie(None)):
@@ -33,12 +34,18 @@ async def chat_endpoint(message: ChatMessage, request: Request, auth_token: str 
         
         # Get chatbot response
         chat_history = get_chat_history(username)
-        append_chat_message(username, message.message, is_user=True)
+        
+        # Only append to cache if use_cache is True (default True for general chat)
+        if message.use_cache:
+            append_chat_message(username, message.message, is_user=True)
         
         response = get_chat_response(username, message.message)
-        append_chat_message(username, response, is_user=False)
         
-        return {"answer": response, "history": get_chat_history(username)}
+        # Only append response to cache if use_cache is True
+        if message.use_cache:
+            append_chat_message(username, response, is_user=False)
+        
+        return {"answer": response, "history": get_chat_history(username) if message.use_cache else []}
 
     except Exception as e:
         print(f"Chat error: {str(e)}")
@@ -72,12 +79,21 @@ async def lecture_chat_endpoint(
         
         # Get chatbot response for specific lecture
         chat_history = get_chat_history(username)
-        append_chat_message(username, message.message, is_user=True)
+        
+        # Only append to cache if use_cache is True
+        if message.use_cache:
+            print(f"Lecture chat: Caching enabled for user {username}, lecture {lecture_id}")
+            append_chat_message(username, message.message, is_user=True)
+        else:
+            print(f"Lecture chat: Caching disabled for user {username}, lecture {lecture_id}")
         
         response = get_chat_response_lecture(username, message.message, lecture_id)
-        append_chat_message(username, response, is_user=False)
         
-        return {"answer": response, "history": get_chat_history(username)}
+        # Only append response to cache if use_cache is True
+        if message.use_cache:
+            append_chat_message(username, response, is_user=False)
+        
+        return {"answer": response, "history": get_chat_history(username) if message.use_cache else []}
 
     except HTTPException as he:
         raise he

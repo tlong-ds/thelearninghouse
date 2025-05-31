@@ -38,7 +38,7 @@ const Login = () => {
       if (success) {
         console.log(`Welcome back ${username}! Login successful.`);
         setTimeout(() => {
-          navigate('/courses');
+          navigate('/');
         }, 1000);
       } else {
         setError('Login failed. Please check your credentials.');
@@ -106,7 +106,7 @@ const Login = () => {
           alert("You have been automatically logged in!");
           // Add timeout before navigation
           setTimeout(() => {
-            navigate('/courses');
+            navigate('/');
           }, 1000); // 1 second delay
         } else {
           setError('Registration successful but login failed. Please try logging in manually.');

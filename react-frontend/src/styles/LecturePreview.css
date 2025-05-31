@@ -1,1857 +1,950 @@
-/* 
- * LecturePreview.css - MacOS Inspired Design
- * 
- * A clean, minimal design with smooth animations and interactions
- * inspired by macOS interface guidelines (Sonoma/Ventura style).
- */
+/* LecturePreview.css - macOS Design Language */
 
-/* Universal box-sizing rule to prevent overflow */
-*, *::before, *::after {
-  box-sizing: border-box;
+/* macOS-inspired global enhancements */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* Ensure consistent background color throughout the page */
-body {
-  background-color: #f8f9fa !important; /* Background color to match Courses.css */
-  overflow-x: hidden !important; /* Prevent horizontal scrolling */
-  width: 100vw !important; /* Ensure body doesn't exceed viewport width */
-  max-width: 100vw !important; /* Additional safety measure */
+.edumate-chat-container.embedded .chat-input, 
+.edumate-chat-container.embedded .chat-input-form input {
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.9);
 }
 
-/* Prevent horizontal scrolling on html element as well */
-html {
-  overflow-x: hidden !important;
-  width: 100vw !important; /* Ensure html doesn't exceed viewport width */
-  max-width: 100vw !important; /* Additional safety measure */
+/* Smooth focus states for accessibility */
+*:focus {
+  outline: none;
 }
 
-/* Main container and layout - Updated background color to match Courses.css */
+*:focus-visible {
+  outline: 2px solid #0066cc;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Global text selection styling */
+::selection {
+  background: rgba(0, 102, 204, 0.2);
+  color: #1d1d1f;
+}
+
+/* Main container */
 .lecture-preview-container {
-  min-height: 100vh;
   display: flex;
   flex-direction: column;
-  background-color: #f8f9fa !important; /* Force background color */
-  width: 100%;
-  max-width: 100vw; /* Prevent container from exceeding viewport width */
-  padding-top: 84px; /* Space for floating header */
-  color: #1d1d1f; /* Apple's primary text color */
-  position: relative; /* Ensure proper stacking */
-  overflow-x: hidden; /* Prevent horizontal scrolling */
-  box-sizing: border-box; /* Include padding in width calculation */
+  min-height: 100vh;
+  background: linear-gradient(180deg, #f8f9fa 0%, #f1f3f4 100%);
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', system-ui, sans-serif;
+  color: #1d1d1f;
+}
+/* Main content area with YouTube-like layout */
+.lecture-main-content {
+  display: flex;
+  flex: 1;
+  gap: 24px;
+  padding: 20px;
 }
 
-/* Main container layout to ensure proper sidebar behavior */
-.lecture-preview-layout {
+/* Left side - Video and content area */
+.video-content-area {
   flex: 1;
   display: flex;
-  height: calc(100vh - 84px);
-  overflow: hidden;
-  position: relative;
-  width: 100%;
-  max-width: 100vw; /* Prevent layout from exceeding viewport width */
-  background-color: #f8f9fa !important; /* Fixed background color */
-  box-sizing: border-box; /* Include padding in width calculation */
-  /* Remove any flex-direction or justify-content that might interfere */
-}
-
-/* Ensure the layout doesn't shift when sidebar opens */
-.lecture-preview-layout::after {
-  content: '';
-  position: fixed;
-  top: 84px;
-  left: 0;
-  width: 280px; /* Same as sidebar width */
-  height: calc(100vh - 84px);
-  z-index: -2; /* Behind the main background */
-  pointer-events: none;
-  visibility: hidden; /* Hidden but preserves space */
-}
-
-/* ===== LEFT SIDEBAR - Course Navigation ===== */
-.course-sidebar {
-  background: rgba(250, 250, 252, 0.95); /* Very light background with transparency */
-  backdrop-filter: blur(25px) saturate(180%);
-  -webkit-backdrop-filter: blur(25px) saturate(180%);
-  border-right: 1px solid rgba(0, 0, 0, 0.06);
-  display: flex;
   flex-direction: column;
-  height: 100%;
-  width: 280px;
-  position: fixed; /* Change to fixed instead of absolute */
-  top: 84px; /* Account for header height */
-  left: 0;
-  bottom: 0;
-  transform: translateX(-100%); /* Start off-screen */
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
-              box-shadow 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  z-index: 200; /* Higher z-index to overlay main content */
-  flex-shrink: 0;
-  box-shadow: 5px 0 25px rgba(0, 0, 0, 0.0); /* Start with no shadow */
+  gap: 16px;
+  min-width: 0; /* Allows flex item to shrink */
 }
 
-/* When sidebar is open (not closed) */
-.course-sidebar:not(.closed) {
-  transform: translateX(0); /* Slide in */
-  box-shadow: 5px 0 25px rgba(0, 0, 0, 0.1); /* Add shadow when open */
+/* Back button container */
+.back-button-container {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 0px;
+  height: 40px; /* Fixed height to maintain consistent spacing */
+  align-items: flex-start;
 }
 
-/* When sidebar is closed */
-.course-sidebar.closed {
-  transform: translateX(-100%); /* Move off-screen */
-  box-shadow: none;
-}
-
-/* Adjust sidebar toggle position */
-.sidebar-toggle {
-  position: absolute;
-  right: -40px; /* Position outside the sidebar */
-  top: 20px;
-  width: 32px;
-  height: 32px;
-  background: #fff;
-  border: 1px solid rgba(0, 0, 0, 0.08);
-  border-radius: 8px; /* Square with rounded corners like macOS */
+.back-button {
   display: flex;
   align-items: center;
-  justify-content: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  color: #1d1d1f;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
   cursor: pointer;
-  z-index: 201; /* Above sidebar */
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-  color: #666;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  height: 32px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+}
+
+.back-button:hover {
+  background: rgba(255, 255, 255, 0.95);
+  transform: translateY(-0.5px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.back-button:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.back-button i {
   font-size: 14px;
 }
 
-.sidebar-toggle:hover {
-  background-color: #f8f8fa;
-  transform: scale(1.05);
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.12);
-}
-
-/* ===== MAIN CONTENT AREA ===== */
-.lecture-main {
-  flex: 1;
-  margin-left: 0;
-  margin-right: 0;
-  padding: 1.5rem;
-  padding-right: 4rem; /* Reduced since no outer bar */
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
-              filter 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-              padding-right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  overflow-y: auto;
-  overflow-x: hidden; /* Prevent horizontal scrolling */
-  height: calc(100vh - 84px);
-  position: relative;
-  width: 100%;
-  max-width: 100%; /* Ensure it doesn't exceed parent width */
-  will-change: transform, filter, padding-right;
-  background-color: transparent;
-  transform-origin: center;
-  box-sizing: border-box; /* Include padding in width calculation */
-}
-
-/* Add a smooth transition effect when expanding sidebar */
-@keyframes fadeInBackground {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-/* Add a fixed background container behind lecture-main */
-.lecture-preview-layout::before {
-  content: '';
-  position: fixed;
-  top: 84px; /* Account for header height */
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #f8f9fa; /* Background color to match Courses.css */
-  z-index: -1; /* Place behind content */
-  width: 100vw; /* Ensure full viewport width */
-  height: calc(100vh - 84px); /* Full height minus header */
-  animation: fadeInBackground 0.3s ease-out; /* Smooth fade in */
-}
-
-/* Remove sidebar-closed class since it's not needed anymore */
-.lecture-main.sidebar-closed {
-  margin-left: 0; /* No change needed */
-}
-
-/* Apply blur to main content when sidebar is open on all screen sizes */
-.course-sidebar:not(.closed) ~ .lecture-main {
-  filter: blur(3px);
-  pointer-events: none;
-  transform: scale(0.98); /* Subtle scale effect for depth */
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
-              filter 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  margin-left: 0; /* Keep margin-left at 0 to prevent content shift */
-}
-
-/* Add an overlay for when sidebar is expanded to prevent clicks on main content */
-.course-sidebar:not(.closed) ~ .lecture-main::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.1);
-  z-index: 10;
-  pointer-events: none;
-  opacity: 1;
-  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-/* Main content wrapper to prevent background squeeze */
-.lecture-main-wrapper {
-  width: 100%;
-  height: 100%;
-  position: relative;
-  background-color: transparent;
-  z-index: 1;
-}
-
-/* Remove blur when right tabs are expanded or user hovers over main content */
-.course-sidebar:not(.closed) ~ .lecture-main.right-tabs-expanded,
-.course-sidebar:not(.closed) ~ .lecture-main:hover {
-  filter: none;
-  pointer-events: auto;
-  transform: scale(1);
-}
-
-/* Remove overlay when hovering or when right tabs are expanded */
-.course-sidebar:not(.closed) ~ .lecture-main.right-tabs-expanded::after,
-.course-sidebar:not(.closed) ~ .lecture-main:hover::after {
-  opacity: 0;
-}
-
-/* Central Content Area with Video and Title */
-.lecture-content-wrapper {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  max-width: 100%;
-  overflow: hidden;
-}
-
-/* Header with title */
-.lecture-header {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  margin-bottom: 2rem;
-  padding: 0;
-  background: transparent;
-  border: none;
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.lecture-header h1 {
-  font-size: 1.8rem;
-  font-weight: 600;
-  color: #1d1d1f; /* Dark gray, almost black - macOS text color */
-  margin: 0;
-  text-align: center;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-/* Move header when right tabs expand */
-.lecture-main.right-tabs-expanded .lecture-header {
-  transform: translateX(-100px);
-}
-
-/* Main Content Layout */
-.content-layout {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 0;
-  padding: 0.5rem; /* Reduced padding for more space */
-}
-
-/* Video Section - Centered with movement based on right tabs */
-.video-content-section {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  max-width: 1150px; /* Reduced to accommodate smaller video */
-  margin: 0 auto;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  will-change: transform, max-width; /* Performance optimization */
-}
-
-/* Move video when right tabs expand */
-.lecture-main.right-tabs-expanded .video-content-section {
-  max-width: 900px; /* More reduced size for wider expanded tabs */
-  transform: translateX(-100px);
-}
-
+/* Video container with macOS styling */
 .video-container {
   position: relative;
   width: 100%;
-  max-width: 1080px; /* Reduced max-width for 1080x720 video */
-  background-color: #f8f9fa;
-  border: 1px solid rgba(0, 0, 0, 0.06);
+  aspect-ratio: 16 / 9;
+  background: #000;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-  aspect-ratio: 3/2; /* 1080x720 aspect ratio (3:2) */
-  margin: 0 auto;
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-              max-width 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-              box-shadow 0.3s ease;
-  transform-origin: center;
-  will-change: transform, max-width; /* Performance optimization */
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15), 0 3px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .video-container:hover {
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
-}
-
-.lecture-main.right-tabs-expanded {
-  padding-right: 7rem; /* Increased padding for wider tabs */
-}
-
-.lecture-main.right-tabs-expanded .video-container {
-  max-width: 900px; /* Smaller when right tabs are expanded */
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2), 0 5px 15px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
 }
 
 .video-container video {
-  position: absolute;
-  top: 0;
-  left: 0;
   width: 100%;
   height: 100%;
   object-fit: contain;
-  background-color: #000;
-  display: block;
 }
 
+/* Video placeholder */
 .placeholder-video {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: calc(100% - 2rem);
-  height: calc(100% - 2rem);
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  background-color: #f8f9fa; /* Updated background color to match Courses.css */
-  color: #86868b; /* macOS secondary text color */
-  gap: 1rem;
-  border-radius: 10px;
-  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.05);
+  height: 100%;
+  color: #8e8e93;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
 }
 
 .placeholder-video i {
-  font-size: 2.5rem;
-  color: #86868b;
+  font-size: 48px;
+  margin-bottom: 12px;
+  opacity: 0.7;
+  color: #8e8e93;
 }
 
 .placeholder-video p {
-  font-size: 1rem;
+  font-size: 16px;
   font-weight: 500;
-  color: #86868b;
-}
-
-/* ===== RIGHT TABS ===== */
-.right-tabs-container {
-  position: fixed !important;
-  top: 84px;
-  right: 10px !important; /* 10px gap from right edge on desktop */
-  left: auto !important;
-  bottom: 0;
-  width: 60px; /* Always show the tab buttons */
-  background: transparent; /* Remove the background bar */
-  backdrop-filter: none; /* Remove backdrop filter */
-  -webkit-backdrop-filter: none;
-  border-left: none; /* Remove border */
-  box-shadow: none; /* Remove shadow */
-  transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
-              right 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  z-index: 1000 !important;
-  display: flex;
-  flex-direction: row;
-  overflow: visible; /* Allow buttons to show outside */
-  will-change: width;
-}
-
-.right-tabs-container.expanded {
-  width: 500px !important; /* Wider to get closer to video */
-  right: 0 !important; /* Snap to edge when expanded */
-  left: auto !important;
-  background: transparent; /* Remove grey background completely */
-  backdrop-filter: none; /* Remove backdrop filter */
-  -webkit-backdrop-filter: none;
-  border-left: none; /* Remove border */
-  box-shadow: none; /* Remove shadow */
-}
-
-.tabs-toggle-area {
-  width: 60px;
-  flex-shrink: 0;
-  background: transparent; /* Remove background */
-  border-right: none; /* Remove border */
-  display: flex;
-  flex-direction: column;
-  padding: 1.5rem 0.5rem; /* Adjust padding */
-  gap: 1rem;
-  align-items: center;
-}
-/* Enhanced macOS-style floating tab buttons */
-.tab-toggle {
-  width: 48px;
-  height: 48px;
-  border: none;
-  border-radius: 16px; /* More rounded for macOS feel */
-  background: rgba(255, 255, 255, 0.95);
-  color: #86868b;
-  font-size: 18px;
-  cursor: pointer;
-  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  backdrop-filter: blur(30px) saturate(180%);
-  -webkit-backdrop-filter: blur(30px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 
-    0 8px 32px rgba(0, 0, 0, 0.12),
-    0 2px 8px rgba(0, 0, 0, 0.08),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.05);
-}
-
-/* Add subtle gradient overlay for depth */
-.tab-toggle::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  border-radius: 16px;
-  background: linear-gradient(135deg, 
-    rgba(255, 255, 255, 0.1) 0%, 
-    transparent 50%, 
-    rgba(0, 0, 0, 0.02) 100%);
-  pointer-events: none;
-  transition: opacity 0.3s ease;
-}
-
-.tab-toggle:hover {
-  background: rgba(255, 255, 255, 1);
-  color: #007AFF; /* Use consistent blue */
-  transform: translateY(-4px) scale(1.08);
-  box-shadow: 
-    0 16px 48px rgba(0, 0, 0, 0.15),
-    0 8px 24px rgba(34, 150, 243, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 1),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.05);
-  border-color: rgba(34, 150, 243, 0.2);
-}
-
-.tab-toggle:hover::before {
-  opacity: 0.5;
-}
-
-.tab-toggle.active {
-  background: linear-gradient(135deg, #007AFF 0%, #1976d2 100%);
-  color: white;
-  transform: translateY(-4px) scale(1.05);
-  box-shadow: 
-    0 12px 40px rgba(34, 150, 243, 0.35),
-    0 6px 20px rgba(34, 150, 243, 0.25),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
-  border-color: rgba(34, 150, 243, 0.4);
-}
-
-.tab-toggle.active::before {
-  background: linear-gradient(135deg, 
-    rgba(255, 255, 255, 0.2) 0%, 
-    transparent 50%, 
-    rgba(0, 0, 0, 0.1) 100%);
-}
-
-.tab-toggle:active {
-  transform: translateY(-2px) scale(1.02);
-  transition: all 0.1s ease;
-}
-
-/* Add a subtle pulsing effect for active state */
-.tab-toggle.active {
-  animation: subtle-pulse 2s ease-in-out infinite;
-}
-
-@keyframes subtle-pulse {
-  0%, 100% {
-    box-shadow: 
-      0 12px 40px rgba(34, 150, 243, 0.35),
-      0 6px 20px rgba(34, 150, 243, 0.25),
-      inset 0 1px 0 rgba(255, 255, 255, 0.3),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.1);
-  }
-  50% {
-    box-shadow: 
-      0 16px 48px rgba(34, 150, 243, 0.4),
-      0 8px 24px rgba(34, 150, 243, 0.3),
-      inset 0 1px 0 rgba(255, 255, 255, 0.3),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.1);
-  }
-}
-
-/* Enhanced tabs toggle area */
-.tabs-toggle-area {
-  width: 60px;
-  flex-shrink: 0;
-  background: transparent;
-  border-right: none;
-  display: flex;
-  flex-direction: column;
-  padding: 2rem 0.5rem;
-  gap: 1.25rem;
-  align-items: center;
-  position: relative;
-}
-
-/* Add a subtle background glow when any tab is active */
-.right-tabs-container.expanded .tabs-toggle-area {
-  background: linear-gradient(90deg, 
-    transparent 0%, 
-    rgba(34, 150, 243, 0.02) 100%);
-}
-
-/* Enhanced tabs content with better glass morphism */
-.tabs-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  opacity: 0;
-  pointer-events: none;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  background: rgba(255, 255, 255, 0.95);
-  backdrop-filter: blur(40px) saturate(180%);
-  -webkit-backdrop-filter: blur(40px) saturate(180%);
-  margin-left: 60px;
-  border-radius: 16px 0 0 0;
-  box-shadow: 
-    inset 1px 0 0 rgba(255, 255, 255, 0.5),
-    inset 0 1px 0 rgba(255, 255, 255, 0.8),
-    0 0 0 1px rgba(0, 0, 0, 0.06);
-}
-
-.right-tabs-container.expanded .tabs-content {
-  opacity: 1;
-  pointer-events: auto;
-  margin-left: 0;
-}
-
-/* Enhanced tab content header */
-.tab-content-header {
-  padding: 1.5rem 2rem 1rem 2rem;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-  background: linear-gradient(180deg, 
-    rgba(255, 255, 255, 0.8) 0%, 
-    rgba(255, 255, 255, 0.4) 100%);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-radius: 16px 0 0 0;
-}
-
-.tab-content-header h3 {
   margin: 0;
-  font-size: 1.1rem;
-  font-weight: 600;
-  color: #1d1d1f;
-  background: #000;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  color: #8e8e93;
 }
 
-/* Enhanced close button */
-.close-tab-btn {
-  width: 32px;
-  height: 32px;
-  border: none;
-  border-radius: 8px;
-  background: rgba(0, 0, 0, 0.04);
-  color: #86868b;
-  font-size: 14px;
-  cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
-
-.close-tab-btn:hover {
-  background: rgba(255, 59, 48, 0.1);
-  color: #ff3b30;
-  transform: scale(1.1);
-  box-shadow: 0 4px 12px rgba(255, 59, 48, 0.15);
-}
-
-.close-tab-btn:active {
-  transform: scale(0.95);
-  transition: all 0.1s ease;
-}
-
-.tab-content-body {
-  flex: 1;
-  padding: 1.5rem;
-  overflow-y: auto;
-  background: white;
-}
-
-/* Tab content styling */
-.content-tab {
-  color: #333;
-  line-height: 1.6;
-}
-
-/* Lecture content styling for markdown */
-.lecture-content {
-  color: #1d1d1f;
-  line-height: 1.7;
-  font-size: 0.95rem;
+/* Lecture info section */
+.lecture-info {
+  padding: 0;
+  margin: 0;
   text-align: left;
 }
 
-.lecture-content h1,
-.lecture-content h2,
-.lecture-content h3,
-.lecture-content h4,
-.lecture-content h5,
-.lecture-content h6 {
+.lecture-title {
+  font-size: 24px;
+  font-weight: 700;
   color: #1d1d1f;
-  font-weight: 600;
-  margin: 1.5rem 0 0.75rem 0;
+  margin: 0 0 8px 0;
   line-height: 1.3;
-}
-
-.lecture-content h1 {
-  font-size: 1.8rem;
-  border-bottom: 2px solid rgba(0, 112, 201, 0.1);
-  padding-bottom: 0.5rem;
-}
-
-.lecture-content h2 {
-  font-size: 1.5rem;
-}
-
-.lecture-content h3 {
-  font-size: 1.3rem;
-}
-
-.lecture-content h4 {
-  font-size: 1.1rem;
-}
-
-.lecture-content p {
-  margin: 0.75rem 0;
-  color: #333;
-}
-
-.lecture-content ul,
-.lecture-content ol {
-  margin: 0.75rem 0;
-  padding-left: 1.5rem;
-}
-
-.lecture-content li {
-  margin: 0.25rem 0;
-}
-
-.lecture-content blockquote {
-  margin: 1rem 0;
-  padding: 1rem 1.25rem;
-  background: rgba(0, 112, 201, 0.05);
-  border-left: 4px solid #0070c9;
-  border-radius: 4px;
-  font-style: italic;
-}
-
-.lecture-content code {
-  background: rgba(0, 0, 0, 0.05);
-  padding: 0.2rem 0.4rem;
-  border-radius: 4px;
-  font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
-  font-size: 0.9em;
-}
-
-.lecture-content pre {
-  background: #f8f9fa;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  border-radius: 8px;
-  padding: 1rem;
-  overflow-x: auto;
-  margin: 1rem 0;
-}
-
-.lecture-content pre code {
-  background: none;
-  padding: 0;
-}
-
-.lecture-content table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 1rem 0;
-  border-radius: 8px;
-  overflow: hidden;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-}
-
-.lecture-content th,
-.lecture-content td {
-  padding: 0.75rem;
   text-align: left;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  letter-spacing: -0.02em;
 }
 
-.lecture-content th {
-  background: rgba(0, 112, 201, 0.05);
-  font-weight: 600;
-}
-
-.lecture-content a {
-  color: #0070c9;
-  text-decoration: none;
-  transition: color 0.2s ease;
-}
-
-.lecture-content a:hover {
-  color: #0077ed;
-  text-decoration: underline;
-}
-
-.lecture-content img {
-  max-width: 100%;
-  height: auto;
-  border-radius: 8px;
-  margin: 1rem 0;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-}
-
-/* Math equation styling */
-.lecture-content .katex {
-  font-size: 1.1em;
-}
-
-.lecture-content .katex-display {
-  margin: 1.5rem 0;
-  padding: 1rem;
-  background: rgba(0, 112, 201, 0.02);
-  border-radius: 8px;
-  overflow-x: auto;
-}
-
-/* Right Tab Content Styling */
-.chatbot-tab,
-.quiz-tab {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-}
-
-.chatbot-placeholder,
-.quiz-placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  height: 200px;
-  gap: 1rem;
-  padding: 2rem;
-}
-
-.chatbot-placeholder i,
-.quiz-placeholder i {
-  font-size: 3rem;
-  color: #86868b;
-  margin-bottom: 0.5rem;
-}
-
-.chatbot-placeholder h4,
-.quiz-placeholder h4 {
-  margin: 0;
-  color: #1d1d1f;
-  font-size: 1.3rem;
-  font-weight: 600;
-}
-
-.chatbot-placeholder p,
-.quiz-placeholder p {
-  margin: 0;
-  color: #86868b;
-  font-size: 1rem;
+.lecture-description {
+  font-size: 16px;
+  font-weight: 400;
+  color: #8e8e93;
+  margin: 0 0 12px 0;
+  padding: 0;
   line-height: 1.5;
-  max-width: 300px;
+  text-align: left;
+  letter-spacing: -0.01em;
 }
 
-/* Empty content styling */
-.empty-content {
+/* Right sidebar - Navigation */
+.lecture-sidebar {
+  width: 360px;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  height: 200px;
-  gap: 1rem;
-  color: #86868b;
+  gap: 16px;
+  flex-shrink: 0;
 }
 
-.empty-content i {
-  font-size: 3rem;
-  margin-bottom: 0.5rem;
+/* Sidebar spacer to align with back button */
+.sidebar-spacer {
+  height: 40px; /* Matches back-button-container height */
 }
 
-.empty-content p {
-  margin: 0;
-  font-size: 1rem;
-}
-
-/* ===== MOBILE HORIZONTAL TABS (Dashboard-style) ===== */
-/* Hidden by default, only shown on mobile */
-.mobile-tabs-container {
-  display: none; /* Hidden by default */
-  flex-direction: column;
-  width: 100%;
-  margin-top: 1.5rem; /* Space below video */
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  overflow: hidden;
-  order: 2; /* Ensure it comes after video */
-}
-
-.mobile-tabs-header {
+/* Tab system container */
+.sidebar-tabs {
   display: flex;
-  border-bottom: 1px solid #eee;
-  background: white;
-  width: 100%;
-}
-
-.mobile-tab {
-  flex: 1;
-  padding: 1rem 0.75rem;
-  background: none;
-  border: none;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: all 0.2s;
-  color: #666;
-  font-weight: 500;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  min-height: 60px;
-  justify-content: center;
-}
-
-.mobile-tab i {
-  font-size: 1.1rem;
-}
-
-.mobile-tab.active {
-  color: #007AFF;
-  border-bottom: 2px solid #007AFF;
-  background: rgba(34, 150, 243, 0.02);
-}
-
-.mobile-tab:hover {
-  background-color: #ebf6ff;
-}
-
- /* Mobile tab content wrapper - ensure consistent sizing */
-.mobile-tab-content {
-  padding: 0; /* Remove padding to allow full container usage */
-  min-height: 400px;
-  max-height: 500px;
-  background: white;
-  width: 100%;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-}
-
-.mobile-tab-content .content-tab,
-.mobile-tab-content .chatbot-tab,
-.mobile-tab-content .quiz-tab {
-  height: 100%;
-  min-height: 400px; /* Consistent minimum height for all tabs */
-  max-height: 500px; /* Consistent maximum height */
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-  overflow: hidden;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-}
-
-/* Mobile tab content styling to match existing styles */
-.mobile-tab-content .chatbot-placeholder,
-.mobile-tab-content .quiz-placeholder,
-.mobile-tab-content .empty-content {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  height: 150px;
-  gap: 1rem;
-}
-
-.mobile-tab-content .chatbot-placeholder i,
-.mobile-tab-content .quiz-placeholder i,
-.mobile-tab-content .empty-content i {
-  font-size: 2rem;
-  color: #86868b;
-}
-
-.mobile-tab-content .chatbot-placeholder h4,
-.mobile-tab-content .quiz-placeholder h4 {
-  margin: 0;
-  color: #1d1d1f;
-  font-size: 1.2rem;
-}
-
-.mobile-tab-content .chatbot-placeholder p,
-.mobile-tab-content .quiz-placeholder p,
-.mobile-tab-content .empty-content p {
-  margin: 0;
-  color: #86868b;
-  font-size: 0.95rem;
-}
-
-.mobile-tab-content .chat-action-btn,
-.mobile-tab-content .quiz-action-btn {
-  margin-top: 1rem;
-  padding: 0.75rem 1.5rem;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-/* Specific background for chat button */
-.mobile-tab-content .chat-action-btn {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-/* Specific background for quiz button */
-.mobile-tab-content .quiz-action-btn {
-  background: #007AFF;
-}
-
-.mobile-tab-content .chat-action-btn:hover {
-  background: linear-gradient(135deg, #5a6fd8 0%, #6a4c93 100%);
-  color: white;
-  text-decoration: none;
-}
-
-.mobile-tab-content .quiz-action-btn:disabled {
-  background: #ccc;
-  cursor: not-allowed;
-}
-
-/* ===== MEDIA QUERIES FOR MOBILE TABS ===== */
-@media (max-width: 768px) {
-  /* Ensure proper video layout on mobile */
-  .video-content-section {
-    flex-direction: column;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 0; /* No gap between video and tabs */
-  }
-  
-  /* Mobile responsive video */
-  .video-container {
-    max-width: 100%;
-    margin: 0 1rem;
-    aspect-ratio: 16/9; /* Switch to 16:9 on mobile for better fit */
-    order: 1; /* Video first */
-  }
-  
-  /* Show mobile horizontal tabs below video */
-  .mobile-tabs-container {
-    display: flex !important; /* Force display on mobile */
-    margin: 1.5rem 1rem 0 1rem; /* Match video margins */
-    order: 2; /* Tabs second, below video */
-  }
-  
-  /* Hide right side floating tabs completely on mobile */
-  .right-tabs-container {
-    display: none !important;
-  }
-  
-  /* Adjust main content padding */
-  .lecture-main {
-    padding: 1rem;
-    padding-right: 1rem;
-  }
-  
-  .content-layout {
-    padding: 0.25rem;
-    flex-direction: column;
-  }
-  
-  /* Ensure no right tab effects interfere on mobile */
-  .lecture-main.right-tabs-expanded {
-    padding-right: 1rem;
-    margin-right: 0;
-    opacity: 1;
-    pointer-events: auto;
-  }
-  
-  /* Disable all translateX transforms on mobile to prevent overflow */
-  .lecture-main.right-tabs-expanded .lecture-header,
-  .lecture-main.right-tabs-expanded .video-content-section {
-    transform: none !important;
-  }
-  
-  /* Mobile tab content styling */
-  .mobile-tab-content .content-tab,
-  .mobile-tab-content .chatbot-tab,
-  .mobile-tab-content .quiz-tab {
-    height: 100%;
-    min-height: 500px; /* Increased minimum height for better chat experience */
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 12px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-    overflow: hidden;
-    position: relative;
-  }
-  
-  
-  /* Enhanced mobile chat container - consistent sizing */
-  .mobile-tab-content .chatbot-tab {
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    min-height: 400px; /* Same as other tabs */
-    max-height: 500px; /* Same as other tabs */
-    height: 100%;
-  }
-  
-  /* Mobile chat placeholder - consistent with other placeholders */
-  .mobile-tab-content .chatbot-placeholder {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    height: 100%; /* Fill the entire tab height */
-    gap: 1rem;
-    padding: 2rem 1rem;
-    background: linear-gradient(135deg, rgba(118, 75, 162, 0.02) 0%, rgba(102, 126, 234, 0.02) 100%);
-    border-radius: 12px;
-  }
-  
-  /* Mobile embedded chat interface - proper sizing */
-  .mobile-tab-content .embedded-chat-container {
-    height: 100%; /* Fill entire tab content */
-    min-height: 400px;
-    max-height: 500px;
-    background: white;
-    border-radius: 12px;
-    border: 1px solid rgba(118, 75, 162, 0.1);
-    overflow: hidden;
-    box-shadow: none; /* Remove extra shadow */
-    display: flex;
-    flex-direction: column;
-  }
-  
-  /* Mobile chat container - ensure proper height */
-  .mobile-tab-content .embedded-chat-container .edumate-chat-container {
-    height: 100%;
-    min-height: 400px;
-    max-height: 500px;
-    flex: 1;
-    border-radius: 12px;
-    box-shadow: none;
-    border: none;
-    background: white;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  /* Mobile content tab - consistent styling */
-  .mobile-tab-content .content-tab {
-    padding: 1.5rem;
-    overflow-y: auto;
-    height: 100%;
-    min-height: 400px;
-    max-height: 500px;
-  }
-  
-  /* Mobile quiz tab - consistent styling */
-  .mobile-tab-content .quiz-tab {
-    padding: 0;
-    height: 100%;
-    min-height: 400px;
-    max-height: 500px;
-    display: flex;
-    flex-direction: column;
-  }
-  
-  /* Mobile quiz and other placeholders - consistent sizing */
-  .mobile-tab-content .quiz-placeholder,
-  .mobile-tab-content .empty-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    text-align: center;
-    height: 100%; /* Fill the entire tab height */
-    gap: 1rem;
-    padding: 2rem 1rem;
-  }
-  
-  /* Mobile tabs container - ensure proper container sizing */
-  .mobile-tabs-container {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    margin-top: 1.5rem;
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-    overflow: hidden;
-    order: 2;
-    height: auto;
-    min-height: 460px; /* Account for header + content */
-    max-height: 560px; /* Account for header + content */
-  }
-  
-  /* Mobile tabs header - consistent styling */
-  .mobile-tabs-header {
-    display: flex;
-    border-bottom: 1px solid #eee;
-    background: white;
-    width: 100%;
-    flex-shrink: 0;
-    height: 60px; /* Fixed header height */
-  }
-  
-  /* Ensure mobile tab content fills remaining space properly */
-  .mobile-tab-content {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-height: 400px;
-    max-height: 500px;
-    overflow: hidden;
-  }
-}
-
-/* ===== COURSE NAVIGATION HEADER ===== */
-.course-nav-header {
-  padding: 1.5rem 1.25rem 1rem 1.25rem;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
-  background: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.9);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.05);
+  margin-bottom: 16px;
+  overflow: hidden;
+  border: 1px solid rgba(0, 0, 0, 0.04);
 }
 
-.course-nav-title {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  color: #007AFF; /* Apple blue */
-  text-decoration: none;
-  font-weight: 600;
-  font-size: 0.95rem;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+.tab-button {
+  flex: 1;
+  padding: 12px 6px;
+  background: transparent;
   border: none;
-  background: none;
+  font-size: 11px;
+  font-weight: 500;
+  color: #8e8e93;
   cursor: pointer;
-  padding: 0.5rem;
-  border-radius: 6px;
-  width: 100%;
-  text-align: left;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  text-align: center;
+  border-right: 1px solid rgba(0, 0, 0, 0.06);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
 }
 
-.course-nav-title:hover {
-  background: rgba(0, 112, 201, 0.08);
-  color: #007AFF;
-  text-decoration: none;
-  transform: translateY(-1px);
+.tab-button:last-child {
+  border-right: none;
 }
 
-.course-nav-title i {
-  font-size: 0.9rem;
-  transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+.tab-button.active {
+  background: linear-gradient(135deg, #0066cc, #5ac8fa);
+  color: white;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
-.course-nav-title:hover i {
-  transform: translateX(-2px);
+.tab-button.active:nth-child(4) {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
 }
 
-/* ===== LECTURE NAVIGATION ===== */
-.lecture-nav {
+
+.tab-button:hover:not(.active) {
+  background: rgba(0, 0, 0, 0.03);
+  color: #1d1d1f;
+}
+
+.tab-button i {
+  font-size: 16px;
+}
+
+.tab-button span {
+  font-size: 10px;
+  font-weight: 500;
+}
+
+/* Tab content container */
+.tab-content {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.05);
+  flex: 1;
+  overflow: hidden;
+  height: calc((100vw - 590px) * 9 / 16);
+  max-height: calc((100vw - 590px) * 9 / 16);
+  display: flex;
+  flex-direction: column;
+  border: 1px solid rgba(0, 0, 0, 0.04);
+}
+
+.tab-content-inner {
   flex: 1;
   overflow-y: auto;
-  padding: 0.5rem 0;
+  padding: 20px;
+  height: 100%;
+  max-height: calc((100vw - 585px) * 9 / 16 - 32px);
 }
 
-.lecture-nav-list {
-  list-style: none;
-  margin: 0;
+/* No padding for chatbot tab and navigation tab */
+.tab-content-inner.no-padding,
+.tab-content-inner:has(.lecture-nav-list) {
   padding: 0;
+  max-height: calc((100vw - 585px) * 9 / 16);
 }
 
-.lecture-nav-item {
-  margin: 0 0.75rem 0.5rem 0.75rem;
-  padding: 0.85rem 1rem;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-  background: rgba(255, 255, 255, 0.4);
-  border: 1px solid rgba(0, 0, 0, 0.04);
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
-
-.lecture-nav-item:hover {
-  background: rgba(255, 255, 255, 0.8);
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-  border-color: rgba(0, 112, 201, 0.2);
-}
-
-.lecture-nav-item.active {
-  background: linear-gradient(135deg, #0070c9 0%, #1a84f7 100%);
-  color: white;
-  border-color: rgba(0, 112, 201, 0.3);
-  box-shadow: 0 4px 16px rgba(0, 112, 201, 0.25);
-  transform: translateY(-2px);
-}
-
-.lecture-nav-item.active:hover {
-  background: linear-gradient(135deg, #0077ed 0%, #2088f7 100%);
-  transform: translateY(-3px);
-  box-shadow: 0 6px 20px rgba(0, 112, 201, 0.3);
-}
-
-.lecture-index {
-  flex-shrink: 0;
-  width: 24px;
-  height: 24px;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.06);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #666;
-  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-.lecture-nav-item.active .lecture-index {
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-}
-
-.lecture-nav-item:hover .lecture-index {
-  background: rgba(0, 112, 201, 0.1);
-  color: #007AFF;
-}
-
-.lecture-nav-item.active:hover .lecture-index {
-  background: rgba(255, 255, 255, 0.3);
-  color: white;
-}
-
-.lecture-nav-title {
-  flex: 1;
-  font-size: 0.9rem;
-  font-weight: 500;
-  color: #1d1d1f;
-  line-height: 1.4;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.lecture-nav-item.active .lecture-nav-title {
-  color: white;
-  font-weight: 600;
-}
-
-.lecture-nav-item.empty {
-  background: rgba(248, 248, 248, 0.6);
-  border: 1px dashed rgba(0, 0, 0, 0.1);
-  color: #86868b;
-  cursor: default;
-  justify-content: center;
-}
-
-.lecture-nav-item.empty:hover {
-  background: rgba(248, 248, 248, 0.6);
-  transform: none;
-  box-shadow: none;
-  border-color: rgba(0, 0, 0, 0.1);
-}
-
-.empty-message {
-  font-style: italic;
-  font-size: 0.85rem;
-}
-
-/* Scrollbar styling for webkit browsers */
-.lecture-nav::-webkit-scrollbar {
-  width: 4px;
-}
-
-.lecture-nav::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-.lecture-nav::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 2px;
-}
-
-.lecture-nav::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.2);
-}
-
-/* Quiz placeholder styling - updated for navigation */
-.quiz-placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 2rem;
-  height: 200px;
-  gap: 1rem;
-}
-
-.quiz-placeholder i {
-  font-size: 3rem;
-  color: #86868b;
-  margin-bottom: 0.5rem;
-}
-
-.quiz-placeholder h4 {
-  margin: 0;
-  color: #1d1d1f;
-  font-size: 1.3rem;
-  font-weight: 600;
-}
-
-.quiz-placeholder p {
-  margin: 0;
-  color: #86868b;
-  font-size: 1rem;
-  line-height: 1.5;
-}
-
-/* Quiz action button styling - Using mobile color scheme adapted for all screens */
-.quiz-action-btn {
-  margin-top: 1rem;
-  padding: 1rem 2rem;
-  background: #007AFF; /* Use mobile blue color */
-  color: white;
-  border: none;
-  border-radius: 10px;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 4px 20px rgba(34, 150, 243, 0.25); /* Blue shadow */
-  border: 1px solid rgba(34, 150, 243, 0.3);
-  min-width: 160px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
+/* Alternative approach for navigation tab - use specific class if :has() is not supported */
+.navigation-tab-content {
+  padding: 12px 12px 4px 12px !important;
+  max-height: calc((100vw - 585px) * 9 / 16) !important;
+  overflow-y: auto;
+  /* Adding padding bottom via a pseudo-element for scroll space */
   position: relative;
-  overflow: hidden;
+  -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+  scrollbar-width: thin; /* Thin scrollbar for Firefox */
+  scrollbar-gutter: stable; /* Prevent layout shift when scrollbar appears */
+  scroll-behavior: smooth; /* Smooth scrolling for better UX */
+  overscroll-behavior: contain; /* Prevent scroll chaining on mobile */
 }
 
-/* Add a subtle shine effect */
-.quiz-action-btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
+.navigation-tab-content::after {
+  content: "";
+  display: block;
+  height: 16px; /* Extra space at the bottom when scrolling */
   width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.5s;
 }
 
-.quiz-action-btn:hover:not(:disabled) {
-  background: #1976d2; /* Darker blue on hover */
-  color: white;
-  text-decoration: none;
-  transform: translateY(-3px) scale(1.02);
-  box-shadow: 0 8px 30px rgba(34, 150, 243, 0.4);
-  border-color: rgba(34, 150, 243, 0.5);
-}
-
-.quiz-action-btn:hover::before {
-  left: 100%;
-}
-
-.quiz-action-btn:active {
-  transform: translateY(-1px) scale(0.98);
-  transition: all 0.1s;
-}
-
-.quiz-action-btn:disabled {
-  background: #d1d1d6;
-  color: #86868b;
-  cursor: not-allowed;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-  border: 1px solid #d1d1d6;
-}
-
-.quiz-action-btn:disabled:hover {
-  transform: none;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
-}
-
-.quiz-action-btn:disabled::before {
-  display: none;
-}
-
-.quiz-action-btn i {
-  font-size: 0.9rem;
-}
-
-/* Chat action button styling - Consistent with quiz button */
-.chat-action-btn {
-  margin-top: 1rem;
-  padding: 1rem 2rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Purple gradient to match chat theme */
-  color: white;
-  border: none;
-  border-radius: 10px;
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.25); /* Purple shadow */
-  border: 1px solid rgba(102, 126, 234, 0.3);
-  min-width: 160px;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  position: relative;
-  overflow: hidden;
-}
-
-/* Add a subtle shine effect */
-.chat-action-btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: left 0.5s;
-}
-
-.chat-action-btn:hover {
-  background: linear-gradient(135deg, #5a6fd8 0%, #6a4c93 100%); /* Darker purple on hover */
-  color: white;
-  text-decoration: none;
-  transform: translateY(-3px) scale(1.02);
-  box-shadow: 0 8px 30px rgba(102, 126, 234, 0.4);
-  border-color: rgba(102, 126, 234, 0.5);
-}
-
-.chat-action-btn:hover::before {
-  left: 100%;
-}
-
-/* Mobile tab content quiz styling */
-.mobile-tab-content .quiz-placeholder {
-  height: 150px;
-  padding: 1.5rem;
-}
-
-.mobile-tab-content .quiz-placeholder i {
-  font-size: 2.5rem;
-}
-
-.mobile-tab-content .quiz-placeholder h4 {
-  font-size: 1.1rem;
-}
-
-.mobile-tab-content .quiz-placeholder p {
-  font-size: 0.9rem;
-}
-
-/* Mobile tab content quiz styling - Consistent with desktop */
-.mobile-tab-content .quiz-action-btn {
-  padding: 0.875rem 1.75rem;
-  font-size: 0.95rem;
-  min-width: 140px;
-  font-weight: 500;
-  letter-spacing: 0.3px;
-  background: #007AFF; /* Same mobile color */
-}
-
-.mobile-tab-content .quiz-action-btn:hover:not(:disabled) {
-  background: #1976d2;
-}
-
-/* Mobile chat action button - Consistent with desktop */
-.mobile-tab-content .chat-action-btn {
-  padding: 0.875rem 1.75rem;
-  font-size: 0.95rem;
-  min-width: 140px;
-  font-weight: 500;
-  letter-spacing: 0.3px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Purple gradient to match chat theme */
-  box-shadow: 0 4px 20px rgba(102, 126, 234, 0.25);
-  border: 1px solid rgba(102, 126, 234, 0.3);
-}
-
-.mobile-tab-content .chat-action-btn:hover {
-  background: linear-gradient(135deg, #5a6fd8 0%, #6a4c93 100%);
-  box-shadow: 0 8px 30px rgba(102, 126, 234, 0.4);
-}
-
-/* Embedded Chat Container Styles */
-.embedded-chat-container {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
-.embedded-chat-container .edumate-chat-container {
-  height: 100%;
-  border: none;
-  box-shadow: none;
-  background: transparent;
-}
-
-/* Right tabs embedded chat specific styling */
-.right-tabs-container .embedded-chat-container {
-  height: calc(100% - 60px); /* Account for tab header */
-  background: #fff;
-  border-radius: 0;
-}
-
-.right-tabs-container .embedded-chat-container .edumate-chat-container {
-  height: 100%;
-  background: #fff;
-}
-
-/* Mobile tabs embedded chat specific styling */
-.mobile-tab-content .embedded-chat-container {
-  height: 400px; /* Fixed height for mobile */
-  background: #fff;
-  border-radius: 12px;
-  border: 1px solid #e0e0e0;
-  overflow: hidden;
-}
-
-.mobile-tab-content .embedded-chat-container .edumate-chat-container {
-  height: 100%;
-  background: #fff;
-}
-
-/* Chatbot tab specific styles */
+/* Specific styling for chatbot tab */
 .chatbot-tab {
   height: 100%;
   display: flex;
   flex-direction: column;
 }
 
-.chatbot-tab .chatbot-placeholder {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  text-align: center;
-  padding: 2rem;
-  color: #86868b;
-}
-
-.chatbot-tab .chatbot-placeholder i {
-  font-size: 3rem;
-  color: #764ba2;
-  margin-bottom: 1rem;
-}
-
-.chatbot-tab .chatbot-placeholder h4 {
-  margin: 0 0 0.5rem 0;
-  color: #1d1d1f;
-  font-size: 1.2rem;
-  font-weight: 600;
-}
-
-.chatbot-tab .chatbot-placeholder p {
-  margin: 0 0 1.5rem 0;
-  color: #86868b;
-  font-size: 0.95rem;
-  line-height: 1.5;
-}
-
-/* Quiz tab specific styles for consistency */
-.quiz-tab {
+/* Lecture chat specific styling */
+.lecture-chat {
   height: 100%;
   display: flex;
   flex-direction: column;
 }
 
-.quiz-tab .quiz-placeholder {
+/* Override EdumateChat.css with more specific selectors */
+.lecture-chat.edumate-chat-container.embedded .chat-send-btn,
+.lecture-chat .edumate-chat-container.embedded .chat-send-btn,
+.lecture-chat .chat-send-btn {
+  padding: 12px 20px !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 10px !important;
+  cursor: pointer !important;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+  min-width: 80px !important;
+  width: auto !important;
+  height: 55px !important;
+  flex-shrink: 0 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  box-shadow: none !important;
+  order: initial !important;
+}
+
+.lecture-chat .chat-messages-container {
+  flex: 1;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  text-align: center;
-  padding: 2rem;
-  color: #86868b;
+  min-height: 0; /* Important for flex shrinking */
 }
 
-.quiz-tab .quiz-placeholder i {
-  font-size: 3rem;
-  color: #007AFF;
-  margin-bottom: 1rem;
-}
-
-.quiz-tab .quiz-placeholder h4 {
-  margin: 0 0 0.5rem 0;
-  color: #1d1d1f;
-  font-size: 1.2rem;
-  font-weight: 600;
-}
-
-.quiz-tab .quiz-placeholder p {
-  margin: 0 0 1.5rem 0;
-  color: #86868b;
-  font-size: 0.95rem;
-  line-height: 1.5;
-}
-
-/* Tab Header Buttons Styling - for Clear Chat and Close buttons */
-.tab-header-buttons {
+.lecture-chat .messages-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1rem;
   display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-left: auto;
+  flex-direction: column;
+  gap: 0.75rem;
+  scrollbar-width: thin;
 }
 
-.tab-header-buttons button {
-  background: none;
-  border: none;
-  padding: 4px 8px;
+/* Webkit scrollbar styling for lecture chat */
+.lecture-chat .messages-list::-webkit-scrollbar {
+  width: 6px;
+  background: transparent;
+}
+
+.lecture-chat .messages-list::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.03);
   border-radius: 6px;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 14px;
-  font-weight: 500;
-  transition: all 0.2s ease;
-  color: #86868b;
-  min-width: 32px;
-  height: 32px;
+  margin: 8px 0;
 }
 
-.tab-header-buttons button:hover {
-  background-color: rgba(0, 0, 0, 0.06);
+.lecture-chat .messages-list::-webkit-scrollbar-thumb {
+  background: rgba(0, 102, 204, 0.6);
+  border-radius: 6px;
+  min-height: 20px;
+}
+
+.lecture-chat .messages-list::-webkit-scrollbar-thumb:hover {
+  background: #0066cc;
+}
+
+.lecture-chat .chat-input-form {
+  position: relative !important;
+  bottom: auto !important;
+  left: auto !important;
+  right: auto !important;
+  flex-shrink: 0;
+  padding: 16px;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-top: 1px solid rgba(0, 0, 0, 0.08);
+  box-shadow: 0 -2px 16px rgba(0, 0, 0, 0.08);
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.lecture-chat .chat-input-form input {
+  flex: 1;
+  padding: 12px 16px;
+  border: 2px solid rgba(0, 0, 0, 0.08);
+  border-radius: 10px;
+  font-size: 14px;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  min-width: 220px;
+  max-width: calc(100% - 80px);
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.lecture-chat .chat-input-form input:focus {
+  outline: none;
+  border-color: #0066cc;
+  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+}
+
+/* Course navigation header */
+/* Lecture navigation list - now serves as main container */
+.lecture-nav-list {
+  list-style: none;
+  margin: 0;
+  padding: 16px;
+  padding-right: calc(16px + 8px); /* Extra padding for scrollbar space */
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.04);
+  flex: 1;
+  /* Enhanced mobile scrolling */
+  -webkit-overflow-scrolling: touch;
+  scrollbar-gutter: stable;
+  overscroll-behavior: contain;
+}
+
+/* Content tab styling */
+.content-tab {
+  text-align: left;
+}
+
+.content-tab h3 {
   color: #1d1d1f;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 16px 0;
+  text-align: left;
+  letter-spacing: -0.02em;
+}
+
+.lecture-content {
+  text-align: left;
+  color: #1d1d1f;
+  line-height: 1.6;
+  letter-spacing: -0.01em;
+}
+
+.lecture-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border-radius: 10px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  margin: 0 0 8px 0;
+}
+
+.lecture-nav-item:last-child {
+  margin-bottom: 0;
+}
+
+.lecture-nav-item:hover {
+  background: rgba(255, 255, 255, 0.98);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08), 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+.lecture-nav-item.active {
+  background: linear-gradient(135deg, #0066cc, #5ac8fa);
+  color: white;
+  box-shadow: 0 3px 10px rgba(0, 102, 204, 0.25);
   transform: translateY(-1px);
 }
 
-.tab-header-buttons button:active {
-  transform: translateY(0);
-  background-color: rgba(0, 0, 0, 0.1);
+.lecture-nav-item.active .lecture-index {
+  background-color: white;
+  color: #0066cc;
 }
 
-/* Clear Chat Button - Consistent with Edumate.css style */
-.tab-header-buttons .clear-chat-btn {
-  background: #fff;
-  color: #dc3545;
-  border: 1px solid #dc3545;
-  border-radius: 4px;
-  padding: 4px 8px;
+.lecture-index {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 8px;
+  background: rgba(0, 0, 0, 0.06);
   font-size: 12px;
+  font-weight: 600;
+  color: #8e8e93;
+  flex-shrink: 0;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.lecture-nav-title {
+  font-size: 13px;
   font-weight: 500;
-  min-width: auto;
-  white-space: nowrap;
-  box-shadow: none;
-  transition: all 0.2s ease;
-  text-transform: none;
-  letter-spacing: normal;
-  position: relative;
-  overflow: visible;
+  line-height: 1.3;
+  color: inherit;
+  letter-spacing: -0.01em;
 }
 
-.tab-header-buttons .clear-chat-btn:hover {
-  background: #dc3545;
-  color: #fff;
-  border-color: #dc3545;
-  transform: none;
-  box-shadow: 0 2px 4px rgba(220, 53, 69, 0.2);
+.lecture-nav-item.active .lecture-nav-title {
+  font-weight: 600;
 }
 
-.tab-header-buttons .clear-chat-btn:active {
-  transform: translateY(1px);
-  box-shadow: 0 1px 2px rgba(220, 53, 69, 0.2);
+/* Empty state */
+.empty-message {
+  color: #8e8e93;
+  font-size: 14px;
+  text-align: center;
+  padding: 20px;
+  letter-spacing: -0.01em;
 }
 
-.tab-header-buttons .clear-chat-btn:focus {
-  outline: none;
-  box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.25);
+/* No lecture state */
+.no-lecture-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.04);
 }
 
-.tab-header-buttons .clear-chat-btn:disabled {
-  background: #f8f9fa;
-  color: #6c757d;
-  border-color: #dee2e6;
-  cursor: not-allowed;
-  transform: none;
-  box-shadow: none;
+.no-lecture-box {
+  text-align: center;
+  padding: 40px;
 }
 
-.tab-header-buttons .clear-chat-btn i {
-  font-size: 11px;
-  margin-right: 4px;
+.no-lecture-box i {
+  font-size: 48px;
+  color: #8e8e93;
+  margin-bottom: 16px;
 }
 
-/* Remove any pseudo-elements to keep it simple like Edumate.css */
-.tab-header-buttons .clear-chat-btn::before,
-.tab-header-buttons .clear-chat-btn::after {
-  display: none;
+.no-lecture-box h2 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1d1d1f;
+  margin: 0 0 16px 0;
+  letter-spacing: -0.02em;
 }
 
-/* Ask Edumate tab specific styling - Mobile tabs */
-.mobile-tab[aria-label="Ask Edumate"]:hover {
-  background-color: rgba(118, 75, 162, 0.1);
-  color: #764ba2;
-}
-
-.mobile-tab[aria-label="Ask Edumate"].active {
-  color: #764ba2;
-  border-bottom: 2px solid #764ba2;
-  background: rgba(118, 75, 162, 0.08);
-}
-
-/* Ask Edumate tab specific styling - Right tab toggles */
-.tab-toggle[title="Ask Edumate"]:hover {
-  background: rgba(255, 255, 255, 1);
-  color: #764ba2;
-  transform: translateY(-4px) scale(1.08);
-  box-shadow: 
-    0 16px 48px rgba(0, 0, 0, 0.15),
-    0 8px 24px rgba(118, 75, 162, 0.15),
-    inset 0 1px 0 rgba(255, 255, 255, 1),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.05);
-  border-color: rgba(118, 75, 162, 0.2);
-}
-
-.tab-toggle[title="Ask Edumate"].active {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+.browse-courses-btn {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #0066cc, #5ac8fa);
   color: white;
-  transform: translateY(-4px) scale(1.05);
-  box-shadow: 
-    0 12px 40px rgba(118, 75, 162, 0.35),
-    0 6px 20px rgba(118, 75, 162, 0.25),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
-  border-color: rgba(118, 75, 162, 0.4);
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  box-shadow: 0 2px 8px rgba(0, 102, 204, 0.3);
 }
 
-/* Update the subtle pulse animation for Ask Edumate tab */
-.tab-toggle[title="Ask Edumate"].active {
-  animation: ask-edumate-pulse 2s ease-in-out infinite;
+.browse-courses-btn:hover {
+  background: #0066cc;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 102, 204, 0.4);
 }
 
-@keyframes ask-edumate-pulse {
-  0%, 100% {
-    box-shadow: 
-      0 12px 40px rgba(118, 75, 162, 0.35),
-      0 6px 20px rgba(118, 75, 162, 0.25),
-      inset 0 1px 0 rgba(255, 255, 255, 0.3),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.1);
-  }
-  50% {
-    box-shadow: 
-      0 16px 48px rgba(118, 75, 162, 0.4),
-      0 8px 24px rgba(118, 75, 162, 0.3),
-      inset 0 1px 0 rgba(255, 255, 255, 0.3),
-      inset 0 -1px 0 rgba(0, 0, 0, 0.1);
-  }
+/* Quiz tab styling */
+.quiz-tab {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  padding: 40px 20px;
 }
 
-/* Lecture Notes and Quiz tabs keep blue theme */
-.mobile-tab[aria-label="Lecture Notes"]:hover,
-.mobile-tab[aria-label="Take Quiz"]:hover {
-  background-color: rgba(34, 150, 243, 0.1);
-  color: #007AFF;
+.quiz-available {
+  text-align: center;
+  max-width: 280px;
 }
 
-.mobile-tab[aria-label="Lecture Notes"].active,
-.mobile-tab[aria-label="Take Quiz"].active {
-  color: #007AFF;
-  border-bottom: 2px solid #007AFF;
-  background: rgba(34, 150, 243, 0.02);
+.quiz-info {
+  margin-bottom: 24px;
 }
 
-.tab-toggle[title="Lecture Notes"]:hover,
-.tab-toggle[title="Take Quiz"]:hover {
-  background: rgba(255, 255, 255, 1);
-  color: #007AFF;
-  transform: translateY(-4px) scale(1.08);
-  box-shadow: 
-    0 16px 48px rgba(0, 0, 0, 0.15),
-    0 8px 24px rgba(34, 150, 243, 0.1),
-    inset 0 1px 0 rgba(255, 255, 255, 1),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.05);
-  border-color: rgba(34, 150, 243, 0.2);
+.quiz-info i {
+  font-size: 48px;
+  color: #0066cc;
+  margin-bottom: 16px;
+  display: block;
 }
 
-.tab-toggle[title="Lecture Notes"].active,
-.tab-toggle[title="Take Quiz"].active {
-  background: linear-gradient(135deg, #007AFF 0%, #1976d2 100%);
+.quiz-info h3 {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1d1d1f;
+  margin: 0 0 8px 0;
+  letter-spacing: -0.02em;
+}
+
+.quiz-info p {
+  font-size: 14px;
+  color: #8e8e93;
+  line-height: 1.5;
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.start-quiz-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: linear-gradient(135deg, #0066cc, #5ac8fa);
   color: white;
-  transform: translateY(-4px) scale(1.05);
-  box-shadow: 
-    0 12px 40px rgba(34, 150, 243, 0.35),
-    0 6px 20px rgba(34, 150, 243, 0.25),
-    inset 0 1px 0 rgba(255, 255, 255, 0.3),
-    inset 0 -1px 0 rgba(0, 0, 0, 0.1);
-  border-color: rgba(34, 150, 243, 0.4);
+  border: none;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  box-shadow: 0 2px 8px rgba(0, 102, 204, 0.3);
 }
 
+.start-quiz-btn:hover {
+  background: #0066cc;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 102, 204, 0.4);
+}
+
+.start-quiz-btn i {
+  font-size: 12px;
+}
+
+/* No quiz state */
+.no-quiz {
+  text-align: center;
+  color: #8e8e93;
+}
+
+.no-quiz i {
+  font-size: 48px;
+  margin-bottom: 16px;
+  display: block;
+  opacity: 0.7;
+  color: #8e8e93;
+}
+
+.no-quiz p {
+  font-size: 14px;
+  margin: 0;
+  line-height: 1.5;
+  letter-spacing: -0.01em;
+}
+
+/* Responsive design */
+@media (max-width: 1024px) {
+  .lecture-main-content {
+    flex-direction: column;
+    gap: 32px; /* Increased gap for more vertical space */
+    padding: 24px 16px 100px 16px; /* More top and bottom padding for scroll space */
+    margin-bottom: 40px; /* Additional bottom margin for container */
+  }
+  
+  .video-content-area {
+    gap: 20px; /* Increased gap between video elements */
+  }
+  
+  .lecture-sidebar {
+    width: 100%;
+    max-height: none; /* Remove height restriction for better scrolling */
+    gap: 20px; /* More gap for better visual separation */
+    margin-bottom: 60px; /* Add bottom margin for scroll space */
+  }
+  
+  .lecture-nav-list {
+    max-height: 400px; /* Increased height for better content viewing */
+  }
+  
+  .tab-content {
+    min-height: 550px; /* Further increased height for better content viewing */
+    margin-bottom: 20px; /* Add margin below tab content */
+    height: auto !important; /* Override fixed height calculation for mobile */
+    max-height: none !important; /* Remove height restriction for mobile */
+    overflow: visible; /* Allow content to be visible instead of hidden */
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .tab-content-inner {
+    height: auto !important; /* Override fixed h@eight for mobile */
+    max-height: none !important; /* Remove height restriction for mobile */
+    overflow-y: visible; /* Allow content to scroll naturally */
+  }
+  
+  .tab-content-inner.no-padding {
+    max-height: none !important; /* Remove height restriction for mobile */
+  }
+  
+  /* Make navigation tab content scrollable in mobile layout */
+  .navigation-tab-content {
+    max-height: 450px !important; /* Increased height for mobile scrolling */
+    overflow-y: auto !important; /* Force scrolling on mobile */
+    padding-bottom: 32px !important; /* Extra padding at bottom for better scrolling experience */
+    -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+    scrollbar-width: thin; /* Thin scrollbar for Firefox */
+    scrollbar-gutter: stable; /* Prevent layout shift when scrollbar appears */
+    scroll-behavior: smooth; /* Smooth scrolling for better UX */
+    overscroll-behavior: contain; /* Prevent scroll chaining on mobile */
+    border-radius: 10px !important; /* Consistent border radius */
+  }
+  
+  .navigation-tab-content::after {
+    height: 24px; /* Increased bottom padding for mobile */
+  }
+  
+  /* Remove sidebar spacer in mobile layout */
+  .sidebar-spacer {
+    height: 0;
+    display: none; /* Completely hide the spacer */
+  }
+}
+
+@media (max-width: 768px) {
+  .lecture-main-content {
+    padding: 24px 16px 120px 16px; /* Increased bottom padding for more scroll space */
+    gap: 36px; /* More breathing room between sections */
+    margin-bottom: 60px; /* Extra container bottom margin */
+  }
+  
+  .video-content-area {
+    gap: 24px; /* More space between video elements on smaller screens */
+    margin-bottom: 20px; /* Add margin below video area */
+  }
+  
+  .lecture-title {
+    font-size: 20px;
+    margin-bottom: 20px; /* Increased margin */
+  }
+  
+  .lecture-description {
+    margin-bottom: 24px; /* More space after description */
+  }
+  
+  .sidebar-tabs {
+    margin-bottom: 16px; /* Reduced gap between tabs and content */
+  }
+  
+  .lecture-sidebar {
+    margin-bottom: 80px; /* Extra bottom margin for mobile */
+  }
+  
+  .tab-content {
+    margin-bottom: 30px; /* Additional margin for mobile */
+    height: 600px !important; /* Override fixed height calculation for mobile */
+    max-height: 600px !important; /* Remove height restriction for mobile */
+    overflow: visible; /* Allow content to be visible instead of hidden */
+  }
+  
+  .tab-content-inner {
+    height: auto !important; /* Override fixed height for mobile */
+    max-height: 100% !important; /* Remove height restriction for mobile */
+    overflow-y: visible; /* Allow content to scroll naturally */
+  }
+  
+  .tab-content-inner.no-padding {
+    max-height: none !important; /* Remove height restriction for mobile */
+    height: 100% !important; /* Fill the entire tab-content */
+  }
+  
+  /* Fix chatbot-tab height to match tab-content exactly */
+  .chatbot-tab {
+    height: 100% !important; /* Take full height of parent */
+    min-height: 600px !important; /* Minimum height for mobile */
+    max-height: 600px !important; /* Match tab-content max-height */
+    box-sizing: border-box !important; /* Include padding/borders in height calculation */
+    display: flex !important;
+    flex-direction: column !important;
+  }
+  
+  /* Ensure lecture-chat fills the chatbot-tab completely */
+  .lecture-chat {
+    height: 100% !important;
+    max-height: 100% !important;
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+    box-sizing: border-box !important;
+  }
+  
+  /* Fix mobile chat input order for lecture chat with highest specificity */
+  .lecture-chat.edumate-chat-container.embedded .chat-input-form,
+  .lecture-chat .edumate-chat-container.embedded .chat-input-form,
+  .lecture-chat .chat-input-form {
+    display: flex !important;
+    flex-direction: row !important; /* Ensure correct order: input first, button second */
+    padding: 12px 16px !important; /* Adjusted padding for mobile */
+    gap: 10px !important; /* Increased gap for better spacing */
+    background: rgba(255, 255, 255, 0.98) !important; /* Slightly more opaque */
+    border-radius: 0 0 12px 12px !important; /* Rounded bottom corners only */
+  }
+  
+  .lecture-chat.edumate-chat-container.embedded .chat-input-form input,
+  .lecture-chat .edumate-chat-container.embedded .chat-input-form input,
+  .lecture-chat .chat-input-form input,
+  .lecture-chat .chat-input {
+    order: 1 !important; /* Ensure input comes first */
+    flex: 1 !important;
+    padding: 12px 14px !important; /* Better padding for touch */
+    border-radius: 8px !important; /* Slightly rounded for mobile */
+    font-size: 16px !important; /* Prevent zoom on iOS */
+    min-height: 44px !important; /* iOS recommended touch target */
+    border: 1px solid rgba(0, 0, 0, 0.1) !important;
+    background: white !important;
+  }
+  
+  .lecture-chat.edumate-chat-container.embedded .chat-send-btn,
+  .lecture-chat .edumate-chat-container.embedded .chat-send-btn,
+  .lecture-chat .chat-send-btn,
+  .lecture-chat.edumate-chat-container.embedded .chat-input-form button,
+  .lecture-chat .edumate-chat-container.embedded .chat-input_form button,
+  .lecture-chat .chat-input-form button {
+    order: 2 !important; /* Ensure button comes second */
+    flex-shrink: 0 !important;
+  }
+  
+  /* Additional override for any potential reverse-order issues */
+  .lecture-chat input[type="text"] + button,
+  .lecture-chat .chat-input + .chat-send-btn,
+  .lecture-chat .chat-input-form input + button {
+    order: 2 !important;
+  }
+  
+  .lecture-chat button + input,
+  .lecture-chat .chat-send-btn + .chat-input,
+  .lecture-chat .chat-input-form button + input {
+    order: 1 !important;
+  }
+}
+
+
+@media (max-width: 480px) {
+  .lecture-chat.edumate-chat-container.embedded .chat-input-form,
+  .lecture-chat .edumate-chat-container.embedded .chat-input-form,
+  .lecture-chat .chat-input-form {
+    padding: 12px;
+    gap: 6px;
+    display: flex !important;
+    flex-direction: row !important; /* Ensure correct order: input first, button second */
+  }
+  
+  .lecture-chat.edumate-chat-container.embedded .chat-input-form input,
+  .lecture-chat .edumate-chat-container.embedded .chat-input-form input,
+  .lecture-chat .chat-input-form input,
+  .lecture-chat .chat-input {
+    padding: 10px 12px;
+    font-size: 13px;
+    min-width: 180px; /* Reduced for mobile */
+    max-width: calc(100% - 65px); /* Account for smaller button + gap */
+    order: 1 !important; /* Ensure input comes first */
+    flex: 1 !important;
+    border-radius: 4px !important; /* Less round border for mobile */
+    height: 38px !important; /* Match send button height */
+    box-sizing: border-box !important;
+  }
+  
+  .lecture-chat.edumate-chat-container.embedded .chat-send-btn,
+  .lecture-chat .edumate-chat-container.embedded .chat-send-btn,
+  .lecture-chat .chat-send-btn,
+  .lecture-chat.edumate-chat-container.embedded .chat-input-form button,
+  .lecture-chat .edumate-chat-container.embedded .chat-input_form button,
+  .lecture-chat .chat-input-form button {
+    min-width: 60px;
+    height: 38px;
+    padding: 8px 14px;
+    font-size: 13px;
+    order: 2 !important; /* Ensure button comes second */
+    flex-shrink: 0 !important;
+    border-radius: 4px !important; /* Match input border radius */
+    box-sizing: border-box !important;
+  }
+}
+
+/* Custom scrollbar for WebKit browsers */
+.lecture-nav-list::-webkit-scrollbar {
+  width: 8px;
+}
+
+.lecture-nav-list::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 4px;
+}
+
+.lecture-nav-list::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.15);
+  border-radius: 4px;
+  transition: background 0.3s ease;
+}
+
+.lecture-nav-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.25);
+}
+
+/* Navigation tab content scrollbar styling */
+.navigation-tab-content::-webkit-scrollbar {
+  width: 6px;
+  background: transparent;
+}
+
+.navigation-tab-content::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 4px;
+  margin: 4px 0;
+}
+
+.navigation-tab-content::-webkit-scrollbar-thumb {
+  background: rgba(0, 102, 204, 0.4);
+  border-radius: 4px;
+  transition: background 0.3s ease;
+  min-height: 30px;
+}
+
+.navigation-tab-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 102, 204, 0.6);
+}

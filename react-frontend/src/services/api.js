@@ -197,9 +197,14 @@ export const fetchDashboardData = async () => {
 };
 
 // Instructor dashboard API call
-export const fetchInstructorDashboard = async () => {
+export const fetchInstructorDashboard = async (courseId = null) => {
   try {
-    const response = await apiClient.get('/api/instructor/dashboard');
+    const url = courseId 
+      ? `/api/instructor/dashboard?course_id=${courseId}`
+      : '/api/instructor/dashboard';
+    console.log('Fetching instructor dashboard from URL:', url);
+    const response = await apiClient.get(url);
+    console.log('Dashboard API response:', response.data);
     return response.data;
   } catch (error) {
     console.error('Error fetching instructor dashboard:', error);

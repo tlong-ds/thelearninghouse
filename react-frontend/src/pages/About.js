@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Container as BootstrapContainer, Card, Row, Col, Table } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../services/AuthContext';
-import Header from '../components/Header';
 import axios from 'axios';
 import config from '../config';
 import '../styles/About.css';
 import { images } from '../utils/images';
 import { useNavigate } from 'react-router-dom';
+import { motion } from 'framer-motion'; // You'll need to install this: npm install framer-motion
+import gradientVideo from '../assets/videos/gradient-bg.mp4';
 
 // Create axios instance with config URL
 const apiClient = axios.create({
@@ -20,7 +21,7 @@ const CACHE_CONFIG = {
     TTL: 5 * 60 * 1000 // 5 minutes in milliseconds
 };
 
-// Cache utility functions
+// Cache utility functions - keeping these unchanged
 const getCachedData = (key) => {
     try {
         const cached = localStorage.getItem(key);
@@ -56,11 +57,32 @@ const setCachedData = (key, data) => {
     }
 };
 
+// Animation variants
+const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.1,
+            delayChildren: 0.2
+        }
+    }
+};
+
+const itemVariants = {
+    hidden: { y: 20, opacity: 0 },
+    visible: {
+        y: 0,
+        opacity: 1,
+        transition: { type: 'spring', stiffness: 100, damping: 15 }
+    }
+};
+
 const About = () => {
     const { currentUser, logout } = useAuth();
     const navigate = useNavigate();
 
-    // Add handleLogout function
+    // Handle logout function - keeping it unchanged
     const handleLogout = async () => {
         try {
             await logout();
@@ -78,7 +100,7 @@ const About = () => {
     });
     const [metricsLoading, setMetricsLoading] = useState(true);
 
-    // Memoized function to fetch metrics with caching
+    // Memoized function to fetch metrics with caching - keeping logic unchanged
     const fetchMetrics = useCallback(async () => {
         try {
             // Check cache first
@@ -116,7 +138,7 @@ const About = () => {
         }
     }, []);
 
-    // Function to force refresh metrics (bypass cache)
+    // Function to force refresh metrics (bypass cache) - keeping unchanged
     const refreshMetrics = useCallback(async () => {
         localStorage.removeItem(CACHE_CONFIG.METRICS_KEY);
         await fetchMetrics();
@@ -124,6 +146,7 @@ const About = () => {
 
     useEffect(() => {
         fetchMetrics();
+        document.title = 'The Learning House | Home';
     }, [fetchMetrics]);
 
     const team = [
@@ -133,165 +156,197 @@ const About = () => {
         { name: "Ha Quang Minh", role: "UI/UX Designer", image: images.ava4 }
     ];
 
+    const features = [
+        {
+            icon: "fas fa-brain",
+            title: "AI-Powered Learning",
+            description: "Personalized assistance that adapts to your learning style and needs."
+        },
+        {
+            icon: "fas fa-book",
+            title: "Interactive Lectures",
+            description: "Engage with content through dynamic, interactive lecture experiences."
+        },
+        {
+            icon: "fas fa-users",
+            title: "Collaborative Learning",
+            description: "Connect with peers and instructors in a seamless learning environment."
+        }
+    ];
+
     return (
-        <div className="about-container">
-            <Header 
-                username={currentUser?.username} 
-                role={currentUser?.role} 
-                onLogout={handleLogout} // Update this
-            />
-            <BootstrapContainer>
-                <h1 className="text-center mb-4">About The Learning House</h1>
-                
-                <p className="lead text-center">
-                    Welcome to <strong>The Learning House</strong>, the home of <strong>Learning Connect</strong> —
-                    a comprehensive marketplace uniting passionate learners with expert instructors across all domains.
-                </p>
-
-                {/* Metrics */}
-                <Row className="metrics-row mb-5">
-                    <Col md={4}>
-                        <Card className="metric-card">
-                            <Card.Body className="text-center">
-                                <h2>📚 {metricsLoading ? '...' : metrics.totalCourses}</h2>
-                                <p>Courses</p>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                    <Col md={4}>
-                        <Card className="metric-card">
-                            <Card.Body className="text-center">
-                                <h2>👩‍🎓 {metricsLoading ? '...' : metrics.totalLearners}</h2>
-                                <p>Learners</p>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                    <Col md={4}>
-                        <Card className="metric-card">
-                            <Card.Body className="text-center">
-                                <h2>👩‍🏫 {metricsLoading ? '...' : metrics.totalInstructors}</h2>
-                                <p>Instructors</p>
-                            </Card.Body>
-                        </Card>
-                    </Col>
-                </Row>
-
-                {/* Problem Statement */}
-                <section className="mb-5">
-                    <h2>Problem Statement</h2>
-                    <p>Learners today crave diverse, high-quality content spanning from soft skills to academic subjects. Yet existing platforms fall short.</p>
-                    <p className="mb-2"><strong>YouTube</strong> lacks structured curricula, clear learning paths, and interactive support.</p>
-                    <p className="mb-2"><strong>Traditional e-learning sites</strong> often restrict content to specific grades or fields.</p>
-                    <p className="mb-2"><strong>Instructors struggle</strong> to publish, monetize, and reach eager audiences due to opaque onboarding.</p>
-                </section>
-
-                {/* Our Solution */}
-                <section className="mb-5">
-                    <h2>Our Solution: The Learning House</h2>
-                    <p><strong>The Learning House</strong> is a unified education marketplace designed to be:</p>
-                    <p className="mb-2"><strong>Easy to learn:</strong> Micro-learning videos, clear skill tracks, badges & certificates</p>
-                    <p className="mb-2"><strong>Easy to teach:</strong> One-click course builder, standardized templates</p>
-                    <p className="mb-2"><strong>Unlimited content:</strong> From personal development to advanced technical subjects</p>
-                    <p className="mb-2"><strong>Community-driven:</strong> Live Q&A, livestreaming, mentorship, and workshops</p>
-                </section>
-
-                {/* Key Features */}
-                <section className="mb-5">
-                    <h2>Key Features</h2>
-                    <Table responsive>
-                        <thead>
-                            <tr>
-                                <th>User Type</th>
-                                <th>Features</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td><strong>Learners</strong></td>
-                                <td>
-                                    • Personalized dashboard: progress, skill badges<br />
-                                    • AI-powered course recommender<br />
-                                    • Interactive Q&A, quizzes, hands-on projects<br />
-                                    • Gamification: leaderboards & rewards
-                                </td>
-                            </tr>
-                            <tr>
-                                <td><strong>Instructors</strong></td>
-                                <td>
-                                    • One-click course creation: video, slides, quizzes, live-stream<br />
-                                    • Detailed analytics: engagement, completion rates<br />
-                                    • Seamless marketplace integration & promotional tools<br />
-                                    • Flexible monetization options
-                                </td>
-                            </tr>
-                        </tbody>
-                    </Table>
-                </section>
-
-                {/* Competitive Advantage */}
-                <section className="mb-5">
-                    <h2>Competitive Advantage</h2>
-                    <p className="mb-2"><strong>Structured Learning:</strong> Combined modules, assessments, and certificates</p>
-                    <p className="mb-2"><strong>Open Platform:</strong> Anyone from life coaches to data scientists can share expertise</p>
-                    <p className="mb-2"><strong>Smart Technology:</strong> AI-driven subtitles, summarization, and personalized paths</p>
-                    <p className="mb-2"><strong>Community & Support:</strong> Mentor matching, peer reviews, instructor workshops</p>
-                </section>
-
-                {/* Roadmap & Vision */}
-                <section className="mb-5">
-                    <h2>Roadmap & Vision</h2>
-                    <div className="roadmap">
-                        <h3>Phase 1 (MVP)</h3>
-                        <p className="mb-2">Core marketplace: course listing, enrollment, secure payments</p>
-                        <p className="mb-2">Foundational UX for web & mobile</p>
-
-                        <h3>Phase 2</h3>
-                        <p className="mb-2">AI-driven recommendations & auto-transcripts</p>
-                        <p className="mb-2">Advanced analytics & community forums</p>
-
-                        <h3>Phase 3</h3>
-                        <p className="mb-2">B2B white-label offerings for organizations & schools</p>
-                        <p className="mb-2">Multi-language expansion targeting APAC and global markets</p>
-
-                        <p className="vision">
-                            <strong>Long-term Vision:</strong> Transform Learning Connect into the world's most 
-                            learner-centric, community-driven, and innovation-led educational ecosystem.
-                        </p>
+        <div className="macos-container">
+            <div className="macos-blur-background">
+                <div className="macos-gradient-overlay"></div>
+            </div>
+            
+            <motion.main 
+                className="macos-main"
+                initial="hidden"
+                animate="visible"
+                variants={containerVariants}
+            >
+                {/* Hero Section */}
+                <motion.section className="macos-hero" variants={itemVariants}>
+                    {/* Video Background */}
+                    <div className="macos-hero-video-container">
+                        <div className="macos-hero-overlay"></div>
+                        <video
+                            className="macos-hero-video"
+                            autoPlay
+                            loop
+                            muted
+                            playsInline
+                            src={gradientVideo}
+                        >
+                            {/* Fallback for browsers that don't support video */}
+                        </video>
                     </div>
-                </section>
-
-                {/* Team Section */}
-                <section className="mb-5">
-                    <h2 className="text-center">Meet Our Specialists</h2>
-                    <Row className="team-section">
-                        {team.map((member, index) => (
-                            <Col md={3} key={index} className="text-center mb-4">
-                                <div className="team-member">
-                                    <img src={member.image} alt={member.name} className="team-photo" />
-                                    <h3>{member.name}</h3>
-                                    <p>{member.role}</p>
+                    <h1>The Learning House</h1>
+                    <p className="macos-subtitle">A comprehensive marketplace uniting passionate learners with expert instructors</p>
+                    
+                    <div className="macos-cta-container">
+                        <Link to="/courses" className="macos-cta-primary">
+                            Explore Courses
+                        </Link>
+                        <Link to="/edumate" className="macos-cta-secondary">
+                            Try Edumate AI
+                        </Link>
+                    </div>
+                </motion.section>
+                
+                {/* Metrics Section */}
+                <motion.section className="macos-metrics" variants={itemVariants}>
+                    <h2>Our Impact</h2>
+                    <div className="macos-metrics-grid">
+                        <div className="macos-metric-item">
+                            <h3>{metricsLoading ? '...' : metrics.totalCourses}</h3>
+                            <p>Courses</p>
+                        </div>
+                        <div className="macos-metric-item">
+                            <h3>{metricsLoading ? '...' : metrics.totalLearners}</h3>
+                            <p>Learners</p>
+                        </div>
+                        <div className="macos-metric-item">
+                            <h3>{metricsLoading ? '...' : metrics.totalInstructors}</h3>
+                            <p>Instructors</p>
+                        </div>
+                    </div>
+                </motion.section>
+                
+                {/* Features Section */}
+                <motion.section className="macos-features" variants={itemVariants}>
+                    <h2>Reimagine Your Learning Experience</h2>
+                    
+                    <div className="macos-cards">
+                        {features.map((feature, index) => (
+                            <motion.div 
+                                key={index}
+                                className="macos-card"
+                                whileHover={{ y: -5, transition: { duration: 0.2 } }}
+                            >
+                                <div className="macos-card-icon">
+                                    <i className={feature.icon}></i>
                                 </div>
-                            </Col>
+                                <h3>{feature.title}</h3>
+                                <p>{feature.description}</p>
+                            </motion.div>
                         ))}
-                    </Row>
-                </section>
-
+                    </div>
+                </motion.section>
+                
+                {/* Testimonial Section */}
+                <motion.section className="macos-testimonial" variants={itemVariants}>
+                    <div className="macos-testimonial-content">
+                        <blockquote>
+                            "The Learning House transformed how I approach education. The AI assistant helped me understand complex topics I was struggling with for months."
+                        </blockquote>
+                        <cite>— Sarah K., Computer Science Student</cite>
+                    </div>
+                </motion.section>
+                
+                {/* Roadmap Section */}
+                <motion.section className="macos-roadmap" variants={itemVariants}>
+                    <h2>Our Roadmap</h2>
+                    
+                    <div className="macos-roadmap-timeline">
+                        <div className="macos-roadmap-item">
+                            <div className="macos-roadmap-marker">1</div>
+                            <div className="macos-roadmap-content">
+                                <h3>Phase 1 (MVP)</h3>
+                                <p>Core marketplace: course listing, enrollment, secure payments</p>
+                                <p>Foundational UX for web & mobile</p>
+                            </div>
+                        </div>
+                        
+                        <div className="macos-roadmap-item">
+                            <div className="macos-roadmap-marker">2</div>
+                            <div className="macos-roadmap-content">
+                                <h3>Phase 2</h3>
+                                <p>AI-driven recommendations & auto-transcripts</p>
+                                <p>Advanced analytics & community forums</p>
+                            </div>
+                        </div>
+                        
+                        <div className="macos-roadmap-item">
+                            <div className="macos-roadmap-marker">3</div>
+                            <div className="macos-roadmap-content">
+                                <h3>Phase 3</h3>
+                                <p>B2B white-label offerings for organizations & schools</p>
+                                <p>Multi-language expansion targeting global markets</p>
+                            </div>
+                        </div>
+                    </div>
+                </motion.section>
+                
+                {/* Team Section */}
+                <motion.section className="macos-team" variants={itemVariants}>
+                    <h2>Meet Our Team</h2>
+                    
+                    <div className="macos-team-grid">
+                        {team.map((member, index) => (
+                            <motion.div 
+                                key={index}
+                                className="macos-team-member"
+                                whileHover={{ scale: 1.03, transition: { duration: 0.2 } }}
+                            >
+                                <div className="macos-team-photo-container">
+                                    <img src={member.image} alt={member.name} className="macos-team-photo" />
+                                </div>
+                                <h3>{member.name}</h3>
+                                <p>{member.role}</p>
+                            </motion.div>
+                        ))}
+                    </div>
+                </motion.section>
+                
                 {/* Contact Section */}
-                <section className="contact-section text-center mb-5">
+                <motion.section className="macos-contact" variants={itemVariants}>
                     <h2>Get In Touch</h2>
-                    <p>
-                        <a href="mailto:support@learninghouse.com">📧 support@learninghouse.com</a><br />
-                        <a href="https://www.learninghouse.com">🌐 www.learninghouse.com</a><br />
-                        📞 +84 888 888 888
-                    </p>
-                </section>
-
-                <footer className="text-center text-muted">
-                    <small>© 2025 The Learning House. All rights reserved.</small>
-                </footer>
-            </BootstrapContainer>
+                    <div className="macos-contact-methods">
+                        <a href="mailto:support@learninghouse.com" className="macos-contact-item">
+                            <i className="fas fa-envelope"></i>
+                            <span>support@learninghouse.com</span>
+                        </a>
+                        <a href="https://www.learninghouse.com" className="macos-contact-item">
+                            <i className="fas fa-globe"></i>
+                            <span>www.learninghouse.com</span>
+                        </a>
+                        <a href="tel:+84888888888" className="macos-contact-item">
+                            <i className="fas fa-phone"></i>
+                            <span>+84 888 888 888</span>
+                        </a>
+                    </div>
+                </motion.section>
+            </motion.main>
+            
+            <footer className="macos-footer">
+                <div className="macos-footer-bottom">
+                    <p>&copy; {new Date().getFullYear()} The Learning House. All rights reserved.</p>
+                </div>
+            </footer>
         </div>
     );
 };
 
-export default React.memo(About);
+export default About;

@@ -1,6 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../services/AuthContext';
-import Header from '../components/Header';
 import { sendChatMessage, clearChatHistory } from '../services/chatbotAPI';
 import '../styles/Edumate.css';
 import '../styles/markdown.css';
@@ -290,8 +289,6 @@ const Edumate = () => {
 
   return (
     <div className={`edumate-container ${isMobile ? 'mobile' : ''} ${isKeyboardVisible ? 'keyboard-visible' : ''}`}>
-      <Header username={currentUser?.username} role={currentUser?.role} onLogout={logout} />
-      
       <div className="edumate-content">
         <div className="edumate-header">
           <div className="header-content">
@@ -360,7 +357,7 @@ const Edumate = () => {
               type="text"
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
-              placeholder={"Ask me anything about your courses..."}
+              placeholder={"Ask me something..."}
               disabled={loading}
               autoComplete="off"
               autoCorrect="off"

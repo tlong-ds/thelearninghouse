@@ -1,224 +1,706 @@
-.about-container {
-    min-height: 100vh;
-    background-color: #f8f9fa;
+/* macOS-inspired Container */
+.macos-container {
+  font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  color: #1d1d1f;
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
 }
 
-.about-container .container {
-    padding: 2rem 0;
-    margin-top: 84px; /* Space for floating header */
+/* Frosted Glass Background */
+.macos-blur-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -1;
+  background-color: rgba(255, 255, 255, 0.8);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
-/* Typography improvements */
-.about-container h1 {
-    font-size: 2.5rem;
-    font-weight: 700;
-    margin-bottom: 1.5rem;
-    color: #2c3e50;
+.macos-gradient-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(226, 227, 239, 0.4) 0%, rgba(255, 255, 255, 0.1) 100%);
+  z-index: -1;
 }
 
-.about-container .lead {
-    font-size: 1.25rem;
-    line-height: 1.7;
-    color: #6c757d;
-    margin-bottom: 3rem;
-    max-width: 800px;
-    margin-left: auto;
-    margin-right: auto;
+/* Main Content */
+.macos-main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem 2rem; /* Changed from padding: 2rem; to remove top padding */
 }
 
-.metrics-row .metric-card {
-    background: #fff;
-    border-radius: 10px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-    border: none;
-    padding: 1.5rem;
+/* Hero Section */
+.macos-hero {
+  text-align: center;
+  padding: 8rem 1rem 10rem; /* Increased bottom padding */
+  position: relative;
+  overflow: hidden;
+  border-radius: 0;
+  margin-bottom: 0;
+  margin-top: 0;
+  background: linear-gradient(135deg, rgba(0, 102, 204, 0.05) 0%, rgba(90, 200, 250, 0.1) 100%); /* Will be replaced by video */
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  min-height: 105vh; 
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Center content vertically */
+  /* Move this up to connect with the top of the page */
+  position: relative;
+  top: -2rem; /* Pull the hero section up to eliminate gap */
 }
 
-.metrics-row .metric-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
-    background: linear-gradient(145deg, #ffffff, #f8f9fa);
+/* Add video background for hero section */
+.macos-hero-video-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 0;
 }
 
-.metrics-row .metric-card:hover {
-    transform: translateY(-5px);
+.macos-hero-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0.9; /* Increased opacity for better visibility */
+  z-index: 0;
 }
 
-.metrics-row h2 {
-    font-size: 2.5rem;
-    color: #2c3e50;
-    margin-bottom: 0.5rem;
+.macos-hero::before {
+  content: "";
+  position: absolute;
+  top: -150px; /* Enlarged position */
+  right: -150px; /* Enlarged position */
+  width: 500px; /* Increased from 300px to 500px */
+  height: 500px; /* Increased from 300px to 500px */
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 102, 204, 0.2) 0%, rgba(0, 102, 204, 0) 70%);
+  z-index: 0;
 }
 
-section {
-    margin-bottom: 4rem;
-    padding: 2rem;
-    background: white;
-    border-radius: 15px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    transition: all 0.3s ease;
+.macos-hero::after {
+  content: "";
+  position: absolute;
+  bottom: -150px; /* Enlarged position */
+  left: -150px; /* Enlarged position */
+  width: 450px; /* Increased from 250px to 450px */
+  height: 450px; /* Increased from 250px to 450px */
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(90, 200, 250, 0.15) 0%, rgba(90, 200, 250, 0) 70%);
+  z-index: 0;
 }
 
-section:hover {
-    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.08);
+/* Add an overlay for the video to ensure text remains readable */
+.macos-hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.5) 0%, rgba(255, 255, 255, 0.3) 100%);
+  z-index: 1;
 }
 
-section h2 {
-    color: #2c3e50;
-    margin-bottom: 2rem;
-    border-bottom: 3px solid #007AFF;
-    padding-bottom: 0.75rem;
-    font-weight: 700;
-    font-size: 1.75rem;
+.macos-hero h1 {
+  font-size: 4.5rem; /* Increased from 3.5rem to 4.5rem */
+  font-weight: 600;
+  margin-bottom: 1.5rem; /* Increased from 1rem to 1.5rem */
+  background: linear-gradient(to right, #0066cc, #5ac8fa);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  position: relative;
+  z-index: 2; /* Increased to be above the video overlay */
 }
 
-section p {
-    line-height: 1.8;
-    color: #4a5568;
-    font-size: 1.1rem;
-    margin-bottom: 1.2rem;
+.macos-subtitle {
+  font-size: 1.8rem; /* Increased from 1.5rem to 1.8rem */
+  font-weight: 400;
+  color: #86868b;
+  margin-bottom: 3rem; /* Increased from 2.5rem to 3rem */
+  max-width: 800px; /* Increased from 700px to 800px */
+  margin-left: auto;
+  margin-right: auto;
+  position: relative;
+  z-index: 2; /* Increased to be above the video overlay */
 }
 
-section p.mb-2 {
-    position: relative;
-    padding-left: 0.5rem;
-    border-left: 3px solid #e2e8f0;
-    margin-left: 0.5rem;
-    padding-left: 1.5rem;
-    margin-bottom: 1.2rem;
-    transition: all 0.3s ease;
+.macos-cta-container {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem; /* Increased from 1rem to 1.5rem */
+  margin-top: 3rem; /* Increased from 2rem to 3rem */
+  position: relative;
+  z-index: 2; /* Increased to be above the video overlay */
 }
 
-section p.mb-2:hover {
-    border-left-color: #007AFF;
-    background-color: #f8f9fa;
+.macos-cta-primary {
+  background: linear-gradient(135deg, #0066cc, #5ac8fa);
+  color: white;
+  padding: 1rem 2.5rem; /* Increased from 0.8rem 2rem to 1rem 2.5rem */
+  border-radius: 2rem;
+  font-weight: 500;
+  font-size: 1.1rem; /* Added font size */
+  text-decoration: none;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 16px rgba(0, 102, 204, 0.3);
 }
 
-.roadmap h3 {
-    margin-top: 2rem;
-    margin-bottom: 1rem;
-    color: #2c3e50;
-    font-size: 1.3rem;
-    border-bottom: 2px solid #e2e8f0;
-    padding-bottom: 0.5rem;
+.macos-cta-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 102, 204, 0.4);
+  color: white;
 }
 
-.team-section {
-    margin-top: 3rem;
-    background: linear-gradient(145deg, #ffffff, #f8f9fa);
-    padding: 3rem 0;
-    border-radius: 15px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+.macos-cta-secondary {
+  background-color: rgba(0, 0, 0, 0.05);
+  color: #1d1d1f;
+  padding: 1rem 2.5rem; /* Increased from 0.8rem 2rem to 1rem 2.5rem */
+  border-radius: 2rem;
+  font-weight: 500;
+  font-size: 1.1rem; /* Added font size */
+  text-decoration: none;
+  transition: all 0.3s ease;
 }
 
-.team-member {
-    margin-bottom: 2rem;
+.macos-cta-secondary:hover {
+  background-color: rgba(0, 0, 0, 0.1);
+  color: #1d1d1f;
 }
 
-.team-photo {
-    width: 200px;
-    height: 200px;
-    border-radius: 50%;
-    object-fit: cover;
-    margin-bottom: 1rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+/* Metrics Section */
+.macos-metrics {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  margin: -2rem 0 0 0; /* Added negative top margin to pull up */
+  text-align: center;
+  position: relative;
+  padding: 3rem;
+  border-radius: 0;
+  background-color: rgba(255, 255, 255, 0.8); /* Changed to first background color */
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%230066cc' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM36 0V4h-2V0h-4v4h4v4h2V4h4V0h-4zM0 34v-4H2v4h4v2H2v4H0v-4H2v-2H0zM0 0V4h2V0h4v4H4v4H2V4H0z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  z-index: 1; /* Ensure metrics section is above hero */
 }
 
-.team-member h3 {
-    font-size: 1.2rem;
-    margin: 0.5rem 0;
-    color: #2c3e50;
+.macos-metrics h2 {
+  font-size: 2.5rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+  color: #1d1d1f;
+  position: relative;
+  z-index: 1;
+  text-align: center;
 }
 
-.team-member p {
-    color: #6c757d;
+/* Metrics grid container */
+.macos-metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 2rem;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-.roadmap h3 {
-    color: #2c3e50;
-    font-size: 1.3rem;
-    margin-top: 1.5rem;
+.macos-metric-item {
+  background-color: rgba(255, 255, 255, 0.7);
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  text-align: center;
 }
 
-.vision {
-    margin-top: 2rem;
-    padding: 1rem;
-    background-color: #f8f9fa;
-    border-left: 4px solid #007bff;
+.macos-metric-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
 }
 
-.contact-section a {
-    color: #007bff;
-    text-decoration: none;
-    margin: 0.5rem 0;
-    display: inline-block;
+.macos-metric-item h3 {
+  font-size: 2.5rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  background: linear-gradient(to right, #0066cc, #5ac8fa);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  text-align: center;
 }
 
-.contact-section a:hover {
-    color: #0056b3;
-    text-decoration: underline;
+.macos-metric-item p {
+  color: #86868b;
+  font-size: 1rem;
+  font-weight: 500;
+  text-align: center;
 }
 
-footer {
-    margin-top: 4rem;
-    padding: 2rem 0;
-    border-top: 1px solid #e9ecef;
-    background: white;
-    text-align: center;
+/* Features Section */
+.macos-features {
+  padding: 4rem 2rem;
+  text-align: center;
+  border-radius: 0;
+  background: linear-gradient(135deg, rgba(0, 102, 204, 0.05) 0%, rgba(90, 200, 250, 0.1) 100%);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 0;
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
 }
 
-/* Table improvements */
-.table {
-    background: white;
-    border-radius: 10px;
-    overflow: hidden;
-    margin-top: 1.5rem;
+/* Remove this ::before element completely */
+/* 
+.macos-features::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 200px;
+  background: linear-gradient(45deg, rgba(0, 102, 204, 0.05), rgba(90, 200, 250, 0.08));
+  z-index: -1;
+}
+*/
+
+.macos-features h2 {
+  font-size: 2.5rem;
+  font-weight: 600;
+  margin-bottom: 3rem;
+  color: #1d1d1f;
+  position: relative;
 }
 
-.table th {
-    background: #f8f9fa;
-    font-weight: 600;
-    color: #2c3e50;
-    border-bottom: 2px solid #007AFF;
+.macos-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-top: 3rem;
 }
 
-.table td {
-    vertical-align: middle;
-    padding: 1.5rem 1rem;
+.macos-card {
+  background-color: rgba(255, 255, 255, 0.7);
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  text-align: center;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
-/* Contact section improvements */
-.contact-section {
-    text-align: center;
-    background: linear-gradient(145deg, #ffffff, #f8f9fa);
-    padding: 3rem 2rem;
-    border-radius: 15px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+.macos-card:hover {
+  background-color: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
 }
 
-.contact-section a {
-    display: inline-block;
-    margin: 0.5rem 0;
-    padding: 0.5rem 1rem;
-    color: #007AFF;
-    text-decoration: none;
-    font-size: 1.1rem;
-    transition: all 0.3s ease;
+.macos-card-icon {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0066cc, #5ac8fa);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  color: white;
+  font-size: 1.8rem;
 }
 
-.contact-section a:hover {
-    color: #1976d2;
-    transform: translateY(-2px);
+.macos-card h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #1d1d1f;
 }
 
-@media (max-width: 768px) {
-    .team-photo {
-        width: 150px;
-        height: 150px;
-    }
-    
-    .metrics-row .col-md-4 {
-        margin-bottom: 1rem;
-    }
+.macos-card p {
+  color: #86868b;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+
+.macos-testimonial {
+  padding: 4rem 0;
+  margin: 0; /* Keep the margin at 0 to connect with the Features section */
+  position: relative;
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  background: linear-gradient(135deg, rgba(0, 102, 204, 0.05) 0%, rgba(90, 200, 250, 0.1) 100%);
+}
+
+.macos-testimonial::before {
+    content: "“";
+    position: absolute;
+    top: 30px;
+    left: 10%;
+    font-size: 150px;
+    color: rgba(0, 102, 204, 0.1);
+    font-family: Georgia, serif;
+    z-index: 0;
+}
+
+.macos-testimonial::after {
+    content: "”";
+    position: absolute;
+    bottom: 30px;
+    right: 10%;
+    font-size: 150px;
+    color: rgba(0, 102, 204, 0.1);
+    font-family: Georgia, serif;
+    z-index: 0;
+}
+
+.macos-testimonial-content {
+  max-width: 800px;
+  margin: 0 auto;
+  text-align: center;
+  padding: 3rem;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 1.5rem;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  position: relative;
+  z-index: 1;
+}
+
+.macos-testimonial blockquote {
+  font-size: 1.4rem;
+  font-weight: 400;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+  color: #1d1d1f;
+  position: relative;
+  font-style: italic;
+}
+
+.macos-testimonial cite {
+  font-style: normal;
+  color: #86868b;
+  font-weight: 500;
+  display: block;
+  margin-top: 1rem;
+}
+
+/* Roadmap Section */
+.macos-roadmap {
+  padding: 4rem 2rem;
+  text-align: center;
+  border-radius: 0;
+  background-color: rgba(255, 255, 255, 0.8);
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%230066cc' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM36 0V4h-2V0h-4v4h4v4h2V4h4V0h-4zM0 34v-4H2v4h4v2H2v4H0v-4H2v-2H0zM0 0V4h2V0h4v4H4v4H2V4H0z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  margin-bottom: 0; /* Changed from 4rem to 0 */
+}
+
+.macos-roadmap h2 {
+  font-size: 2.5rem;
+  font-weight: 600;
+  margin-bottom: 3rem;
+  color: #1d1d1f;
+  position: relative;
+}
+
+.macos-roadmap-timeline {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.macos-roadmap-item {
+  display: flex;
+  gap: 1.5rem;
+  text-align: left;
+}
+
+.macos-roadmap-marker {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #0066cc, #5ac8fa);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.macos-roadmap-content {
+  background-color: rgba(255, 255, 255, 0.7);
+  padding: 1.5rem;
+  border-radius: 1rem;
+  flex-grow: 1;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.macos-roadmap-content h3 {
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: #1d1d1f;
+}
+
+.macos-roadmap-content p {
+  color: #494949;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+  line-height: 1.6;
+}
+
+/* Team Section */
+.macos-team {
+  padding: 4rem 2rem;
+  text-align: center;
+  border-radius: 0; /* Changed from 1.5rem to 0 */
+  margin-bottom: 0; /* Changed from 4rem to 0 */
+  background: linear-gradient(135deg, rgba(0, 102, 204, 0.05) 0%, rgba(90, 200, 250, 0.1) 100%);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  position: relative;
+  overflow: hidden;
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+}
+
+.macos-team::before {
+  content: "";
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(90, 200, 250, 0.2) 0%, rgba(90, 200, 250, 0) 70%);
+  top: -150px;
+  right: -150px;
+  z-index: 0;
+}
+
+.macos-team::after {
+  content: "";
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(0, 102, 204, 0.15) 0%, rgba(0, 102, 204, 0) 70%);
+  bottom: -150px;
+  left: -150px;
+  z-index: 0;
+}
+
+.macos-team h2 {
+  font-size: 2.5rem;
+  font-weight: 600;
+  margin-bottom: 3rem;
+  color: #1d1d1f;
+  position: relative;
+  z-index: 1;
+}
+
+.macos-team-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 2rem;
+}
+
+.macos-team-member {
+  background-color: rgba(255, 255, 255, 0.7);
+  border-radius: 1rem;
+  padding: 2rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  text-align: center;
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.macos-team-photo-container {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  overflow: hidden;
+  margin: 0 auto 1.5rem;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border: 3px solid white;
+}
+
+.macos-team-photo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.macos-team-member h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: #1d1d1f;
+}
+
+.macos-team-member p {
+  color: #86868b;
+  font-size: 0.9rem;
+}
+
+/* Contact Section - Adjust margin and padding */
+.macos-contact {
+  padding: 4rem 2rem 2rem; /* Reduced bottom padding */
+  text-align: center;
+  position: relative;
+  background-color: rgba(255, 255, 255, 0.8);
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%230066cc' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zM36 0V4h-2V0h-4v4h4v4h2V4h4V0h-4zM0 34v-4H2v4h4v2H2v4H0v-4H2v-2H0zM0 0V4h2V0h4v4H4v4H2V4H0z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+  margin-bottom: 0;
+  overflow: hidden;
+}
+
+.macos-contact h2 {
+  font-size: 2.5rem;
+  font-weight: 600;
+  margin-bottom: 3rem;
+  color: #1d1d1f;
+  position: relative;
+  z-index: 1;
+}
+
+.macos-contact-methods {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  max-width: 500px;
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.macos-contact-item {
+  background-color: rgba(255, 255, 255, 0.7);
+  padding: 1.2rem 1.5rem;
+  border-radius: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  text-decoration: none;
+  color: #1d1d1f;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.macos-contact-item:hover {
+  background-color: rgba(255, 255, 255, 0.9);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+  color: #0066cc;
+}
+
+.macos-contact-item i {
+  color: #0066cc;
+  font-size: 1.2rem;
+}
+
+/* Footer - Remove top margin and adjust padding */
+.macos-footer {
+  background-color: rgba(245, 245, 247, 0.8);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  padding: 1.5rem 2rem; /* Reduced padding */
+  margin-top: 0;
+  width: 100vw;
+  margin-left: calc(-50vw + 50%);
+}
+
+/* Adjust footer bottom margins */
+.macos-footer-bottom {
+  max-width: 1200px;
+  margin: 0 auto; /* Changed from 3rem auto 0 to 0 auto */
+  padding-top: 0; /* Removed padding-top */
+  border-top: none; /* Removed border-top */
+  text-align: center;
+  color: #86868b;
+  font-size: 0.9rem;
+}
+
+/* Add content container classes to keep things centered */
+.macos-container-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  position: relative;
+}
+
+/* Make sure the team grid, section split, and cards stay centered */
+.macos-team-grid,
+.macos-section-split,
+.macos-cards,
+.macos-roadmap-timeline {
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Section transitions */
+.macos-hero,
+.macos-metrics,
+.macos-features,
+.macos-testimonial,
+.macos-roadmap,
+.macos-team,
+.macos-contact,
+.macos-footer {
+  transition: background-color 0.5s ease, background-image 0.5s ease;
+}
+
+/* Fallback for browsers that don't support video */
+@supports not (object-fit: cover) {
+  .macos-hero-video-container {
+    display: none;
+  }
+  
+  .macos-hero {
+    background: linear-gradient(135deg, rgba(0, 102, 204, 0.08) 0%, rgba(90, 200, 250, 0.15) 100%);
+  }
+}
+
+/* Prefers-reduced-motion: Respect user preferences for reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .macos-hero-video {
+    display: none;
+  }
+  
+  .macos-hero {
+    background: linear-gradient(135deg, rgba(0, 102, 204, 0.08) 0%, rgba(90, 200, 250, 0.15) 100%);
+  }
 }

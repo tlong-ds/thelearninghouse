@@ -60,7 +60,7 @@
 }
 
 .form-group:focus-within label {
-  color: #007AFF;
+  color: #0066cc;
 }
 
 .form-group input,
@@ -91,7 +91,7 @@
 .form-group input:focus,
 .form-group textarea:focus,
 .form-group select:focus {
-  border-color: #007AFF;
+  border-color: #0066cc;
   box-shadow: 0 0 0 3px rgba(34, 150, 243, 0.1);
   outline: none;
 }
@@ -124,16 +124,19 @@
 
 .add-skill-btn {
   padding: 0 20px;
-  background-color: var(--primary-color);
-  color: white;
+  background: linear-gradient(135deg, #0066cc, #5ac8fa) !important;
+  color: white !important;
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 4px 16px rgba(0, 102, 204, 0.3);
 }
 
 .add-skill-btn:hover:not(:disabled) {
-  background-color: var(--primary-dark);
+  background: linear-gradient(135deg, #0066cc, #5ac8fa) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 24px rgba(0, 102, 204, 0.4) !important;
 }
 
 .add-skill-btn:disabled {
@@ -160,7 +163,7 @@
 
 .skills-input-container input:focus {
   outline: none;
-  border-color: #007AFF;
+  border-color: #0066cc;
   box-shadow: 0 0 0 3px rgba(34, 150, 243, 0.1);
 }
 
@@ -205,20 +208,20 @@
 .skill-suggestion:before {
   content: "+";
   font-size: 1.1rem;
-  color: #007AFF;
+  color: #0066cc;
   font-weight: 500;
 }
 
 .skill-suggestion:hover {
   background-color: #f0f7ff;
-  color: #007AFF;
+  color: #0066cc;
 }
 
 .skill-suggestion.new-skill {
   margin-top: 0.5rem;
   border-top: 1px dashed #e2e8f0;
   padding-top: 1rem;
-  color: #007AFF;
+  color: #0066cc;
   font-weight: 500;
 }
 
@@ -235,7 +238,7 @@
 }
 
 .selected-skills-container:focus-within {
-  border-color: #007AFF;
+  border-color: #0066cc;
   box-shadow: 0 0 0 3px rgba(34, 150, 243, 0.1);
 }
 
@@ -253,7 +256,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
-  background-color: #007AFF;
+  background-color: #0066cc;
   color: white;
   padding: 0.5rem 1rem;
   border-radius: 20px;
@@ -335,16 +338,17 @@
 }
 
 .primary-btn {
-  background-color: #007AFF;
+  background: linear-gradient(135deg, #0066cc, #5ac8fa) !important;
   border: none;
-  color: white;
-  box-shadow: 0 4px 12px rgba(34, 150, 243, 0.15);
+  color: white !important;
+  box-shadow: 0 4px 16px rgba(0, 102, 204, 0.3);
+  transition: all 0.3s ease !important;
 }
 
 .primary-btn:hover:not(:disabled) {
-  background-color: #1771ba;
-  transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(34, 150, 243, 0.2);
+  background: linear-gradient(135deg, #0066cc, #5ac8fa) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 24px rgba(0, 102, 204, 0.4) !important;
 }
 
 .primary-btn:disabled {

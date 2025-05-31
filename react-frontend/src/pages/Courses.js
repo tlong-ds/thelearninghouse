@@ -3,7 +3,6 @@ import { Link, useNavigate } from 'react-router-dom';
 import { fetchCourses, fetchInstructorCourses } from '../services/api';
 import { useAuth } from '../services/AuthContext';
 import { useLoading } from '../services/LoadingContext';
-import Header from '../components/Header';
 import CourseCard from '../components/CourseCard';
 import '../styles/Courses.css';
 
@@ -102,7 +101,6 @@ const Courses = () => {
   if (error) {
     return (
       <div className="courses-container">
-        <Header username={currentUser.username} role={currentUser.role} onLogout={handleLogout} />
         <div className="error">{error}</div>
       </div>
     );
@@ -110,7 +108,6 @@ const Courses = () => {
   
   return (
     <div className="courses-container">
-      <Header username={currentUser.username} role={currentUser.role} onLogout={handleLogout} />
       
       <div className="courses-content">
         <div className="courses-header">
@@ -128,10 +125,10 @@ const Courses = () => {
               value={sortBy} 
               onChange={(e) => setSortBy(e.target.value)}
             >
-              <option value="enrollments">Sort by Enrollments</option>
-              <option value="name">Sort by Name</option>
-              <option value="rating">Sort by Rating</option>
-              <option value="completion">Sort by Completion</option>
+              <option value="enrollments">Enrollments</option>
+              <option value="name">Name</option>
+              <option value="rating">Rating</option>
+              <option value="completion">Completion</option>
             </select>
             <button 
               className="sort-order-btn"

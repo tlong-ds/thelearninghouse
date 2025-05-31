@@ -5,8 +5,7 @@
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   backdrop-filter: blur(20px);
   padding-top: 84px; /* Space for floating header (60px + 24px gap) */
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
-}
+  }
 
 .courses-content {
   flex: 1;
@@ -79,8 +78,8 @@
 
 .search-bar input:focus {
   outline: none;
-  border-color: #007AFF;
-  box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.2), 0 4px 16px rgba(0, 0, 0, 0.08);
+  border-color: #0066cc;
+  box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.2), 0 4px 16px rgba(0, 0, 0, 0.08);
   background: rgba(255, 255, 255, 1);
 }
 
@@ -90,7 +89,7 @@
 
 /* Enhanced search bar interactions */
 .search-bar:focus-within::before {
-  color: #007AFF;
+  color: #0066cc;
   transform: translateY(-50%) scale(1.1);
 }
 
@@ -133,7 +132,7 @@
 
 /* Improved focus ring for better accessibility */
 .search-bar input:focus-visible {
-  outline: 2px solid #007AFF;
+  outline: 2px solid #0066cc;
   outline-offset: 2px;
 }
 
@@ -171,47 +170,25 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #007AFF, #5856D6);
-  color: #fff;
+  background: linear-gradient(135deg, #0066cc, #5ac8fa) !important;
+  color: #fff !important;
   padding: 14px 32px;
   border-radius: 12px;
   font-weight: 600;
   font-size: 16px;
   text-decoration: none;
-  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  box-shadow: 0 8px 24px rgba(0, 122, 255, 0.25);
+  transition: all 0.3s ease !important;
+  box-shadow: 0 4px 16px rgba(0, 102, 204, 0.3);
   border: none;
   cursor: pointer;
-  position: relative;
-  overflow: hidden;
-}
-
-.add-course-btn .btn::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.05));
-  opacity: 0;
-  transition: opacity 0.3s;
 }
 
 .add-course-btn .btn:hover,
 .add-course-btn .btn:focus {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 32px rgba(0, 122, 255, 0.35);
-  text-decoration: none;
-}
-
-.add-course-btn .btn:hover::before {
-  opacity: 1;
-}
-
-.add-course-btn .btn:active {
-  transform: translateY(0);
-  box-shadow: 0 4px 16px rgba(0, 122, 255, 0.3);
+  background: linear-gradient(135deg, #0066cc, #5ac8fa) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 24px rgba(0, 102, 204, 0.4) !important;
+  text-decoration: none !important;
 }
 
 .no-courses {
@@ -272,8 +249,8 @@
 
 .courses-container .course-controls select:focus {
   outline: none;
-  border-color: #007AFF;
-  box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.2), 0 4px 16px rgba(0, 0, 0, 0.08);
+  border-color: #0066cc;
+  box-shadow: 0 0 0 4px rgba(0, 102, 204, 0.2), 0 4px 16px rgba(0, 0, 0, 0.08);
   background: rgba(255, 255, 255, 1);
 }
 
@@ -303,7 +280,7 @@
 
 .sort-order-btn:focus {
   outline: none;
-  border-color: #007AFF;
+  border-color: #0066cc;
   box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.2), 0 4px 16px rgba(0, 0, 0, 0.08);
 }
 
@@ -339,7 +316,7 @@
 
 /* System colors for better integration */
 :root {
-  --system-blue: #007AFF;
+  --system-blue: #0066cc;
   --system-purple: #5856D6;
   --system-text-primary: #1d1d1f;
   --system-text-secondary: #86868b;

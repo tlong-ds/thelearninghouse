@@ -11,8 +11,8 @@
   --shadow-default: 0 8px 32px rgba(0, 0, 0, 0.1);
   --shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.15);
   --shadow-pressed: 0 4px 16px rgba(0, 0, 0, 0.12);
-  --primary-color: #007AFF;
-  --primary-color-dark: #0056b3;
+  --primary-color: #0066cc;
+  --primary-color-dark: #5ac8fa;
   --success-color: #34C759;
   --warning-color: #FF9500;
   --danger-color: #FF3B30;
@@ -30,8 +30,7 @@
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   backdrop-filter: blur(20px);
   padding-top: 84px; /* Space for floating header (60px + 24px gap) */
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
-}
+  }
 
 .dashboard-content {
   flex: 1;
@@ -41,7 +40,7 @@
   padding: var(--spacing-xl);
 }
 
-.greeting {
+.dashboard-greeting {
   margin-bottom: var(--spacing-xl);
   font-size: 1.5rem;
   font-weight: 600;
@@ -55,20 +54,20 @@
   box-shadow: var(--shadow-default);
 }
 
-.username {
+.dashboard-username {
   font-weight: 700;
   color: var(--primary-color);
   text-shadow: 0 1px 2px rgba(0, 122, 255, 0.1);
 }
 
-.metrics-container {
+.dashboard-metrics-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: var(--spacing-lg);
   margin-bottom: 2.5rem;
 }
 
-.metric-card {
+.dashboard-metric-card {
   background: var(--glass-background);
   backdrop-filter: blur(20px);
   border: 1px solid var(--glass-border);
@@ -81,7 +80,7 @@
   overflow: hidden;
 }
 
-.metric-card::before {
+.dashboard-metric-card::before {
   content: '';
   position: absolute;
   top: 0;
@@ -94,17 +93,17 @@
   pointer-events: none;
 }
 
-.metric-card:hover {
+.dashboard-metric-card:hover {
   transform: translateY(-8px) scale(1.02);
   box-shadow: var(--shadow-hover);
   border-color: rgba(0, 122, 255, 0.3);
 }
 
-.metric-card:hover::before {
+.dashboard-metric-card:hover::before {
   opacity: 1;
 }
 
-.metric-card h3 {
+.dashboard-metric-card h3 {
   font-size: 0.95rem;
   color: var(--text-light);
   margin-bottom: var(--spacing-sm);
@@ -114,7 +113,7 @@
   z-index: 1;
 }
 
-.metric-value {
+.dashboard-metric-value {
   font-size: 2.5rem;
   font-weight: 700;
   color: var(--primary-color);
@@ -124,7 +123,7 @@
   text-shadow: 0 2px 4px rgba(0, 122, 255, 0.1);
 }
 
-.tabs-container {
+.dashboard-tabs-container {
   background: var(--glass-background);
   backdrop-filter: blur(20px);
   border: 1px solid var(--glass-border);
@@ -134,13 +133,13 @@
   margin-bottom: var(--spacing-xl);
 }
 
-.tabs {
+.dashboard-tabs {
   display: flex;
   border-bottom: 1px solid rgba(0, 0, 0, 0.1);
   background: rgba(255, 255, 255, 0.5);
 }
 
-.tab {
+.dashboard-tab {
   padding: 1rem 1.5rem;
   background: none;
   border: none;
@@ -154,42 +153,68 @@
   text-align: center;
 }
 
-.tab.active {
+.dashboard-tab.active {
   color: var(--primary-color);
   background: rgba(0, 122, 255, 0.1);
   border-radius: 12px 12px 0 0;
   font-weight: 600;
 }
 
-.tab:hover {
+.dashboard-tab:hover {
   background: rgba(0, 122, 255, 0.08);
   color: var(--primary-color);
 }
 
-.tab-content {
+.dashboard-tab-content {
   padding: var(--spacing-xl);
   background: rgba(255, 255, 255, 0.3);
 }
 
-.statistics-tab, .courses-tab {
+.dashboard-statistics-tab, .dashboard-courses-tab {
   width: 100%;
 }
 
-.charts-container {
+.dashboard-courses-tab {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
+  width: 100%;
+}
+
+.dashboard-statistics-tab {
+  max-height: 600px;
+  overflow-y: visible;
+  overflow-x: visible;     /* Allow shadows to show */
+  scroll-behavior: smooth;
+  padding: 1.5rem;
+  margin: 0;               /* removed negative margins */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;            /* ensure full-width */
+  box-sizing: border-box; /* include padding in width */
+}
+
+.dashboard-charts-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(480px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: var(--spacing-lg);
   margin: 0 auto;
   align-items: stretch;
+  min-height: 100%;
+  max-width: 1100px;
+  justify-content: center;
+  width: 100%;
 }
 
-.chart-svg-container {
+.dashboard-chart-svg-container {
   width: 100%;
-  height: 300px;
+  height: 350px;
   position: relative;
 }
 
-.statistics-chart {
+.dashboard-statistics-chart {
   width: 100%;
   margin-bottom: 0;
   background: var(--glass-background);
@@ -199,14 +224,16 @@
   padding: var(--card-padding);
   box-shadow: var(--shadow-default);
   height: 100%;
+  min-height: 400px;
   display: flex;
   flex-direction: column;
   transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   position: relative;
-  overflow: hidden;
+  overflow: visible;
+  align-items: center;
 }
 
-.statistics-chart::before {
+.dashboard-statistics-chart::before {
   content: '';
   position: absolute;
   top: 0;
@@ -219,17 +246,17 @@
   pointer-events: none;
 }
 
-.statistics-chart:hover {
+.dashboard-statistics-chart:hover {
   transform: translateY(-4px) scale(1.01);
   box-shadow: var(--shadow-hover);
   border-color: rgba(0, 122, 255, 0.2);
 }
 
-.statistics-chart:hover::before {
+.dashboard-statistics-chart:hover::before {
   opacity: 1;
 }
 
-.statistics-chart h3 {
+.dashboard-statistics-chart h3 {
   margin-bottom: var(--spacing-sm);
   font-size: 1.125rem;
   font-weight: 600;
@@ -241,23 +268,23 @@
   position: relative;
 }
 
-.statistics-chart svg {
+.dashboard-statistics-chart svg {
   flex-grow: 1;
   margin: 0 auto;
   display: block;
 }
 
 /* Chart animation elements */
-.statistics-chart path {
+.dashboard-statistics-chart path {
   transition: d 0.5s ease-in-out;
 }
 
-.statistics-chart circle {
+.dashboard-statistics-chart circle {
   transition: cx 0.5s ease-in-out, cy 0.5s ease-in-out;
 }
 
-.statistics-chart line, 
-.statistics-chart text {
+.dashboard-statistics-chart line, 
+.dashboard-statistics-chart text {
   transition: x 0.5s ease-in-out, 
               y 0.5s ease-in-out, 
               x1 0.5s ease-in-out,
@@ -266,7 +293,7 @@
               y2 0.5s ease-in-out;
 }
 
-.no-data-message {
+.dashboard-no-data-message {
   text-align: center;
   padding: 3rem 1rem;
   color: var(--text-medium);
@@ -282,11 +309,14 @@
   border-radius: var(--border-radius);
   box-shadow: var(--shadow-default);
   font-weight: 500;
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
-.browse-courses-btn, .view-courses-btn {
+.dashboard-browse-courses-btn, .dashboard-view-courses-btn {
   margin-top: var(--spacing-lg);
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-color-dark));
+  background: linear-gradient(135deg, #0066cc, #5ac8fa);
   border: none;
   padding: 0.875rem 1.75rem;
   border-radius: 12px;
@@ -297,35 +327,95 @@
   transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   text-decoration: none;
   display: inline-block;
-  box-shadow: 0 4px 16px rgba(0, 122, 255, 0.3);
+  box-shadow: 0 4px 16px rgba(0, 102, 204, 0.3);
   letter-spacing: -0.01em;
 }
 
-.browse-courses-btn:hover, .view-courses-btn:hover {
+.dashboard-browse-courses-btn:hover, .dashboard-view-courses-btn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 122, 255, 0.4);
-  background: linear-gradient(135deg, var(--primary-color-dark), #004085);
+  box-shadow: 0 8px 24px rgba(0, 102, 204, 0.4);
 }
 
-.browse-courses-btn:active, .view-courses-btn:active {
+.dashboard-browse-courses-btn:active, .dashboard-view-courses-btn:active {
   transform: translateY(0);
   box-shadow: var(--shadow-pressed);
 }
 
-.courses-list {
+.dashboard-courses-list {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: var(--spacing-xl);
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: calc(var(--spacing-xl) + 1rem);
+  max-height: 600px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  padding: 1.5rem;
+  padding-right: calc(1.5rem + 8px);
+  margin: -1.5rem;
+  margin-right: calc(-1.5rem - 8px);
+  /* Auto-hiding scrollbar styling */
 }
 
-.course-card {
-  background: var(--glass-background);
-  backdrop-filter: blur(20px);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--border-radius);
-  padding: var(--card-padding);
-  box-shadow: var(--shadow-default);
-  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+/* Auto-hiding scrollbar for courses list */
+.dashboard-courses-list::-webkit-scrollbar {
+  width: 6px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.dashboard-courses-list::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 3px;
+}
+
+.dashboard-courses-list::-webkit-scrollbar-thumb {
+  background: rgba(0, 122, 255, 0.4);
+  border-radius: 3px;
+  transition: background 0.3s ease, opacity 0.3s ease;
+}
+
+.dashboard-courses-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 122, 255, 0.6);
+}
+
+/* Show scrollbar on hover or during scroll */
+.dashboard-courses-list:hover::-webkit-scrollbar {
+  opacity: 1;
+}
+
+.dashboard-courses-list:hover::-webkit-scrollbar-thumb {
+  opacity: 1;
+}
+
+/* Firefox scrollbar styling */
+.dashboard-courses-list {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  transition: scrollbar-color 0.3s ease;
+}
+
+.dashboard-courses-list:hover {
+  scrollbar-color: rgba(0, 122, 255, 0.4) transparent;
+}
+
+/* Hide scrollbar completely for statistics tab */
+.dashboard-statistics-tab::-webkit-scrollbar {
+  display: none;
+}
+
+/* Firefox - hide scrollbar for statistics tab */
+.dashboard-statistics-tab {
+  scrollbar-width: none;
+}
+
+.dashboard-course-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85));
+  backdrop-filter: blur(25px);
+  border: 2px solid rgba(52, 199, 89, 0.1);
+  border-radius: 20px;
+  padding: calc(var(--card-padding) + 0.5rem);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
@@ -334,110 +424,165 @@
   cursor: pointer;
   text-decoration: none;
   color: inherit;
+  min-height: 280px;
 }
 
-.course-card::before {
+.dashboard-course-card::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, rgba(0, 122, 255, 0.02), rgba(88, 86, 214, 0.02));
+  background: linear-gradient(135deg, rgba(52, 199, 89, 0.05), rgba(0, 122, 255, 0.06));
   opacity: 0;
-  transition: opacity 0.4s ease;
+  transition: opacity 0.5s ease;
   pointer-events: none;
 }
 
-.course-card:hover {
-  transform: translateY(-8px) scale(1.02);
-  box-shadow: var(--shadow-hover);
-  border-color: rgba(0, 122, 255, 0.3);
+.dashboard-course-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--success-color), var(--primary-color), #FF9500);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
+
+.dashboard-course-card:hover {
+  transform: translateY(-10px) scale(1.025);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.15), 0 8px 24px rgba(0, 0, 0, 0.08);
+  border-color: rgba(52, 199, 89, 0.3);
   text-decoration: none;
   color: inherit;
 }
 
-.course-card:hover::before {
+.dashboard-course-card:hover::before {
   opacity: 1;
 }
 
-.course-info h3 {
-  font-size: 1.25rem;
-  margin-bottom: var(--spacing-sm);
-  color: var(--text-dark);
-  font-weight: 600;
-  line-height: 1.3;
-  letter-spacing: -0.01em;
-  z-index: 1;
-  position: relative;
+.dashboard-course-card:hover::after {
+  opacity: 1;
 }
 
-.instructor {
-  font-size: 0.9rem;
+.dashboard-course-info h3 {
+  font-size: 1.375rem;
+  margin-bottom: var(--spacing-md);
+  color: var(--text-dark);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  z-index: 1;
+  position: relative;
+  text-align: left;
+}
+
+.dashboard-instructor {
+  font-size: 0.95rem;
   color: var(--text-medium);
   margin-bottom: var(--spacing-lg);
-  font-weight: 500;
+  font-weight: 600;
   z-index: 1;
   position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0rem;
+  text-align: left;
 }
 
-.progress-info {
-  margin-top: var(--spacing-lg);
+.dashboard-progress-info {
+  margin-top: auto;
   z-index: 1;
   position: relative;
+  text-align: left;
 }
 
-.progress-container {
+.dashboard-progress-info p {
+  color: var(--text-medium);
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: var(--spacing-sm);
+  text-align: left;
+}
+
+.dashboard-progress-container {
   width: 100%;
-  height: 8px;
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 12px;
+  height: 10px;
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 15px;
   overflow: hidden;
   margin-top: var(--spacing-sm);
   backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-.progress-bar {
+.dashboard-progress-bar {
   height: 100%;
-  background: linear-gradient(135deg, var(--success-color), #28a745);
-  border-radius: 12px;
+  background: linear-gradient(135deg, var(--success-color), #28a745, var(--primary-color));
+  border-radius: 15px;
   position: relative;
-  transition: width 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  box-shadow: 0 2px 8px rgba(52, 199, 89, 0.3);
+  transition: width 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  box-shadow: 0 3px 12px rgba(52, 199, 89, 0.4);
+  min-width: 25px;
+}
+
+.dashboard-progress-bar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: progressShimmer 2s infinite;
+}
+
+@keyframes progressShimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }
 
 /* Hide separate course actions - the whole card is now clickable */
-.course-actions {
+.dashboard-course-actions {
   display: none;
 }
 
-.student-view-course-btn {
+.dashboard-student-view-course-btn {
   display: none;
 }
 
 /* Time filter controls */
-.time-filter-controls {
+.dashboard-time-filter-controls {
   display: flex;
   align-items: center;
   margin-bottom: var(--spacing-xl);
   gap: var(--spacing-sm);
   flex-wrap: wrap;
   justify-content: center;
+  width: 100%;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.time-filter-controls span {
+.dashboard-time-filter-controls span {
   font-weight: 600;
   color: var(--text-dark);
   font-size: 1rem;
   letter-spacing: -0.01em;
+  text-align: center;
 }
 
-.time-filter-btn {
+.dashboard-time-filter-btn {
   background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  padding: 0.625rem 1.25rem;
+  border: none;
   border-radius: 12px;
+  padding: 0.625rem 1.25rem;
   font-size: 0.9rem;
   font-weight: 500;
   cursor: pointer;
@@ -447,64 +592,49 @@
   letter-spacing: -0.01em;
 }
 
-.time-filter-btn:hover {
+.dashboard-time-filter-btn:hover {
   background: rgba(255, 255, 255, 0.9);
   transform: translateY(-1px);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-  border-color: rgba(0, 0, 0, 0.15);
 }
 
-.time-filter-btn.active {
+.dashboard-time-filter-btn.active {
   background: linear-gradient(135deg, var(--primary-color), var(--primary-color-dark));
   color: white;
-  border-color: transparent;
   box-shadow: 0 4px 16px rgba(0, 122, 255, 0.3);
   transform: translateY(-1px);
 }
 
-.time-filter-btn.active:hover {
+.dashboard-time-filter-btn.active:hover {
   box-shadow: 0 6px 20px rgba(0, 122, 255, 0.4);
 }
 
-/* Transparent Enrolled Courses Sorting Controls - Matching Courses Page Design */
-.courses-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2.5rem;
-  gap: 16px;
-  padding: 12px 20px;
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  border-radius: 0;
-}
 
-.courses-header h2 {
-  color: var(--text-dark);
-  font-weight: 600;
-  font-size: 1.5rem;
-  margin: 0;
-  letter-spacing: -0.01em;
-}
 
-.dashboard-container .course-controls {
+.dashboard-container .dashboard-course-controls {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   align-items: center;
   flex-shrink: 0;
+  justify-content: flex-end;
+  margin-bottom: var(--spacing-lg);
+  padding: 0 var(--spacing-sm);
+  margin-left: auto;
+  width: auto;
+  margin-right: 12px;
 }
 
-.dashboard-container .course-controls select {
-  padding: 0 40px 0 16px;
+.dashboard-container .dashboard-course-controls select {
+  padding: 0 36px 0 12px;
   text-align: left;
-  border-radius: 12px;
+  border-radius: 10px;
   border: 1px solid rgba(0, 0, 0, 0.1);
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 400;
   color: var(--text-dark);
-  height: 40px;
-  min-width: 140px;
+  height: 36px;
+  min-width: 120px;
+  max-width: 160px;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
   cursor: pointer;
@@ -514,29 +644,29 @@
   appearance: none;
   background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' fill='%231d1d1f'%3E%3Cpath d='M4.646 6.146a.5.5 0 01.708 0L8 8.793l2.646-2.647a.5.5 0 01.708.708l-3 3a.5.5 0 01-.708 0l-3-3a.5.5 0 010-.708z'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 12px center;
+  background-position: right 10px center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-  flex: 1;
+  flex-shrink: 0;
 }
 
-.dashboard-container .course-controls select:hover {
+.dashboard-container .dashboard-course-controls select:hover {
   border-color: rgba(0, 0, 0, 0.2);
   transform: translateY(-1px);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
   background: rgba(255, 255, 255, 1);
 }
 
-.dashboard-container .course-controls select:focus {
+.dashboard-container .dashboard-course-controls select:focus {
   outline: none;
   border-color: var(--primary-color);
   box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.2), 0 4px 16px rgba(0, 0, 0, 0.08);
   background: rgba(255, 255, 255, 1);
 }
 
-.dashboard-container .sort-order-btn {
-  height: 40px;
-  width: 40px;
-  border-radius: 12px;
+.dashboard-container .dashboard-sort-order-btn {
+  height: 36px;
+  width: 36px;
+  border-radius: 10px;
   border: 1px solid rgba(0, 0, 0, 0.1);
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(10px);
@@ -548,105 +678,110 @@
   justify-content: center;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
   flex-shrink: 0;
+  font-size: 14px;
 }
 
-.dashboard-container .sort-order-btn:hover {
+.dashboard-container .dashboard-sort-order-btn:hover {
   background: rgba(255, 255, 255, 1);
   border-color: rgba(0, 0, 0, 0.2);
   transform: translateY(-1px);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 }
 
-.dashboard-container .sort-order-btn:focus {
+.dashboard-container .dashboard-sort-order-btn:focus {
   outline: none;
   border-color: var(--primary-color);
   box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.2), 0 4px 16px rgba(0, 0, 0, 0.08);
 }
 
 @media (max-width: 992px) {
-  .charts-container {
-    grid-template-columns: 1fr;
-    max-width: 550px;
+  .dashboard-charts-container {
+    max-width: 900px;
     margin: 0 auto;
   }
 }
 
 @media (max-width: 768px) {
-  .metrics-container {
+  .dashboard-metrics-container {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .charts-container {
+  .dashboard-charts-container {
     grid-template-columns: 1fr;
+    max-width: 550px;
+    margin: 0 auto;
+    width: 100%;
   }
 
-  .chart-svg-container {
+  .dashboard-chart-svg-container {
     height: 280px;
   }
 
-  .statistics-chart {
+  .dashboard-statistics-chart {
     padding: var(--spacing-lg);
     min-height: 320px;
+    width: 100%;
+    margin: 0 auto;
+    align-items: center;
   }
 
-  .statistics-chart h3 {
+  .dashboard-statistics-chart h3 {
     font-size: 1rem;
     margin-bottom: var(--spacing-md);
   }
 
-  .courses-list {
+  .dashboard-courses-list {
+    max-height: 400px; /* Even smaller height on very small screens */
     grid-template-columns: 1fr;
+    gap: calc(var(--spacing-lg) + 0.5rem); /* Maintain shadow space on mobile */
+    padding: 1rem;
+    padding-right: calc(1rem + 8px);
+    margin: -1rem;
+    margin-right: calc(-1rem - 8px);
   }
 
-  .time-filter-controls {
+  .dashboard-time-filter-controls {
     flex-direction: column;
   }
 
-  .time-filter-btn {
+  .dashboard-time-filter-btn {
     width: 100%;
   }
 
-  .courses-header {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 1rem;
-    padding: 8px 12px;
-  }
-
-  .courses-header h2 {
-    font-size: 1.25rem;
-    text-align: center;
-  }
-
-  .dashboard-container .course-controls {
+  .dashboard-container .dashboard-course-controls {
     width: 100%;
     gap: 8px;
+    justify-content: center;
+    padding: 0;
+    margin-bottom: var(--spacing-md);
+    margin-left: 0;
   }
 
-  .dashboard-container .course-controls select {
-    flex: 1;
+  .dashboard-container .dashboard-course-controls select {
+    max-width: none;
     height: 36px;
     font-size: 14px;
-    min-width: 120px;
+    min-width: 0;
+    flex: 1;
   }
 
-  .dashboard-container .sort-order-btn {
+  .dashboard-container .dashboard-sort-order-btn {
     height: 36px;
     width: 36px;
   }
 }
 
 @media (max-width: 480px) {
-  .metrics-container {
+  .dashboard-metrics-container {
     grid-template-columns: 1fr;
   }
 
-  .tab {
+  .dashboard-tab {
     padding: 0.75rem 1rem;
     font-size: 0.9rem;
   }
 
-  .tab-content {
+  .dashboard-tab-content {
     padding: 1.5rem 1rem;
   }
 
@@ -655,28 +790,21 @@
   }
 
   /* Ultra-compact mobile chart optimizations */
-  .chart-svg-container {
+  .dashboard-chart-svg-container {
     height: 250px;
   }
 
-  .statistics-chart {
+  .dashboard-statistics-chart {
     padding: var(--spacing-md);
     min-height: 290px;
-    margin: 0 var(--spacing-xs);
+    margin: 0 auto;
+    max-width: 100%;
+    width: calc(100% - var(--spacing-xs) * 2);
   }
 
-  .statistics-chart h3 {
+  .dashboard-statistics-chart h3 {
     font-size: 0.9rem;
     margin-bottom: var(--spacing-sm);
-  }
-
-  .courses-header {
-    gap: 6px;
-    padding: 6px 8px;
-  }
-
-  .courses-header h2 {
-    font-size: 1.125rem;
   }
 
   .dashboard-container .course-controls {
@@ -697,7 +825,7 @@
 }
 
 /* Data point hover effect */
-.data-point circle:hover {
+.dashboard-data-point circle:hover {
   r: 6;
   cursor: pointer;
 }

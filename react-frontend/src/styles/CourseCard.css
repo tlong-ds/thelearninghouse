@@ -7,8 +7,8 @@
   --border-radius: 16px;
   --shadow-default: 0 8px 32px rgba(0, 0, 0, 0.1);
   --shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.15);
-  --primary-color: #007AFF;
-  --primary-color-dark: #0056b3;
+  --primary-color: #0066cc;
+  --primary-color-dark: #5ac8fa;
   --success-color: #34C759;
   --success-color-dark: #28a745;
   --danger-color: #FF3B30;
@@ -85,7 +85,7 @@
   position: absolute;
   top: 12px;
   right: 12px;
-  background: linear-gradient(135deg, #007AFF, #5856D6);
+  background: linear-gradient(135deg, #0066cc, #5ac8fa);
   color: white;
   padding: 6px 14px;
   border-radius: 12px;

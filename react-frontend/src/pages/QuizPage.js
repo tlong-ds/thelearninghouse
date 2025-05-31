@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { fetchLectureDetails } from '../services/api';
 import Quiz from '../components/Quiz';
-import Header from '../components/Header';
 import { useAuth } from '../services/AuthContext';
 import { useLoading } from '../services/LoadingContext';
 import '../styles/QuizPage.css';
@@ -58,7 +57,6 @@ const QuizPage = () => {
   if (error || !lecture) {
     return (
       <div className="quiz-page">
-        <Header username={currentUser?.username} role={currentUser?.role} onLogout={logout} />
         <div className="quiz-error-container">
           <div className="error">{error || 'Quiz not found'}</div>
           <button className="back-button" onClick={handleBack} title="Back to Lecture">
@@ -71,8 +69,6 @@ const QuizPage = () => {
 
   return (
     <div className="quiz-page">
-      <Header username={currentUser?.username} role={currentUser?.role} onLogout={logout} />
-      
       <div className="quiz-page-content">
         <div className="quiz-navigation">
           <button className="back-button" onClick={handleBack} title="Back to Lecture">

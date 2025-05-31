@@ -11,8 +11,8 @@
   --shadow-default: 0 8px 32px rgba(0, 0, 0, 0.1);
   --shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.15);
   --shadow-pressed: 0 4px 16px rgba(0, 0, 0, 0.12);
-  --primary-color: #007AFF;
-  --primary-color-dark: #0056b3;
+  --primary-color: #0066cc;
+  --primary-color-dark: #5ac8fa;
   --success-color: #34C759;
   --warning-color: #FF9500;
   --danger-color: #FF3B30;
@@ -31,10 +31,9 @@
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   backdrop-filter: blur(20px);
   padding-top: 84px; /* Space for floating header (60px + 24px gap) */
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
-}
+  }
 
-.dashboard-content {
+.instructor-dashboard-content {
   flex: 1;
   width: 100%;
   max-width: 1200px;
@@ -42,7 +41,7 @@
   padding: var(--spacing-xl);
 }
 
-h1 {
+.instructor-h1 {
   margin-bottom: var(--spacing-lg);
   color: var(--text-dark);
   font-weight: 700;
@@ -50,7 +49,7 @@ h1 {
   letter-spacing: -0.02em;
 }
 
-.greeting {
+.instructor-greeting {
   margin-bottom: var(--spacing-xl);
   font-size: 1.5rem;
   font-weight: 600;
@@ -64,21 +63,21 @@ h1 {
   box-shadow: var(--shadow-default);
 }
 
-.username {
+.instructor-username {
   font-weight: 700;
   color: var(--primary-color);
   text-shadow: 0 1px 2px rgba(0, 122, 255, 0.1);
 }
 
 /* Metrics Grid */
-.metrics-grid {
+.instructor-metrics-container {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
   gap: var(--spacing-lg);
   margin-bottom: 2.5rem;
 }
 
-.metric-card {
+.instructor-metric-card {
   background: var(--glass-background);
   backdrop-filter: blur(20px);
   border: 1px solid var(--glass-border);
@@ -91,7 +90,7 @@ h1 {
   overflow: hidden;
 }
 
-.metric-card::before {
+.instructor-metric-card::before {
   content: '';
   position: absolute;
   top: 0;
@@ -104,37 +103,38 @@ h1 {
   pointer-events: none;
 }
 
-.metric-card:hover {
+.instructor-metric-card:hover {
   transform: translateY(-8px) scale(1.02);
   box-shadow: var(--shadow-hover);
   border-color: rgba(0, 122, 255, 0.3);
 }
 
-.metric-card:hover::before {
+.instructor-metric-card:hover::before {
   opacity: 1;
 }
 
-.metric-card h3 {
-  font-size: 1rem;
-  color: var(--text-medium);
+.instructor-metric-card h3 {
+  font-size: 0.95rem !important;
+  color: var(--text-light) !important;
   margin-bottom: var(--spacing-sm);
-  font-weight: 600;
-  letter-spacing: -0.01em;
-  z-index: 1;
+  font-weight: 500 !important;
+  letter-spacing: 0.01em !important;
   position: relative;
+  z-index: 1;
 }
 
-.metric-value {
-  font-size: 2.25rem;
-  font-weight: 700;
-  color: var(--primary-color);
+.instructor-metric-value {
+  font-size: 2.5rem !important;
+  font-weight: 700 !important;
+  color: var(--primary-color) !important;
   margin-bottom: var(--spacing-xs);
   letter-spacing: -0.02em;
-  z-index: 1;
   position: relative;
+  z-index: 1;
+  text-shadow: 0 2px 4px rgba(0, 122, 255, 0.1);
 }
 
-.metric-trend {
+.instructor-metric-trend {
   font-size: 0.9rem;
   margin-top: var(--spacing-sm);
   font-weight: 600;
@@ -142,16 +142,16 @@ h1 {
   position: relative;
 }
 
-.metric-trend.positive {
+.instructor-metric-trend.positive {
   color: var(--success-color);
 }
 
-.metric-trend.negative {
+.instructor-metric-trend.negative {
   color: var(--danger-color);
 }
 
 /* Tabs Container */
-.tabs-container {
+.instructor-tabs-container {
   background: var(--glass-background);
   backdrop-filter: blur(20px);
   border: 1px solid var(--glass-border);
@@ -161,18 +161,18 @@ h1 {
   transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
-.tabs-container:hover {
+.instructor-tabs-container:hover {
   box-shadow: var(--shadow-hover);
 }
 
-.tabs {
+.instructor-tabs {
   display: flex;
   border-bottom: 1px solid rgba(0, 0, 0, 0.08);
   background: rgba(255, 255, 255, 0.5);
   backdrop-filter: blur(10px);
 }
 
-.tab {
+.instructor-tab {
   padding: var(--spacing-lg) var(--card-padding);
   background: none;
   border: none;
@@ -187,34 +187,93 @@ h1 {
   text-align: center;
 }
 
-.tab.active {
+.instructor-tab.active {
   color: var(--primary-color);
   background: rgba(0, 122, 255, 0.1);
   border-radius: 12px 12px 0 0;
 }
 
-.tab:hover {
+.instructor-tab:hover {
   background: rgba(0, 122, 255, 0.08);
   color: var(--primary-color);
 }
 
-.tab-content {
+.instructor-tab-content {
   padding: var(--spacing-xl);
 }
 
-/* Charts */
-.chart-container {
-  max-width: 800px;
-  margin: 0 auto;
+/* Statistics Tab */
+.instructor-statistics-tab {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  max-height: 600px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  padding: 1.5rem;
+  padding-right: calc(1.5rem + 8px);
+  margin: -1.5rem;
+  margin-right: calc(-1.5rem - 8px);
 }
 
-.chart-svg-container {
+/* Auto-hiding scrollbar for instructor statistics tab */
+.instructor-statistics-tab::-webkit-scrollbar {
+  width: 6px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.instructor-statistics-tab::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 3px;
+}
+
+.instructor-statistics-tab::-webkit-scrollbar-thumb {
+  background: rgba(0, 122, 255, 0.4);
+  border-radius: 3px;
+  transition: background 0.3s ease, opacity 0.3s ease;
+}
+
+.instructor-statistics-tab::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 122, 255, 0.6);
+}
+
+/* Show scrollbar on hover or during scroll */
+.instructor-statistics-tab:hover::-webkit-scrollbar {
+  opacity: 1;
+}
+
+.instructor-statistics-tab:hover::-webkit-scrollbar-thumb {
+  opacity: 1;
+}
+
+/* Firefox scrollbar styling for instructor statistics tab */
+.instructor-statistics-tab {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  transition: scrollbar-color 0.3s ease;
+  -webkit-overflow-scrolling: touch;
+}
+
+.instructor-statistics-tab:hover {
+  scrollbar-color: rgba(0, 122, 255, 0.4) transparent;
+}
+
+/* Charts */
+.instructor-chart-container {
+  max-width: 900px;
+  margin: 0 auto;
   width: 100%;
-  height: 300px;
+}
+
+.instructor-chart-svg-container {
+  width: 100%;
+  height: 350px;
   position: relative;
 }
 
-.statistics-chart {
+.instructor-statistics-chart {
   width: 100%;
   margin-bottom: 0;
   background: var(--glass-background);
@@ -224,6 +283,7 @@ h1 {
   padding: var(--card-padding);
   box-shadow: var(--shadow-default);
   height: 100%;
+  min-height: 400px;
   display: flex;
   flex-direction: column;
   transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -231,7 +291,7 @@ h1 {
   overflow: hidden;
 }
 
-.statistics-chart::before {
+.instructor-statistics-chart::before {
   content: '';
   position: absolute;
   top: 0;
@@ -244,17 +304,17 @@ h1 {
   pointer-events: none;
 }
 
-.statistics-chart:hover {
+.instructor-statistics-chart:hover {
   transform: translateY(-4px) scale(1.01);
   box-shadow: var(--shadow-hover);
   border-color: rgba(0, 122, 255, 0.2);
 }
 
-.statistics-chart:hover::before {
+.instructor-statistics-chart:hover::before {
   opacity: 1;
 }
 
-.statistics-chart h3 {
+.instructor-statistics-chart h3 {
   margin-bottom: var(--spacing-sm);
   font-size: 1.125rem;
   font-weight: 600;
@@ -266,7 +326,7 @@ h1 {
   position: relative;
 }
 
-.statistics-chart svg {
+.instructor-statistics-chart svg {
   flex-grow: 1;
   margin: 0 auto;
   display: block;
@@ -275,16 +335,16 @@ h1 {
 }
 
 /* Chart animation */
-.statistics-chart path {
+.instructor-statistics-chart path {
   transition: d 0.5s ease-in-out;
 }
 
-.statistics-chart circle {
+.instructor-statistics-chart circle {
   transition: cx 0.5s ease-in-out, cy 0.5s ease-in-out;
 }
 
-.statistics-chart line, 
-.statistics-chart text {
+.instructor-statistics-chart line, 
+.instructor-statistics-chart text {
   transition: x 0.5s ease-in-out, 
               y 0.5s ease-in-out, 
               x1 0.5s ease-in-out,
@@ -294,26 +354,28 @@ h1 {
 }
 
 /* Time Filter Controls */
-.time-filter-controls {
+.instructor-time-filter-controls {
   display: flex;
   align-items: center;
-  margin-bottom: var(--spacing-xl);
   gap: var(--spacing-sm);
   flex-wrap: wrap;
-  justify-content: center;
+  justify-content: flex-end;
+  min-width: 300px;
 }
 
-.time-filter-controls span {
+.instructor-time-filter-controls span {
   font-weight: 600;
   color: var(--text-dark);
   font-size: 1rem;
   letter-spacing: -0.01em;
+  margin-right: var(--spacing-xs);
+  white-space: nowrap;
 }
 
-.time-filter-btn {
+.instructor-time-filter-btn {
   background: rgba(255, 255, 255, 0.7);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(0, 0, 0, 0.1);
+  border: none;
   padding: 0.625rem 1.25rem;
   border-radius: 12px;
   font-size: 0.9rem;
@@ -325,55 +387,45 @@ h1 {
   letter-spacing: -0.01em;
 }
 
-.time-filter-btn:hover {
+.instructor-time-filter-btn:hover {
   background: rgba(255, 255, 255, 0.9);
   transform: translateY(-1px);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-  border-color: rgba(0, 0, 0, 0.15);
 }
 
-.time-filter-btn.active {
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-color-dark));
+.instructor-time-filter-btn.active {
+  background: linear-gradient(135deg, #0066cc, #5ac8fa);
   color: white;
-  border-color: transparent;
-  box-shadow: 0 4px 16px rgba(0, 122, 255, 0.3);
+  border: none;
+  box-shadow: 0 4px 16px rgba(0, 102, 204, 0.3);
   transform: translateY(-1px);
 }
 
-.time-filter-btn.active:hover {
-  box-shadow: 0 6px 20px rgba(0, 122, 255, 0.4);
+.instructor-time-filter-btn.active:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 102, 204, 0.4);
 }
 
-/* Course Management - Transparent Design Matching Courses Page */
-.courses-header {
+/* Courses Tab */
+.instructor-courses-tab {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2.5rem;
-  gap: 16px;
-  padding: 12px 20px;
-  background: transparent;
-  border: none;
-  box-shadow: none;
-  border-radius: 0;
+  flex-direction: column;
+  gap: var(--spacing-md);
+  padding: var(--spacing-lg);
 }
 
-.courses-header h2 {
-  color: var(--text-dark);
-  font-weight: 600;
-  font-size: 1.5rem;
-  margin: 0;
-  letter-spacing: -0.01em;
-}
-
-.instructor-dashboard .course-controls {
+/* Course Controls */
+.instructor-dashboard .instructor-course-controls {
   display: flex;
   gap: 12px;
   align-items: center;
   flex-shrink: 0;
+  justify-content: flex-end;
+  margin-bottom: var(--spacing-lg);
+  padding: 0 var(--spacing-sm);
 }
 
-.instructor-dashboard .course-controls select {
+.instructor-dashboard .instructor-course-controls select {
   padding: 0 40px 0 16px;
   text-align: left;
   border-radius: 12px;
@@ -396,21 +448,21 @@ h1 {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
 }
 
-.instructor-dashboard .course-controls select:hover {
+.instructor-dashboard .instructor-course-controls select:hover {
   border-color: rgba(0, 0, 0, 0.2);
   transform: translateY(-1px);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
   background: rgba(255, 255, 255, 1);
 }
 
-.instructor-dashboard .course-controls select:focus {
+.instructor-dashboard .instructor-course-controls select:focus {
   outline: none;
   border-color: var(--primary-color);
   box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.2), 0 4px 16px rgba(0, 0, 0, 0.08);
   background: rgba(255, 255, 255, 1);
 }
 
-.instructor-dashboard .sort-order-btn {
+.instructor-dashboard .instructor-sort-order-btn {
   height: 40px;
   width: 40px;
   border-radius: 12px;
@@ -427,39 +479,98 @@ h1 {
   flex-shrink: 0;
 }
 
-.instructor-dashboard .sort-order-btn:hover {
+.instructor-dashboard .instructor-sort-order-btn:hover {
   background: rgba(255, 255, 255, 1);
   border-color: rgba(0, 0, 0, 0.2);
   transform: translateY(-1px);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
 }
 
-.instructor-dashboard .sort-order-btn:focus {
+.instructor-dashboard .instructor-sort-order-btn:focus {
   outline: none;
   border-color: var(--primary-color);
   box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.2), 0 4px 16px rgba(0, 0, 0, 0.08);
 }
 
-.instructor-dashboard .sort-order-btn:hover {
+.instructor-dashboard .instructor-sort-order-btn:hover {
   background-color: #f0f2f5;
   border-color: #ddd;
 }
 
-/* Course Cards - Simplified Navigation Design */
-.courses-list {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: var(--spacing-xl);
+/* Chart data point styling */
+.instructor-data-point {
+  cursor: pointer;
+  transition: transform 0.2s ease;
 }
 
-.course-card {
-  background: var(--glass-background);
-  backdrop-filter: blur(20px);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--border-radius);
-  padding: var(--card-padding);
-  box-shadow: var(--shadow-default);
-  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+.instructor-data-point:hover {
+  transform: scale(1.2);
+}
+
+/* Instructor Course Cards - Enhanced Design with Instructor-specific Features */
+.instructor-courses-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: var(--spacing-xl);
+  max-height: 600px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+  padding: 1.5rem;
+  padding-right: calc(1.5rem + 8px);
+  margin: -1.5rem;
+  margin-right: calc(-1.5rem - 8px);
+}
+
+.instructor-courses-list::-webkit-scrollbar {
+  width: 6px;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.instructor-courses-list::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 3px;
+}
+
+.instructor-courses-list::-webkit-scrollbar-thumb {
+  background: rgba(0, 122, 255, 0.4);
+  border-radius: 3px;
+  transition: background 0.3s ease, opacity 0.3s ease;
+}
+
+.instructor-courses-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 122, 255, 0.6);
+}
+
+/* Show scrollbar on hover or during scroll */
+.instructor-courses-list:hover::-webkit-scrollbar {
+  opacity: 1;
+}
+
+.instructor-courses-list:hover::-webkit-scrollbar-thumb {
+  opacity: 1;
+}
+
+.instructor-courses-list {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  transition: scrollbar-color 0.3s ease;
+  -webkit-overflow-scrolling: touch;
+}
+
+.instructor-courses-list:hover {
+  scrollbar-color: rgba(0, 122, 255, 0.4) transparent;
+}
+
+.instructor-course-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.75));
+  backdrop-filter: blur(25px);
+  border: 2px solid rgba(0, 122, 255, 0.1);
+  border-radius: 20px;
+  padding: calc(var(--card-padding) + 0.5rem);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1), 0 2px 8px rgba(0, 0, 0, 0.05);
+  transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   display: flex;
   flex-direction: column;
   gap: var(--spacing-lg);
@@ -468,99 +579,208 @@ h1 {
   cursor: pointer;
   text-decoration: none;
   color: inherit;
+  min-height: 300px;
 }
 
-.course-card::before {
+.instructor-course-card::before {
   content: '';
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: linear-gradient(135deg, rgba(0, 122, 255, 0.02), rgba(88, 86, 214, 0.02));
+  background: linear-gradient(135deg, rgba(0, 122, 255, 0.05), rgba(88, 86, 214, 0.08));
   opacity: 0;
-  transition: opacity 0.4s ease;
+  transition: opacity 0.5s ease;
   pointer-events: none;
 }
 
-.course-card:hover {
-  transform: translateY(-8px) scale(1.02);
-  box-shadow: var(--shadow-hover);
-  border-color: rgba(0, 122, 255, 0.3);
-  text-decoration: none;
-  color: inherit;
+.instructor-course-card::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, var(--primary-color), var(--success-color), #FF9500);
+  opacity: 0;
+  transition: opacity 0.5s ease;
 }
 
-.course-card:hover::before {
+.instructor-course-card:hover {
+  transform: translateY(-10px) scale(1.025);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.15), 0 8px 24px rgba(0, 0, 0, 0.08);
+  border-color: rgba(0, 122, 255, 0.3);
+}
+
+.instructor-course-card:hover::before {
   opacity: 1;
 }
 
-.course-info h3 {
-  font-size: 1.25rem;
-  margin-bottom: var(--spacing-sm);
-  color: var(--text-dark);
-  font-weight: 600;
-  line-height: 1.3;
-  letter-spacing: -0.01em;
+.instructor-course-card:hover::after {
+  opacity: 1;
+}
+
+.instructor-course-info {
   z-index: 1;
   position: relative;
 }
 
-.course-stats {
+.instructor-course-info h3 {
+  font-size: 1.375rem;
+  margin-bottom: var(--spacing-md);
+  color: var(--text-dark);
+  font-weight: 700;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  z-index: 1;
+  position: relative;
+  text-align: left;
+}
+
+.instructor-course-meta {
   display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-lg);
+  z-index: 1;
+  position: relative;
+  text-align: left;
+}
+
+.instructor-course-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  text-align: left;
+}
+
+.instructor-course-status.published {
+  background: rgba(52, 199, 89, 0.15);
+  color: var(--success-color);
+  border: 1px solid rgba(52, 199, 89, 0.3);
+}
+
+.instructor-course-status.draft {
+  background: rgba(255, 149, 0, 0.15);
+  color: var(--warning-color);
+  border: 1px solid rgba(255, 149, 0, 0.3);
+}
+
+.instructor-course-status.private {
+  background: rgba(174, 174, 178, 0.15);
+  color: var(--text-light);
+  border: 1px solid rgba(174, 174, 178, 0.3);
+}
+
+.instructor-course-stats {
+  display: flex;
+  flex-wrap: wrap;
   gap: var(--spacing-lg);
   color: var(--text-medium);
   font-size: 0.9rem;
   font-weight: 500;
   z-index: 1;
   position: relative;
+  margin-bottom: var(--spacing-lg);
 }
 
-.progress-info {
+.instructor-stat-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.5rem 0.75rem;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 12px;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  text-align: left;
+}
+
+.instructor-stat-icon {
+  color: var(--primary-color);
+  font-size: 1rem;
+}
+
+.instructor-progress-info {
   margin-top: auto;
   z-index: 1;
   position: relative;
+  text-align: left;
 }
 
-.progress-info p {
+.instructor-progress-info p {
   color: var(--text-medium);
   font-size: 0.9rem;
-  font-weight: 500;
+  font-weight: 600;
   margin-bottom: var(--spacing-sm);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  text-align: left;
 }
 
-.progress-container {
+.instructor-progress-percentage {
+  display: none; /* Hide percentage text from progress bars */
+  color: var(--primary-color);
+  font-weight: 700;
+}
+
+.instructor-progress-container {
   width: 100%;
-  height: 8px;
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 12px;
+  height: 10px;
+  background: rgba(0, 0, 0, 0.08);
+  border-radius: 15px;
   overflow: hidden;
   backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
 }
 
-.progress-bar {
+.instructor-progress-bar {
   height: 100%;
-  background: linear-gradient(135deg, var(--success-color), #28a745);
-  border-radius: 12px;
+  background: linear-gradient(135deg, var(--success-color), #28a745, var(--primary-color));
+  border-radius: 15px;
   position: relative;
-  transition: width 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  box-shadow: 0 2px 8px rgba(52, 199, 89, 0.3);
-  min-width: 20px;
+  transition: width 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  box-shadow: 0 3px 12px rgba(52, 199, 89, 0.4);
+  min-width: 25px;
 }
 
-.progress-text {
+.instructor-progress-bar::after {
+  content: '';
   position: absolute;
-  right: 5px;
-  color: transparent;
-  font-size: 0.7rem;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+  animation: progressShimmer 2s infinite;
+}
+
+@keyframes progressShimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.instructor-progress-text {
+  position: absolute;
+  right: 8px;
+  color: white;
+  font-size: 0.75rem;
   font-weight: bold;
   display: flex;
   align-items: center;
   height: 100%;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 /* Remove separate course actions - the whole card is now clickable */
-.course-actions {
+.instructor-course-actions {
   display: none;
 }
 
@@ -569,7 +789,7 @@ h1 {
 }
 
 /* Loading and Error States */
-.loading, .error-message {
+.instructor-loading, .instructor-error-message {
   text-align: center;
   padding: var(--spacing-xl);
   color: var(--text-medium);
@@ -581,25 +801,25 @@ h1 {
   font-weight: 500;
 }
 
-.error-message button {
+.instructor-error-message button {
   margin-top: var(--spacing-lg);
   padding: 0.75rem 1.5rem;
-  background: linear-gradient(135deg, var(--primary-color), var(--primary-color-dark));
+  background: linear-gradient(135deg, #0066cc, #5ac8fa);
   color: white;
   border: none;
   border-radius: 12px;
   cursor: pointer;
   font-weight: 600;
   transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
-  box-shadow: 0 4px 16px rgba(0, 122, 255, 0.3);
+  box-shadow: 0 4px 16px rgba(0, 102, 204, 0.3);
 }
 
-.error-message button:hover {
+.instructor-error-message button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 122, 255, 0.4);
+  box-shadow: 0 8px 24px rgba(0, 102, 204, 0.4);
 }
 
-.no-data-message {
+.instructor-no-data-message {
   text-align: center;
   padding: 3rem var(--spacing-lg);
   color: var(--text-medium);
@@ -617,144 +837,610 @@ h1 {
   font-weight: 500;
 }
 
+/* Statistics Controls */
+.instructor-statistics-controls {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+  margin-bottom: var(--spacing-xl);
+}
+
+.instructor-statistics-controls .instructor-filters-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--spacing-lg);
+  width: 100%;
+  margin-bottom: var(--spacing-md);
+}
+
+.instructor-course-filter-controls {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  flex: 1;
+  min-width: 200px;
+  max-width: 400px;
+}
+
+.instructor-course-filter-controls span {
+  font-weight: 600;
+  color: var(--text-dark);
+  font-size: 1rem;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.instructor-course-select {
+  flex: 1;
+  min-width: 200px;
+  max-width: 320px;
+  height: 40px;
+  padding: 0.4rem 3rem 0.5rem 1rem;
+  border-radius: 16px;
+  border: 2px solid rgba(0, 0, 0, 0.08);
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(10px);
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--text-dark);
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='20' height='20' fill='%231d1d1f'%3E%3Cpath d='M4.646 6.146a.5.5 0 01.708 0L8 8.793l2.646-2.647a.5.5 0 01.708.708l-3 3a.5.5 0 01-.708 0l-3-3a.5.5 0 010-.708z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 20px 20px;
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.04),
+    0 1px 4px rgba(0, 0, 0, 0.02);
+  outline: none;
+}
+
+.instructor-course-select:hover {
+  background-color: rgba(255, 255, 255, 1);
+  border-color: var(--primary-color);
+  transform: translateY(-2px);
+  box-shadow: 
+    0 4px 16px rgba(0, 122, 255, 0.12),
+    0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.instructor-course-select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 
+    0 0 0 4px rgba(0, 122, 255, 0.2),
+    0 4px 16px rgba(0, 122, 255, 0.12),
+    0 2px 8px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.instructor-course-select option {
+  padding: 0.75rem;
+  background: white;
+  color: var(--text-dark);
+  font-size: 1rem;
+}
+
 /* Responsive Design */
 @media (max-width: 992px) {
-  .metrics-grid {
+  .instructor-metrics-container {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .chart-container {
+  .instructor-chart-container {
     width: 100%;
   }
 }
 
 @media (max-width: 768px) {
-  .metrics-grid {
+  .instructor-metrics-container {
     grid-template-columns: repeat(2, 1fr);
   }
 
-  .courses-header {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 1rem;
-    padding: 8px 12px;
-  }
-
-  .courses-header h2 {
-    font-size: 1.25rem;
-    text-align: center;
-  }
-
-  .instructor-dashboard .course-controls {
+  .instructor-dashboard .instructor-course-controls {
     width: 100%;
     gap: 8px;
+    justify-content: center;
+    padding: 0;
+    margin-bottom: var(--spacing-md);
   }
 
-  .instructor-dashboard .course-controls select {
+  .instructor-dashboard .instructor-course-controls select {
     flex: 1;
     height: 36px;
     font-size: 14px;
     min-width: 120px;
   }
 
-  .instructor-dashboard .sort-order-btn {
+  .instructor-dashboard .instructor-sort-order-btn {
     height: 36px;
     width: 36px;
   }
 
-  .courses-list {
+  .instructor-courses-list {
     grid-template-columns: 1fr;
   }
 
-  .time-filter-controls {
+  .instructor-time-filter-controls {
     flex-direction: column;
+    align-items: stretch;
+    width: 100%;
   }
 
-  .time-filter-btn {
+  .instructor-time-filter-btn {
     width: 100%;
   }
 
   /* Mobile chart optimizations */
-  .chart-container {
+  .instructor-chart-container {
     width: 100%;
     padding: 0 var(--spacing-sm);
   }
 
-  .chart-svg-container {
+  .instructor-chart-svg-container {
     height: 280px;
   }
 
-  .statistics-chart {
+  .instructor-statistics-chart {
     padding: var(--spacing-lg);
     min-height: 320px;
   }
 
-  .statistics-chart h3 {
+  .instructor-statistics-chart h3 {
     font-size: 1rem;
     margin-bottom: var(--spacing-md);
   }
 }
 
 @media (max-width: 480px) {
-  .metrics-grid {
+  .instructor-metrics-container {
     grid-template-columns: 1fr;
   }
 
-  .dashboard-content {
+  .instructor-dashboard-content {
     padding: var(--spacing-xl) var(--spacing-lg);
   }
 
-  .tab {
+  .instructor-tab {
     padding: var(--spacing-sm) var(--spacing-lg);
     font-size: 0.9rem;
   }
 
-  .courses-header {
-    gap: 6px;
-    padding: 6px 8px;
-  }
-
-  .courses-header h2 {
-    font-size: 1.125rem;
-  }
-
-  .instructor-dashboard .course-controls {
+  .instructor-dashboard .instructor-course-controls {
     gap: 6px;
   }
 
-  .instructor-dashboard .course-controls select {
+  .instructor-dashboard .instructor-course-controls select {
     height: 32px;
     font-size: 13px;
     padding: 0 32px 0 12px;
     min-width: 100px;
   }
 
-  .instructor-dashboard .sort-order-btn {
+  .instructor-dashboard .instructor-sort-order-btn {
     height: 32px;
     width: 32px;
   }
 
   /* Ultra-compact mobile chart optimizations */
-  .chart-container {
+  .instructor-chart-container {
     padding: 0;
   }
 
-  .chart-svg-container {
+  .instructor-chart-svg-container {
     height: 250px;
   }
 
-  .statistics-chart {
+  .instructor-statistics-chart {
     padding: var(--spacing-md);
     min-height: 290px;
     margin: 0 var(--spacing-xs);
   }
 
-  .statistics-chart h3 {
+  .instructor-statistics-chart h3 {
     font-size: 0.9rem;
     margin-bottom: var(--spacing-sm);
   }
 
-  .tab-content {
+  .instructor-tab-content {
     padding: var(--spacing-lg);
+  }
+}
+
+/* Course Filter Responsive Styles */
+@media (max-width: 768px) {
+  .instructor-statistics-controls {
+    gap: var(--spacing-md);
+  }
+  
+  .instructor-statistics-controls .instructor-filters-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .instructor-course-filter-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-sm);
+    max-width: 100%;
+    min-width: auto;
+  }
+  
+  .instructor-course-filter-controls span {
+    align-self: flex-start;
+    margin-bottom: 0;
+  }
+  
+  .instructor-course-select {
+    width: 100%;
+    min-width: auto;
+    max-width: 100%;
+    height: 38px;
+    font-size: 0.9rem;
+    padding: 0.625rem 2.5rem 0.625rem 0.875rem;
+    background-size: 18px 18px;
+    background-position: right 0.875rem center;
+  }
+
+  .instructor-time-filter-controls {
+    justify-content: flex-start;
+    width: 100%;
+    min-width: auto;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+  }
+
+  .instructor-time-filter-controls span {
+    width: 100%;
+    margin-bottom: var(--spacing-xs);
+  }
+}
+
+@media (max-width: 640px) {
+  .instructor-course-filter-controls {
+    gap: var(--spacing-xs);
+  }
+  
+  .instructor-course-filter-controls span {
+    font-size: 0.9rem;
+  }
+  
+  .instructor-course-select {
+    height: 36px;
+    font-size: 0.85rem;
+    padding: 0.5rem 2.25rem 0.5rem 0.75rem;
+    background-size: 16px 16px;
+    background-position: right 0.75rem center;
+  }
+}
+
+/* Course Analytics Styles */
+.instructor-analytics-loading {
+  text-align: center;
+  padding: var(--spacing-md);
+  color: var(--text-medium);
+  font-style: italic;
+}
+
+.instructor-course-analytics {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xl);
+}
+
+.instructor-analytics-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-lg);
+}
+
+.instructor-analytics-chart {
+  background: var(--glass-background);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-lg);
+  backdrop-filter: blur(20px);
+  box-shadow: var(--shadow-default);
+}
+
+.instructor-course-details {
+  background: var(--glass-background);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--border-radius);
+  padding: var(--spacing-xl);
+  backdrop-filter: blur(20px);
+  box-shadow: var(--shadow-default);
+}
+
+.instructor-course-details h3 {
+  margin-bottom: var(--spacing-lg);
+  color: var(--text-dark);
+  font-weight: 600;
+  font-size: 1.25rem;
+}
+
+.instructor-analytics-metrics {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-md);
+  margin-bottom: var(--spacing-xl);
+}
+
+.instructor-analytics-metric {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md);
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: var(--border-radius);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.instructor-metric-label {
+  color: var(--text-medium);
+  font-weight: 500;
+}
+
+.instructor-metric-value {
+  color: var(--text-dark);
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+.instructor-progress-distribution {
+  margin-bottom: var(--spacing-xl);
+}
+
+.instructor-progress-distribution h4 {
+  margin-bottom: var(--spacing-md);
+  color: var(--text-dark);
+  font-weight: 600;
+}
+
+.instructor-progress-bars {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.instructor-progress-item {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.instructor-progress-label {
+  min-width: 100px;
+  color: var(--text-medium);
+  font-weight: 500;
+  font-size: 0.9rem;
+}
+
+.instructor-progress-bar-container {
+  flex: 1;
+  position: relative;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+.instructor-progress-bar-fill {
+  height: 100%;
+  border-radius: 12px;
+  transition: width 0.3s ease;
+  position: relative;
+}
+
+.instructor-progress-count {
+  position: absolute;
+  right: var(--spacing-sm);
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-dark);
+  font-weight: 600;
+  font-size: 0.8rem;
+}
+
+/* Desktop visibility rules for progress counts */
+.instructor-progress-count.desktop-only {
+  display: block;
+}
+
+.instructor-progress-count.mobile-only {
+  display: none;
+}
+
+.instructor-lecture-analytics {
+  margin-top: var(--spacing-xl);
+}
+
+.instructor-lecture-analytics h4 {
+  margin-bottom: var(--spacing-md);
+  color: var(--text-dark);
+  font-weight: 600;
+}
+
+.instructor-lecture-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.instructor-lecture-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--spacing-md);
+  background: rgba(255, 255, 255, 0.6);
+  border-radius: var(--border-radius);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  transition: all 0.2s ease;
+}
+
+.instructor-lecture-item:hover {
+  background: rgba(255, 255, 255, 0.8);
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-hover);
+}
+
+.instructor-lecture-info h5 {
+  margin-bottom: var(--spacing-xs);
+  color: var(--text-dark);
+  font-weight: 600;
+  text-align: left;
+}
+
+.instructor-lecture-stats {
+  display: flex;
+  gap: var(--spacing-md);
+}
+
+.instructor-lecture-stats span {
+  color: var(--text-medium);
+  font-size: 0.9rem;
+}
+
+.instructor-lecture-progress {
+  width: 120px;
+}
+
+/* Responsive Design for Course Analytics */
+@media (min-width: 768px) {
+  .instructor-analytics-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .instructor-analytics-metrics {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .instructor-analytics-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .instructor-lecture-item {
+    flex-direction: row;
+  }
+
+  .instructor-lecture-stats {
+    gap: var(--spacing-lg);
+  }
+}
+
+@media (max-width: 640px) {
+  .instructor-analytics-metrics {
+    grid-template-columns: 1fr;
+  }
+
+  /* Mobile Progress Distribution - Horizontal bars with count numbers only */
+  .instructor-progress-bars {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    padding: var(--spacing-md);
+    background: rgba(255, 255, 255, 0.4);
+    border-radius: var(--border-radius);
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    width: 100%;
+  }
+
+  .instructor-progress-item {
+    display: flex !important;
+    flex-direction: row !important;
+    align-items: center;
+    justify-content: space-between; /* Space between label and count */
+    gap: var(--spacing-md);
+    width: 100%;
+    min-height: 40px; /* Ensure consistent height */
+    background: rgba(255, 255, 255, 0.2); /* Debug background */
+    padding: var(--spacing-xs);
+    border-radius: 4px;
+  }
+
+  .instructor-progress-label {
+    min-width: 80px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    color: var(--text-medium);
+    text-align: left;
+    flex-shrink: 0; /* Prevent label from shrinking */
+  }
+
+  .instructor-progress-bar-container {
+    display: none !important; /* Hide the progress bar container on mobile */
+  }
+
+  .instructor-progress-bar-fill {
+    display: none !important; /* Hide the actual progress bar fill on mobile */
+  }
+
+  .instructor-progress-count.desktop-only {
+    display: none !important; /* Hide desktop count on mobile */
+  }
+
+  .instructor-progress-count.mobile-only {
+    display: flex !important; /* Ensure it's visible on mobile */
+    position: static;
+    transform: none;
+    color: white;
+    font-weight: 700;
+    font-size: 1rem;
+    background: var(--primary-color);
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--border-radius);
+    border: 2px solid var(--primary-color);
+    min-width: 45px;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0; /* Prevent count from shrinking */
+    box-shadow: 0 2px 8px rgba(0, 122, 255, 0.3);
+  }
+
+  /* 2-Row Layout for Lecture Items on Mobile */
+  .instructor-lecture-item {
+    flex-direction: column;
+    align-items: stretch;
+    gap: var(--spacing-xs);
+    padding: var(--spacing-md);
+  }
+
+  .instructor-lecture-info {
+    width: 100%;
+  }
+
+  .instructor-lecture-info h5 {
+    margin-bottom: var(--spacing-xs);
+    font-size: 1rem;
+    line-height: 1.3;
+  }
+
+  .instructor-lecture-stats {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--spacing-sm);
+    width: 100%;
+    flex-wrap: wrap;
+  }
+
+  .instructor-lecture-stats span {
+    font-size: 0.8rem;
+    white-space: nowrap;
+  }
+
+  .instructor-lecture-progress {
+    width: 100%;
+    margin-top: var(--spacing-xs);
   }
 }

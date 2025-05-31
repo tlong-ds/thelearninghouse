@@ -30,12 +30,12 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 a {
-  color: #007AFF;
+  color: #0066cc;
   text-decoration: none;
 }
 
 a:hover {
-  text-decoration: underline;
+  text-decoration: none;
 }
 
 button {
@@ -79,20 +79,23 @@ button {
 }
 
 .primary-btn {
-  background-color: #007AFF;
+  background: linear-gradient(135deg, #0066cc, #5ac8fa);
   color: white;
-  border: 1px solid #007AFF;
+  border: none;
+  box-shadow: 0 4px 16px rgba(0, 102, 204, 0.3);
+  transition: all 0.3s ease;
 }
 
 .primary-btn:hover {
-  background-color: #007AFF;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0, 102, 204, 0.4);
   text-decoration: none;
 }
 
 .secondary-btn {
   background-color: transparent;
-  color: #007AFF;
-  border: 1px solid #007AFF;
+  color: #0066cc;
+  border: 1px solid #0066cc;
 }
 
 .secondary-btn:hover {

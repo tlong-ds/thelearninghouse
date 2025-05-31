@@ -2,7 +2,6 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createCourse } from '../services/api';
 import { useAuth } from '../services/AuthContext';
-import Header from '../components/Header';
 import '../styles/AddCourse.css';
 
 // Skills data from skills.csv
@@ -94,7 +93,7 @@ const AddCourse = () => {
   // Check if user is an instructor after all hooks are defined
   useEffect(() => {
     if (currentUser && currentUser.role !== 'Instructor') {
-      navigate('/courses');
+      navigate('/');
     }
   }, [currentUser, navigate]);
   
@@ -160,8 +159,6 @@ const AddCourse = () => {
     <div className="add-course-container">
       {currentUser && (
         <>
-          <Header username={currentUser.username} role={currentUser.role} onLogout={handleLogout} />
-          
           <div className="add-course-content">
             <h1>Create New Course</h1>
             
@@ -285,7 +282,7 @@ const AddCourse = () => {
                   <button 
                     type="button" 
                     className="btn secondary-btn"
-                    onClick={() => navigate('/courses')}
+                    onClick={() => navigate('/')}
                   >
                     Cancel
                   </button>
