@@ -70,18 +70,19 @@ const AppContent = () => {
       {/* Static Header */}
       <ConditionalHeader />
 
+      {/* Global Loading Screen using React Portal - renders outside normal DOM tree */}
+      {loading && (
+        <Loading 
+          fullscreen 
+          message={loadingMessage}
+          showProgress={showProgress}
+          progress={progress}
+        />
+      )}
+
       <div className="app-layout">
         {/* Main Content Area */}
         <main className="main-content">
-          {loading && (
-            <Loading 
-              fullscreen 
-              message={loadingMessage}
-              showProgress={showProgress}
-              progress={progress}
-            />
-          )}
-          
           <div className="App">
             <Routes>
               <Route path="/login" element={<Login />} />

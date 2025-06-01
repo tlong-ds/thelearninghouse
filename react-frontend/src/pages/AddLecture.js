@@ -255,20 +255,12 @@ const AddLecture = () => {
     }
   };
 
-  if (!course) {
-    return (
-      <div className="add-lecture-container">
-        <div className="loading">Loading course details...</div>
-      </div>
-    );
-  }
-
   return (
     <div className="add-lecture-container">
       <div className="add-lecture-content">
         <div className="add-lecture-header">
           <h1>Add New Lecture</h1>
-          <p className="course-name">Course: {course.name}</p>
+          {course && <p className="course-name">Course: {course.name}</p>}
         </div>
 
         {error && <div className="error-message">{error}</div>}
