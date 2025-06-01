@@ -172,15 +172,19 @@ async def login(response: Response, payload: LoginPayload):
         print(f"Authentication successful for: {payload.username} (ID: {user_id}, Name: {full_name})")
         
         token = create_token(user_data)
-        # Set cookie with less restrictive settings for cross-origin
+        # Set cookie with settings that work for both Chrome and Safari
+        # For localhost development, we need different settings than production
+        is_localhost = os.getenv("ENVIRONMENT", "development") == "development"
+        
         response.set_cookie(
             key="auth_token",
             value=token,
-            httponly=False,
-            samesite="None",  # Allow cross-site cookie
-            secure=True,
+            httponly=False,  # Allow JavaScript access for localStorage fallback
+            samesite="Lax" if is_localhost else "None",  # Lax for localhost, None for cross-origin
+            secure=False if is_localhost else True,  # False for HTTP localhost, True for HTTPS production
             path="/",
-            max_age=604800
+            max_age=604800,  # 7 days
+            domain=None  # Let browser set the domain automatically
         )
         return {
             "message": f"Login successful for {user_data['username']}", 
