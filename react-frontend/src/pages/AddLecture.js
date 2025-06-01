@@ -25,7 +25,6 @@ const AddLecture = () => {
     }
   });
   const [videoPreview, setVideoPreview] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(0);
   
   // Progress tracking states
   const [processStage, setProcessStage] = useState('');
@@ -221,7 +220,6 @@ const AddLecture = () => {
         for (let i = 10; i <= 100; i += 10) {
           await new Promise(resolve => setTimeout(resolve, 200));
           updateStageProgress('videoUpload', 'processing', i);
-          setUploadProgress(i);
           updateProgress(70 + (i * 0.25)); // Progress from 70% to 95%
         }
         updateStageProgress('videoUpload', 'completed', 100);
