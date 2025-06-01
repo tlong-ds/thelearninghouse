@@ -12,9 +12,16 @@
   left: 0;
   right: 0;
   bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.8);
   backdrop-filter: blur(20px) saturate(180%);
   z-index: 999998; /* Lower than header z-index */
   animation: loadingFadeIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  /* Ensure it covers the entire viewport regardless of scroll */
+  overflow: hidden;
+  /* Disable pointer events on the page behind */
+  pointer-events: auto;
 }
 
 .loading-content {
@@ -22,6 +29,7 @@
   flex-direction: column;
   align-items: center;
   gap: 2rem;
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
   padding: 3rem 2.5rem;
   border-radius: 24px;
@@ -35,6 +43,8 @@
   position: relative;
   overflow: hidden;
   animation: loadingContentFloat 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) 0.2s both;
+  /* Ensure content is always visible and centered */
+  margin: auto;
 }
 
 .loading-spinner {
@@ -129,6 +139,30 @@
     opacity: 1;
     backdrop-filter: blur(20px) saturate(180%);
   }
+}
+
+/* Ensure loading screen always covers viewport */
+body.loading-active {
+  overflow: hidden !important;
+  position: fixed !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+html.loading-active {
+  overflow: hidden !important;
+}
+
+/* Ensure loading container is always on top except for header */
+.loading-container.fullscreen::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: inherit;
+  z-index: -1;
 }
 
 @keyframes loadingContentFloat {
