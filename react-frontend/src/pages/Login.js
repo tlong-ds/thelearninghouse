@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../services/AuthContext';
 import { images } from '../utils/images';
@@ -17,9 +17,39 @@ const Login = () => {
   const [expertise, setExpertise] = useState('');
   const [role, setRole] = useState('Learner');
   const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   
   const { login, register } = useAuth();
   const navigate = useNavigate();
+  
+  // Handle body scroll lock when loading
+  useEffect(() => {
+    if (isLoading) {
+      // Add loading classes to prevent scrolling
+      document.body.classList.add('loading-active');
+      document.documentElement.classList.add('loading-active');
+    } else {
+      // Remove loading classes to restore scrolling
+      document.body.classList.remove('loading-active');
+      document.documentElement.classList.remove('loading-active');
+    }
+    
+    // Cleanup function to remove classes when component unmounts
+    return () => {
+      document.body.classList.remove('loading-active');
+      document.documentElement.classList.remove('loading-active');
+    };
+  }, [isLoading]);
+  
+  // Add no-scroll class to body when component mounts
+  useEffect(() => {
+    document.body.classList.add('no-scroll');
+    
+    // Remove the class when component unmounts
+    return () => {
+      document.body.classList.remove('no-scroll');
+    };
+  }, []);
   
   const validateEmail = (email) => {
     return /^[\w.-]+@[\w.-]+\.\w+$/.test(email);
@@ -28,13 +58,18 @@ const Login = () => {
   const handleLogin = async (e) => {
     e.preventDefault();
     setError('');
+    setIsLoading(true);
     
     if (!username || !password) {
       setError('Please fill in both fields.');
+      setIsLoading(false);
       return;
     }
     
     try {
+      // Show loading for 1 second before actual login
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
       const success = await login(username, password, role);
       
       if (success) {
@@ -44,45 +79,56 @@ const Login = () => {
         }, 1000);
       } else {
         setError('Login failed. Please check your credentials.');
+        setIsLoading(false);
       }
     } catch (err) {
       console.error('Login error:', err);
       setError('Login failed. Please try again.');
+      setIsLoading(false);
     }
   };
   
   const handleRegister = async (e) => {
     e.preventDefault();
     setError('');
+    setIsLoading(true);
     
     // Validation
     if (!fullName || !username || !email || !password || !confirmPassword ||
         (role === 'Learner' && !phone) || (role === 'Instructor' && !expertise)) {
       setError('Please fill in all required fields.');
+      setIsLoading(false);
       return;
     }
     
     if (password.length < 8) {
       setError('Password must be at least 8 characters long.');
+      setIsLoading(false);
       return;
     }
     
     if (!validateEmail(email)) {
       setError('Please enter a valid email address (e.g., example@gmail.com).');
+      setIsLoading(false);
       return;
     }
     
     if (password !== confirmPassword) {
       setError('Passwords do not match.');
+      setIsLoading(false);
       return;
     }
     
     if (role === 'Learner' && phone.length < 9) {
       setError('Invalid phone number.');
+      setIsLoading(false);
       return;
     }
     
     try {
+      // Show loading for 1-2 seconds before actual registration
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
       // Prepare user data
       const userData = {
         username,
@@ -112,10 +158,12 @@ const Login = () => {
           }, 1000); // 1 second delay
         } else {
           setError('Registration successful but login failed. Please try logging in manually.');
+          setIsLoading(false);
         }
       }
     } catch (error) {
       setError(error.message || 'Registration failed. Please try again later.');
+      setIsLoading(false);
     }
   };
   
@@ -138,6 +186,16 @@ const Login = () => {
 
       {/* Login Card */}
       <div className="login-card">
+        {/* Cancel Button - Moved outside the columns for better mobile positioning */}
+        <button 
+          type="button" 
+          className="login-cancel-btn"
+          onClick={() => navigate('/')}
+          aria-label="Go to Home"
+        >
+          <i className="fas fa-times"></i>
+        </button>
+        
         {/* Left Column - Dummy Image */}
         <div className="login-card-left">
           <div className="login-image-container">
@@ -157,15 +215,6 @@ const Login = () => {
 
         {/* Right Column - Login Form */}
         <div className="login-card-right">
-          {/* Cancel Button */}
-          <button 
-            type="button" 
-            className="login-cancel-btn"
-            onClick={() => navigate('/')}
-            aria-label="Go to Home"
-          >
-            <i className="fas fa-times"></i>
-          </button>
           
           <div className="login-form-wrapper">
             {/* Header */}
@@ -249,9 +298,18 @@ const Login = () => {
                 
                 {error && <div className="error-message">{error}</div>}
                 
-                <button type="submit" className="login-submit-btn">
-                  <span>Sign In</span>
-                  <i className="fas fa-arrow-right"></i>
+                <button type="submit" className="login-submit-btn" disabled={isLoading}>
+                  {isLoading ? (
+                    <>
+                      <i className="fas fa-spinner fa-spin"></i>
+                      <span>Signing In...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Sign In</span>
+                      <i className="fas fa-arrow-right"></i>
+                    </>
+                  )}
                 </button>
                 
                 <div className="login-copyright">
@@ -344,9 +402,18 @@ const Login = () => {
                 
                 {error && <div className="error-message">{error}</div>}
                 
-                <button type="submit" className="login-submit-btn">
-                  <span>Create Account</span>
-                  <i className="fas fa-arrow-right"></i>
+                <button type="submit" className="login-submit-btn" disabled={isLoading}>
+                  {isLoading ? (
+                    <>
+                      <i className="fas fa-spinner fa-spin"></i>
+                      <span>Creating Account...</span>
+                    </>
+                  ) : (
+                    <>
+                      <span>Create Account</span>
+                      <i className="fas fa-arrow-right"></i>
+                    </>
+                  )}
                 </button>
                 
                 <div className="login-copyright">
@@ -357,6 +424,20 @@ const Login = () => {
           </div>
         </div>
       </div>
+
+      {/* Loading Overlay */}
+      {isLoading && (
+        <div className="loading-overlay">
+          <div className="loading-content">
+            <div className="loading-spinner">
+              <i className="fas fa-spinner fa-spin"></i>
+            </div>
+            <div className="loading-text">
+              {isLogin ? 'Signing you in...' : 'Creating your account...'}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

@@ -378,7 +378,71 @@
 
 /* Loading component should be below header */
 .loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(20px) saturate(180%);
   z-index: 998000 !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: loadingFadeIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.loading-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  padding: 2.5rem 2rem;
+  border-radius: 20px;
+  border: 1px solid rgba(59, 130, 246, 0.2);
+  box-shadow: 
+    0 32px 64px rgba(0, 0, 0, 0.08),
+    0 16px 32px rgba(0, 0, 0, 0.04),
+    inset 0 1px 0 rgba(59, 130, 246, 0.3);
+  max-width: 320px;
+  text-align: center;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid rgba(59, 130, 246, 0.2);
+  border-top: 3px solid #3b82f6;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.loading-content p {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 500;
+  color: #374151;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+@keyframes loadingFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
 /* Mobile responsive design */

@@ -207,21 +207,26 @@ const Home = () => {
                     
                     <div className="macos-cta-container">
                         {currentUser ? (
-                            <>
-                                <Link to="/courses" className="macos-cta-primary">
-                                    Explore Courses
-                                </Link>
-                                <Link to="/edumate" className="macos-cta-secondary">
-                                    Try Edumate AI
-                                </Link>
-                            </>
+                            currentUser.role === 'Instructor' ? (
+                                <>
+                                    <Link to="/courses" className="macos-cta-primary">
+                                        Manage Courses
+                                    </Link>
+                                </>
+                            ) : (
+                                <>
+                                    <Link to="/courses" className="macos-cta-primary">
+                                        Explore Courses
+                                    </Link>
+                                    <Link to="/edumate" className="macos-cta-secondary">
+                                        Try Edumate AI
+                                    </Link>
+                                </>
+                            )
                         ) : (
                             <>
                                 <Link to="/login" className="macos-cta-primary">
-                                    Explore Courses
-                                </Link>
-                                <Link to="/login" className="macos-cta-secondary">
-                                    Try Edumate AI
+                                    Join Us Now!
                                 </Link>
                             </>
                         )}
