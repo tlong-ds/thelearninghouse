@@ -342,7 +342,7 @@ const Dashboard = () => {
           
           <div className="dashboard-tab-content">
             {activeTab === 'statistics' && (
-              <div className="dashboard-statistics-tab scrollbar-hidden">
+              <div className="dashboard-statistics-tab scrollbar-responsive">
                 {(dashboardData.statistics.lecturesPassed.length === 0 && dashboardData.statistics.averageScores.length === 0) ? (
                   <div className="dashboard-no-data-message">
                     <p>You haven't passed any lecture quizzes yet. Complete quizzes to see your statistics.</p>

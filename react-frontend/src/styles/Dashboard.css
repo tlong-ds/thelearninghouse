@@ -202,6 +202,106 @@
   align-items: center;
   width: 100%;            /* ensure full-width */
   box-sizing: border-box; /* include padding in width */
+  /* Ensure content can expand beyond container */
+  min-height: fit-content;
+  height: auto;
+}
+
+/* Mobile-specific scrolling for statistics tab */
+@media (max-width: 768px) {
+  .dashboard-statistics-tab {
+    max-height: calc(100vh - 200px) !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    scroll-behavior: smooth !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding: var(--spacing-md) !important;
+    margin: 0 !important;
+    border-radius: var(--border-radius) !important;
+    background: rgba(255, 255, 255, 0.05) !important;
+    backdrop-filter: blur(10px) !important;
+  }
+
+  /* Ensure scrollbar is visible on mobile for statistics tab */
+  .dashboard-statistics-tab.scrollbar-hidden {
+    scrollbar-width: thin !important;
+    scrollbar-color: rgba(0, 122, 255, 0.3) transparent !important;
+  }
+
+  .dashboard-statistics-tab.scrollbar-hidden::-webkit-scrollbar {
+    width: 6px !important;
+    height: 6px !important;
+  }
+
+  .dashboard-statistics-tab.scrollbar-hidden::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-radius: 3px !important;
+  }
+
+  .dashboard-statistics-tab.scrollbar-hidden::-webkit-scrollbar-thumb {
+    background: rgba(0, 122, 255, 0.4) !important;
+    border-radius: 3px !important;
+    transition: background 0.3s ease !important;
+  }
+
+  .dashboard-statistics-tab.scrollbar-hidden::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 122, 255, 0.6) !important;
+  }
+
+  /* Ensure all chart containers are properly sized for scrolling */
+  .dashboard-statistics-chart {
+    min-height: 350px !important;
+    max-height: none !important;
+    margin-bottom: var(--spacing-lg) !important;
+    flex-shrink: 0 !important;
+  }
+
+
+
+  /* Ensure chart containers don't interfere with scrolling */
+  .dashboard-chart-container {
+    width: 100% !important;
+    overflow: visible !important;
+    padding: 0 !important;
+  }
+
+  .dashboard-chart-svg-container {
+    height: 320px !important;
+    width: 100% !important;
+    overflow: visible !important;
+  }
+}
+
+/* Additional mobile optimizations for very small screens */
+@media (max-width: 480px) {
+  .dashboard-statistics-tab {
+    max-height: calc(100vh - 180px) !important;
+    padding: var(--spacing-sm) !important;
+  }
+
+  .dashboard-statistics-chart {
+    min-height: 300px !important;
+    padding: var(--spacing-md) !important;
+  }
+
+  .dashboard-chart-svg-container {
+    height: 280px !important;
+  }
+
+
+
+
+}
+
+/* Ensure proper spacing between charts in statistics tab */
+@media (max-width: 768px) {
+  .dashboard-statistics-tab > * {
+    margin-bottom: var(--spacing-lg) !important;
+  }
+
+  .dashboard-statistics-tab > *:last-child {
+    margin-bottom: var(--spacing-md) !important;
+  }
 }
 
 .dashboard-charts-container {
@@ -671,6 +771,11 @@
     max-width: 550px;
     margin: 0 auto;
     width: 100%;
+    /* Ensure charts don't interfere with scrolling */
+    position: relative;
+    height: auto;
+    min-height: fit-content;
+    flex-shrink: 0; /* Prevent charts from shrinking and hiding content */
   }
 
   .dashboard-chart-svg-container {
@@ -702,10 +807,17 @@
 
   .dashboard-time-filter-controls {
     flex-direction: column;
+    margin-bottom: var(--spacing-md);
   }
 
   .dashboard-time-filter-btn {
     width: 100%;
+  }
+
+  /* Ensure charts container is properly sized for mobile scrolling */
+  .dashboard-charts-container {
+    margin-bottom: var(--spacing-xl);
+    min-height: auto;
   }
 
   .dashboard-container .dashboard-course-controls {
@@ -749,6 +861,29 @@
     padding: 1.5rem 1rem;
   }
 
+  /* Enhanced mobile scrolling for very small screens */
+  .dashboard-statistics-tab {
+    max-height: 65vh !important; /* Slightly smaller for tiny screens */
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding: 0.75rem !important;
+    /* Ensure scrolling works on tiny screens */
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: contain !important;
+    touch-action: pan-y !important; /* Allow vertical scrolling touch gestures */
+  }
+  
+  .dashboard-statistics-tab.scrollbar-hidden::-webkit-scrollbar {
+    width: 6px !important;
+    height: 6px !important;
+  }
+  
+  .dashboard-statistics-tab.scrollbar-hidden::-webkit-scrollbar-thumb {
+    background: rgba(102, 126, 234, 0.7) !important;
+    border-radius: 6px;
+    min-height: 20px;
+  }
+
   /* Ultra-compact mobile chart optimizations */
   .dashboard-chart-svg-container {
     height: 250px;
@@ -788,4 +923,64 @@
 .dashboard-data-point circle:hover {
   r: 6;
   cursor: pointer;
+}
+
+/* Add responsive scrollbar utility classes */
+
+/* Default scrollbar-hidden behavior for desktop */
+.scrollbar-responsive {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.scrollbar-responsive::-webkit-scrollbar {
+  display: none;
+}
+
+/* Override scrollbar visibility on mobile devices */
+@media (max-width: 768px) {
+  .scrollbar-responsive {
+    scrollbar-width: thin !important;
+    scrollbar-color: rgba(0, 122, 255, 0.3) rgba(255, 255, 255, 0.1) !important;
+  }
+
+  .scrollbar-responsive::-webkit-scrollbar {
+    display: block !important;
+    width: 6px !important;
+    height: 6px !important;
+  }
+
+  .scrollbar-responsive::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.1) !important;
+    border-radius: 3px !important;
+  }
+
+  .scrollbar-responsive::-webkit-scrollbar-thumb {
+    background: rgba(0, 122, 255, 0.4) !important;
+    border-radius: 3px !important;
+    transition: background 0.3s ease !important;
+  }
+
+  .scrollbar-responsive::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 122, 255, 0.6) !important;
+  }
+
+  .scrollbar-responsive::-webkit-scrollbar-thumb:active {
+    background: rgba(0, 122, 255, 0.8) !important;
+  }
+}
+
+/* Touch-friendly scrolling improvements */
+@media (max-width: 768px) {
+  .dashboard-statistics-tab {
+    -webkit-overflow-scrolling: touch !important;
+    overscroll-behavior: contain !important;
+    scroll-padding-top: 60px !important;
+    scroll-snap-type: y proximity !important;
+  }
+
+  .dashboard-statistics-chart {
+    scroll-snap-align: start !important;
+    scroll-margin-top: 60px !important;
+  }
 }
