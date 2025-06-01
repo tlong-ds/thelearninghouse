@@ -795,6 +795,8 @@ body {
 @media (max-width: 1024px) {
   .hero-main {
     gap: 40px;
+    margin-left: 0; /* Fix tablet layout alignment by removing negative margin */
+    justify-content: center; /* Center content when margin-left is removed */
   }
   
   .hero-info {

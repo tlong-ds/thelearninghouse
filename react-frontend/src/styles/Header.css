@@ -181,7 +181,7 @@
 .header-user-info {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 8px; /* Adaptive gap: 12px (large desktop) → 10px (desktop) → 6px (tablet) → 5px (small tablet) → 4px (mobile) → 3px (small mobile) → 2px (extra small) */
   padding: 4px 12px 4px 6px;
   border-radius: 8px;
   cursor: pointer;
@@ -446,6 +446,25 @@
 }
 
 /* Mobile responsive design */
+/* Large desktop - more generous spacing */
+@media (min-width: 1200px) {
+  .header-user-info {
+    gap: 12px; /* More generous gap on large screens */
+    padding: 4px 16px 4px 8px; /* Slightly more padding too */
+  }
+  
+  .header-user-text {
+    min-width: 80px; /* More space for text on large screens */
+  }
+}
+
+/* Desktop - standard spacing */
+@media (min-width: 993px) and (max-width: 1199px) {
+  .header-user-info {
+    gap: 10px; /* Standard gap for regular desktop */
+  }
+}
+
 /* Tablet optimization */
 @media (max-width: 992px) {
   .header-nav ul {
@@ -459,7 +478,7 @@
   }
   
   .header-user-info {
-    gap: 1px;
+    gap: 6px; /* Reduced from 8px but more reasonable than 1px */
   }
   
   .header-username {
@@ -472,6 +491,14 @@
   }
 }
 
+/* Small tablet to large mobile */
+@media (max-width: 900px) {
+  .header-user-info {
+    gap: 5px; /* Progressive reduction */
+  }
+}
+
+/* Medium mobile */
 @media (max-width: 768px) {
   .app-header {
     top: 8px;
@@ -522,7 +549,7 @@
   
   .header-user-info {
     display: flex; /* Keep user toggle visible on mobile */
-    gap: 6px; /* Smaller gap for mobile */
+    gap: 4px; /* More progressive reduction for mobile */
     padding: 4px 8px 4px 4px; /* Reduced padding for mobile */
   }
   
@@ -593,7 +620,7 @@
   
   .header-user-info {
     display: flex; /* Keep toggle visible */
-    gap: 5px; /* Even smaller gap */
+    gap: 3px; /* Progressive reduction */
     padding: 3px 6px 3px 3px; /* Smaller padding */
   }
   
@@ -657,7 +684,7 @@
   
   .header-user-info {
     display: flex; /* Keep toggle visible */
-    gap: 4px; /* Minimal gap */
+    gap: 2px; /* Minimum practical gap for extra small screens */
     padding: 2px 4px 2px 2px; /* Minimal padding */
   }
   
