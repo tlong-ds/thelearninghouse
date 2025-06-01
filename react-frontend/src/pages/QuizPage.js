@@ -94,7 +94,6 @@ const QuizPage = () => {
           <button className="back-button" onClick={handleBack} title="Back to Lecture">
             <i className="fas fa-arrow-left"></i>
           </button>
-          <h1>{lecture.title} - Quiz</h1>
         </div>
 
         <Quiz 

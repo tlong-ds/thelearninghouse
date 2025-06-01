@@ -189,7 +189,7 @@ const LecturePreview = () => {
                     displayLecture.courseLectures.map((l, index) => (
                       <div
                         key={l.id}
-                        className={`lecture-nav-item ${parseInt(l.id) === parseInt(displayLecture.id) ? 'active' : ''}`}
+                        className={`lecture-nav-item ${parseInt(l.id) === parseInt(displayLecture.id) ? 'active' : ''} ${l.passed ? 'passed' : ''}`}
                         onClick={() => navigate(`/lecture/${l.id}`, {
                           state: { 
                             courseName: displayLecture.courseName,

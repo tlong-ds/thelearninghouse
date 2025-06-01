@@ -1,39 +1,30 @@
-.quiz-container {
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
-  margin: 0 auto;
-  width: 100%;
-  min-height: 600px;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  position: relative;
-  z-index: 1;
-}
+/* ===== MOBILE-FIRST BASE STYLES ===== */
 
+
+/* Quiz Title - Mobile-first design */
 .quiz-title {
-  font-size: 1.8rem;
+  font-size: 1.2rem;
+  font-weight: 700;
   margin: 0;
-  padding: 2rem;
-  color: #333;
-  text-align: left;
-  border-bottom: 1px solid #eee;
-}
-
-.quiz-content {
-  display: flex;
-  flex: 1;
+  padding: 1rem 0.75rem;
+  color: #1d1d1f;
+  text-align: center;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+  letter-spacing: -0.025em;
+  flex-shrink: 0;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
 }
 
 .quiz-error {
   text-align: center;
-  padding: 2rem;
+  padding: 1rem;
+  margin: 1rem;
   color: #721c24;
   background-color: #f8d7da;
   border: 1px solid #f5c6cb;
-  border-radius: 8px;
-  margin: 2rem;
+  border-radius: 12px;
+  font-size: 0.9rem;
 }
 
 .quiz-debug {
@@ -45,94 +36,182 @@
   overflow-y: auto;
   background: #f8f9fa;
   padding: 0.5rem;
-  border-radius: 4px;
+  border-radius: 8px;
   text-align: left;
 }
 
+/* Quiz Form - Mobile-first: Single column layout */
 .quiz-form {
   display: flex;
-  flex: 1;
   flex-direction: column;
-}
-
-/* Two column layout */
-.quiz-content {
-  display: flex;
   flex: 1;
+  min-height: 0;
 }
 
+/* Questions Column - Mobile-first: Full width card */
 .quiz-questions-column {
-  flex: 3;
-  padding: 2rem;
-  overflow-y: auto;
-  max-height: calc(100vh - 200px);
-  border-right: 1px solid #eee;
+  order: 1;
+  flex: none;
+  padding: 0.75rem;
+  border-right: none;
+  max-height: none;
+  overflow-y: visible;
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.9) 0%, 
+    rgba(252, 252, 252, 0.85) 100%);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  margin: 0 1rem 1rem 1rem;
+  border-radius: 16px;
+  box-shadow: 
+    0 4px 25px rgba(0, 0, 0, 0.08),
+    0 2px 10px rgba(0, 0, 0, 0.04),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
 }
 
+/* Navigation Column - Mobile-first: Full width card */
 .quiz-navigation-column {
-  flex: 1;
-  padding: 2rem;
+  order: 2;
+  flex: none;
+  padding: 0.75rem;
+  background: linear-gradient(135deg, 
+    rgba(248, 250, 252, 0.95) 0%, 
+    rgba(241, 245, 249, 0.9) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  margin: 0 1rem 1.5rem 1rem;
+  border-radius: 16px;
+  box-shadow: 
+    0 8px 32px rgba(0, 102, 204, 0.12),
+    0 4px 16px rgba(0, 102, 204, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
 }
 
+/* Question Navigation - Mobile-first */
 .question-navigation {
-  margin-bottom: 2rem;
+  margin-bottom: 0;
 }
 
 .question-navigation h3 {
+  font-size: 0.9rem;
   margin-bottom: 1rem;
-  font-size: 1.2rem;
-  color: #555;
+  text-align: center;
+  color: #1d1d1f;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+  font-weight: 600;
+  letter-spacing: -0.018em;
+  position: relative;
+  padding-bottom: 0.75rem;
 }
 
+/* Question Navigation Buttons - Mobile-first */
 .question-nav-buttons {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.75rem;
+  justify-content: center;
+  gap: 0.5rem;
+  max-width: 100%;
+  overflow-x: auto;
+  padding: 0.75rem 0.5rem;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 12px;
+  box-shadow: 
+    inset 0 1px 3px rgba(0, 0, 0, 0.06),
+    0 1px 6px rgba(0, 102, 204, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+  position: relative;
+  overflow: visible;
 }
 
+/* Question Nav Button - Mobile-first */
 .question-nav-button {
-  width: 40px;
-  height: 40px;
-  background-color: #f5f5f5;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  width: 30px;
+  height: 30px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.95) 0%, 
+    rgba(248, 250, 252, 0.9) 100%);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(0, 102, 204, 0.1);
+  border-radius: 8px;
+  box-shadow: 
+    0 2px 8px rgba(0, 0, 0, 0.06),
+    0 1px 4px rgba(0, 0, 0, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  color: #1d1d1f;
+  transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.2s ease;
+}
+
+
+/* Question Nav Button States - Mobile-first */
+.question-nav-button:hover {
+  transform: translateY(-1px) scale(1.02);
+  box-shadow: 
+    0 4px 12px rgba(0, 102, 204, 0.12),
+    0 2px 6px rgba(0, 102, 204, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  background: linear-gradient(135deg, 
+    rgba(0, 102, 204, 0.08) 0%, 
+    rgba(90, 200, 250, 0.05) 100%);
+  border-color: rgba(0, 102, 204, 0.2);
 }
 
 .question-nav-button.answered {
-  background-color: #e3f2fd;
-  border-color: #0066cc;
+  background: linear-gradient(135deg, 
+    rgba(0, 102, 204, 0.15) 0%, 
+    rgba(90, 200, 250, 0.1) 100%);
+  border-color: rgba(0, 102, 204, 0.25);
   color: #0066cc;
+  box-shadow: 
+    0 2px 8px rgba(0, 102, 204, 0.15),
+    0 1px 4px rgba(0, 102, 204, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
 }
 
 .question-nav-button.current {
-  background: linear-gradient(135deg, #0066cc, #5ac8fa);
-  border-color: #0066cc;
+  width: 34px;
+  height: 34px;
+  background: linear-gradient(135deg, #0066cc 0%, #5ac8fa 100%);
   color: white;
-  box-shadow: 0 4px 16px rgba(0, 102, 204, 0.3);
-  transition: all 0.3s ease;
+  font-weight: 700;
+  border: none;
+  box-shadow: 
+    0 6px 20px rgba(0, 102, 204, 0.35),
+    0 3px 10px rgba(0, 102, 204, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  transform: scale(1.1);
+  position: relative;
+  z-index: 10;
+  margin: 2px;
 }
 
 .question-nav-button.current:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 102, 204, 0.4);
+  transform: scale(1.15) translateY(-1px);
+  box-shadow: 
+    0 8px 25px rgba(0, 102, 204, 0.4),
+    0 4px 12px rgba(0, 102, 204, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.35);
+  z-index: 15;
 }
 
-.question-nav-button:hover {
-  background-color: #e0e0e0;
-}
-
+/* Question - Mobile-first */
 .question {
-  margin-bottom: 2.5rem;
-  padding-bottom: 2rem;
+  margin-bottom: 1.5rem;
+  padding-bottom: 1rem;
   border-bottom: 1px solid #eee;
 }
 
@@ -141,8 +220,39 @@
   margin-bottom: 0;
 }
 
+/* Question Progress - Mobile-first with fully rounded borders */
+.question-progress {
+  background-color: #e3f2fd;
+  padding: 0.75rem 1rem;
+  margin: 0rem 0rem 0.5rem 0rem;
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #0066cc;
+  border: 1px solid #c9e2fe;
+  border-radius: 12px; /* Fully rounded borders on all sides */
+}
+
+/* Question Text - Mobile-first */
 .question-text {
   margin-bottom: 1.5rem;
+  padding: 0.75rem;
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.95) 0%, 
+    rgba(252, 252, 252, 0.9) 100%);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(0, 102, 204, 0.08);
+  border-radius: 14px;
+  box-shadow: 
+    0 4px 20px rgba(0, 0, 0, 0.06),
+    0 2px 8px rgba(0, 0, 0, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: #1d1d1f;
+  letter-spacing: -0.01em;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
 }
 
 .question-text h1, 
@@ -150,30 +260,41 @@
 .question-text h3 {
   margin-top: 0.5rem;
   margin-bottom: 0.5rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+  font-weight: 600;
+  color: #1d1d1f;
+  letter-spacing: -0.016em;
 }
 
 .question-text p {
   margin-bottom: 0.5rem;
+  color: #1d1d1f;
 }
 
 .question-text ul, 
 .question-text ol {
   margin-left: 1.5rem;
   margin-bottom: 0.5rem;
+  color: #1d1d1f;
 }
 
 .question-text pre {
-  background-color: #f5f5f5;
+  background: rgba(142, 142, 147, 0.12);
   padding: 0.75rem;
-  border-radius: 4px;
+  border-radius: 8px;
   overflow-x: auto;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+  font-size: 0.875rem;
+  border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .question-text code {
-  background-color: #f5f5f5;
+  background: rgba(142, 142, 147, 0.12);
   padding: 0.2rem 0.4rem;
-  border-radius: 3px;
-  font-family: monospace;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+  font-size: 0.875rem;
+  color: #1d1d1f;
 }
 
 .question-number {
@@ -182,32 +303,124 @@
   margin-right: 0.5rem;
 }
 
+/* Desktop: Options Container with Navigation Arrows */
+.options-container {
+  display: grid;
+  grid-template-columns: 80px 1fr 80px;
+  gap: 1.5rem;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+/* Desktop: Navigation Arrow Buttons */
+.nav-arrow-button {
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.5rem;
+  color: #1d1d1f;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  flex-shrink: 0;
+  align-self: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+}
+
+.nav-arrow-button:hover:not(:disabled) {
+  background: rgba(0, 102, 204, 0.1);
+  border-color: rgba(0, 102, 204, 0.2);
+  color: #0066cc;
+  transform: translateY(-2px) scale(1.05);
+  box-shadow: 0 6px 20px rgba(0, 102, 204, 0.15), 0 3px 10px rgba(0, 102, 204, 0.08);
+}
+
+.nav-arrow-button:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.nav-arrow-button.prev {
+  order: 1;
+}
+
+.nav-arrow-button.next {
+  order: 3;
+}
+
+/* Desktop: Options Grid - Centered in container */
 .options-grid {
+  order: 2;
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 1.5rem;
-  margin-bottom: 1rem;
+  flex: 1;
+  align-self: center;
 }
 
+/* Options - Mobile-first enhanced macOS design */
 .option {
   display: flex;
   align-items: center;
   justify-content: center;
-  min-height: 100px;
-  padding: 1.5rem;
-  background-color: #f8f9fa;
-  border: 2px solid #dee2e6;
-  border-radius: 8px;
+  min-height: 70px;
+  padding: 0.75rem;
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.9) 0%, 
+    rgba(252, 252, 252, 0.85) 100%);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(0, 102, 204, 0.08);
+  border-radius: 14px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   position: relative;
+  overflow: hidden;
+  box-shadow: 
+    0 3px 12px rgba(0, 0, 0, 0.06),
+    0 1.5px 6px rgba(0, 0, 0, 0.03),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  color: #1d1d1f;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+}
+
+.option::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, 
+    transparent, 
+    rgba(0, 102, 204, 0.08), 
+    transparent);
+  transition: left 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.option:hover::before {
+  left: 100%;
 }
 
 .option:hover {
-  background-color: #e9ecef;
-  border-color: #adb5bd;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  background: linear-gradient(135deg, 
+    rgba(0, 102, 204, 0.06) 0%, 
+    rgba(90, 200, 250, 0.04) 100%);
+  border-color: rgba(0, 102, 204, 0.15);
+  transform: translateY(-2px) scale(1.01);
+  box-shadow: 
+    0 6px 18px rgba(0, 102, 204, 0.12),
+    0 3px 9px rgba(0, 102, 204, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 /* Hide the radio button completely */
@@ -221,40 +434,51 @@
 }
 
 .option-text {
-  padding-left: 1.5rem;
+  padding-left: 0;
   position: relative;
   width: 100%;
   text-align: center;
-  font-size: 1.2rem;
-  color: #333;
+  font-size: 0.9rem;
+  color: #1d1d1f;
   font-weight: 500;
+  letter-spacing: -0.003em;
+  line-height: 1.4;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
 }
 
-/* Style for selected option */
+/* Style for selected option - Mobile-first enhanced design */
 .option.selected,
 .option:has(input[type="radio"]:checked) {
-  background-color: #e3f2fd;
-  border-color: #0066cc;
+  background: linear-gradient(135deg, 
+    rgba(0, 102, 204, 0.12) 0%, 
+    rgba(90, 200, 250, 0.08) 100%);
+  border-color: rgba(0, 102, 204, 0.28);
   border-width: 2px;
-  box-shadow: 0 2px 4px rgba(0, 102, 204, 0.2);
+  transform: translateY(-1px) scale(1.005);
+  box-shadow: 
+    0 4px 15px rgba(0, 102, 204, 0.18),
+    0 2px 8px rgba(0, 102, 204, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
 }
 
 .option.selected::after,
 .option:has(input[type="radio"]:checked)::after {
   content: '✓';
   position: absolute;
-  top: 12px;
-  right: 12px;
-  width: 25px;
-  height: 25px;
+  top: 16px;
+  right: 16px;
+  width: 28px;
+  height: 28px;
   border-radius: 50%;
-  background-color: #0066cc;
+  background: linear-gradient(135deg, #0066cc, #5ac8fa);
   color: white;
   display: flex;
   justify-content: center;
   align-items: center;
-  font-size: 14px;
-  font-weight: bold;
+  font-size: 16px;
+  font-weight: 600;
+  box-shadow: 0 2px 8px rgba(0, 102, 204, 0.3);
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
 }
 
 .option-text p {
@@ -263,10 +487,13 @@
 }
 
 .option-text code {
-  background: #f5f5f5;
-  padding: 0.1rem 0.3rem;
-  border-radius: 2px;
-  font-size: 0.9em;
+  background: rgba(142, 142, 147, 0.12);
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, 'Courier New', monospace;
+  font-size: 0.95em;
+  color: #1d1d1f;
+  border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .options-grid {
@@ -316,6 +543,17 @@
   border-left: 4px solid #dc3545;
 }
 
+.success-message {
+  color: #155724;
+  padding: 0.75rem 1rem;
+  margin: 1rem 0;
+  background-color: #d4edda;
+  border-radius: 8px;
+  font-size: 1rem;
+  border-left: 4px solid #28a745;
+  font-weight: 500;
+}
+
 .option:has(input[type="radio"]:checked) {
   background-color: #e3f2fd;
   border-color: #0066cc;
@@ -328,35 +566,65 @@
   color: white;
   border: none;
   padding: 1rem 2rem;
-  border-radius: 8px;
+  border-radius: 12px;
   cursor: pointer;
   font-size: 1.1rem;
   font-weight: 600;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
   margin-top: 2rem;
   align-self: flex-end;
   width: 100%;
   max-width: 200px;
-  box-shadow: 0 4px 16px rgba(0, 102, 204, 0.3);
+  box-shadow: 0 4px 16px rgba(0, 102, 204, 0.25), 0 2px 8px rgba(0, 102, 204, 0.15);
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+  letter-spacing: -0.003em;
 }
 
 .submit-button:hover:not(:disabled) {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 24px rgba(0, 102, 204, 0.4);
+  background: linear-gradient(135deg, #0056cc, #3eb8f0);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 24px rgba(0, 102, 204, 0.35), 0 4px 12px rgba(0, 102, 204, 0.2);
 }
 
 .submit-button:disabled {
-  background-color: #ccc;
+  background: rgba(142, 142, 147, 0.3);
+  color: rgba(60, 60, 67, 0.6);
   cursor: not-allowed;
   transform: none;
-  box-shadow: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 .quiz-results {
-  padding: 1rem 0;
-  max-width: 800px;
-  margin: 2rem auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 3rem 2rem;
+  max-width: 600px;
+  margin: 0 auto;
   text-align: center;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.quiz-results h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #1d1d1f;
+  margin-bottom: 1.5rem;
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+}
+
+.quiz-results p {
+  font-size: 1.25rem;
+  color: #1d1d1f;
+  margin-bottom: 1rem;
+  font-weight: 500;
 }
 
 .score {
@@ -395,12 +663,15 @@
   margin-bottom: 1rem;
   color: #666;
   font-size: 0.9rem;
+  background-color: #f8f9fa;
+  padding: 0.75rem 1rem;
+  text-align: center;
+  border: 1px solid #e9ecef;
+  border-radius: 10px;
 }
 
 .question-navigation-buttons {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 2rem;
+  display: none; /* Hide original navigation buttons - arrows are now in options container */
 }
 
 .nav-button {
@@ -438,7 +709,7 @@
 
 /* When showing a single question, make sure it takes up appropriate space */
 .question {
-  min-height: 400px;
+  min-height: 300px; /* Reduced from 400px */
   display: flex;
   flex-direction: column;
 }
@@ -447,4 +718,819 @@
 .options-grid {
   flex-grow: 1;
   margin-bottom: 2rem;
+}
+
+/* ========== MOBILE LAYOUT OVERRIDES ========== */
+/* Reorganize layout for mobile devices to show all elements in a single column */
+
+@media (max-width: 768px) {
+
+  /* Ensure quiz-form takes full height and uses flexbox */
+  .quiz-form {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+  }
+  
+  /* Title styling for mobile - macOS aesthetic */
+  .quiz-title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    padding: 2rem 1.5rem 1.75rem 1.5rem;
+    text-align: center;
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    color: #1d1d1f;
+    letter-spacing: -0.025em;
+    flex-shrink: 0;
+    position: relative;
+  }
+  
+
+  
+  /* Mobile: Questions Column - Modern macOS styling */
+  .quiz-questions-column {
+    order: 1;
+    flex: none;
+    padding: 1.5rem;
+    border-right: none;
+    max-height: none;
+    overflow-y: visible;
+    background: linear-gradient(135deg, 
+      rgba(255, 255, 255, 0.9) 0%, 
+      rgba(252, 252, 252, 0.85) 100%);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    margin: 0 1rem 1rem 1rem;
+    border-radius: 16px;
+    box-shadow: 
+      0 4px 25px rgba(0, 0, 0, 0.08),
+      0 2px 10px rgba(0, 0, 0, 0.04),
+      inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  }
+  
+  /* Mobile: Question Navigator - Modern macOS card design */
+  .quiz-navigation-column {
+    order: 2;
+    flex: none;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, 
+      rgba(248, 250, 252, 0.95) 0%, 
+      rgba(241, 245, 249, 0.9) 100%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    margin: 0 1rem 1.5rem 1rem;
+    border-radius: 16px;
+    box-shadow: 
+      0 8px 32px rgba(0, 102, 204, 0.12),
+      0 4px 16px rgba(0, 102, 204, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Show submit section in navigation column on mobile */
+  .quiz-navigation-column .submit-section {
+    display: block;
+  }
+  
+  .question-navigation {
+    margin-bottom: 0;
+  }
+  
+  .question-navigation h3 {
+    font-size: 1.1rem;
+    margin-bottom: 1rem;
+    text-align: center;
+    color: #1d1d1f;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+    font-weight: 600;
+    letter-spacing: -0.018em;
+    position: relative;
+    padding-bottom: 0.75rem;
+  }
+  
+
+  
+  .question-nav-buttons {
+    justify-content: center;
+    gap: 0.75rem;
+    max-width: 100%;
+    overflow-x: auto;
+    padding: 0.75rem 0.5rem;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 12px;
+    box-shadow: 
+      inset 0 1px 3px rgba(0, 0, 0, 0.06),
+      0 1px 6px rgba(0, 102, 204, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+  }
+  
+  .question-nav-button {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+    font-weight: 600;
+    flex-shrink: 0;
+    background: linear-gradient(135deg, 
+      rgba(255, 255, 255, 0.95) 0%, 
+      rgba(248, 250, 252, 0.9) 100%);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(0, 102, 204, 0.1);
+    border-radius: 10px;
+    box-shadow: 
+      0 2px 8px rgba(0, 0, 0, 0.06),
+      0 1px 4px rgba(0, 0, 0, 0.03),
+      inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    color: #1d1d1f;
+    transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  
+  .question-nav-button:hover {
+    transform: translateY(-1px) scale(1.02);
+    box-shadow: 
+      0 4px 12px rgba(0, 102, 204, 0.12),
+      0 2px 6px rgba(0, 102, 204, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    background: linear-gradient(135deg, 
+      rgba(0, 102, 204, 0.08) 0%, 
+      rgba(90, 200, 250, 0.05) 100%);
+    border-color: rgba(0, 102, 204, 0.2);
+  }
+  
+  .question-nav-button.answered {
+    background: linear-gradient(135deg, 
+      rgba(0, 102, 204, 0.15) 0%, 
+      rgba(90, 200, 250, 0.1) 100%);
+    border-color: rgba(0, 102, 204, 0.25);
+    color: #0066cc;
+    box-shadow: 
+      0 2px 8px rgba(0, 102, 204, 0.15),
+      0 1px 4px rgba(0, 102, 204, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.7);
+  }
+  
+  .question-nav-button.current {
+    width: 44px;
+    height: 44px;
+    background: linear-gradient(135deg, #0066cc 0%, #5ac8fa 100%);
+    color: white;
+    font-weight: 700;
+    border: none;
+    box-shadow: 
+      0 6px 20px rgba(0, 102, 204, 0.35),
+      0 3px 10px rgba(0, 102, 204, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+    position: relative;
+    z-index: 10;
+    margin: 2px;
+  }
+  
+  .question-nav-button.current:hover {
+    transform: scale(1.15) translateY(-1px);
+    box-shadow: 
+      0 8px 25px rgba(0, 102, 204, 0.4),
+      0 4px 12px rgba(0, 102, 204, 0.25),
+      inset 0 1px 0 rgba(255, 255, 255, 0.35);
+    z-index: 15;
+  }
+  
+  /* Mobile: Question Number Row */
+  .question-progress {
+    background-color: #e3f2fd;
+    padding: 0.75rem 1rem;
+    margin: 0rem 0rem 0.5rem 0rem;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #0066cc;
+    border: 1px solid #c9e2fe;
+    border-radius: 12px;
+  }
+  
+  /* Mobile: Question Text - Enhanced macOS styling */
+  .question-text {
+    margin-bottom: 1.75rem;
+    padding: 1.25rem;
+    background: linear-gradient(135deg, 
+      rgba(255, 255, 255, 0.95) 0%, 
+      rgba(252, 252, 252, 0.9) 100%);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(0, 102, 204, 0.08);
+    border-radius: 14px;
+    box-shadow: 
+      0 4px 20px rgba(0, 0, 0, 0.06),
+      0 2px 8px rgba(0, 0, 0, 0.03),
+      inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #1d1d1f;
+    letter-spacing: -0.01em;
+  }
+  
+  /* Mobile: Options Container with Navigation Arrows - 3 Column Layout */
+  .options-container {
+    display: grid;
+    grid-template-columns: 60px 1fr 60px;
+    gap: 1rem;
+    align-items: center;
+    margin-bottom: 2rem;
+  }
+  
+  /* Mobile: Navigation Arrow Buttons - Enhanced macOS styling */
+  .nav-arrow-button {
+    background: linear-gradient(135deg, 
+      rgba(255, 255, 255, 0.95) 0%, 
+      rgba(248, 250, 252, 0.9) 100%);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(0, 102, 204, 0.12);
+    border-radius: 50%;
+    width: 52px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #1d1d1f;
+    transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    flex-shrink: 0;
+    align-self: center;
+    box-shadow: 
+      0 4px 12px rgba(0, 0, 0, 0.08),
+      0 2px 6px rgba(0, 0, 0, 0.04),
+      inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+  }
+  
+  .nav-arrow-button:hover:not(:disabled) {
+    background: linear-gradient(135deg, 
+      rgba(0, 102, 204, 0.12) 0%, 
+      rgba(90, 200, 250, 0.08) 100%);
+    border-color: rgba(0, 102, 204, 0.2);
+    color: #0066cc;
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 
+      0 6px 18px rgba(0, 102, 204, 0.15),
+      0 3px 9px rgba(0, 102, 204, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  }
+  
+  .nav-arrow-button:disabled {
+    opacity: 0.25;
+    cursor: not-allowed;
+    background: linear-gradient(135deg, 
+      rgba(142, 142, 147, 0.1) 0%, 
+      rgba(174, 174, 178, 0.08) 100%);
+    border-color: rgba(142, 142, 147, 0.15);
+    color: rgba(60, 60, 67, 0.4);
+    box-shadow: 
+      0 1px 4px rgba(0, 0, 0, 0.04),
+      inset 0 1px 0 rgba(255, 255, 255, 0.6);
+    transform: none;
+  }
+  
+  .nav-arrow-button.prev {
+    order: 1;
+  }
+  
+  .nav-arrow-button.next {
+    order: 3;
+  }
+  
+  /* Mobile: Options Grid - Maintain 2x2 layout */
+  .options-grid {
+    order: 2;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    flex: 1;
+    align-self: center;
+  }
+  
+  /* Mobile: Options - Enhanced macOS design */
+  .option {
+    min-height: 85px;
+    padding: 1.25rem;
+    font-size: 1rem;
+    background: linear-gradient(135deg, 
+      rgba(255, 255, 255, 0.9) 0%, 
+      rgba(252, 252, 252, 0.85) 100%);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(0, 102, 204, 0.08);
+    border-radius: 14px;
+    box-shadow: 
+      0 3px 12px rgba(0, 0, 0, 0.06),
+      0 1.5px 6px rgba(0, 0, 0, 0.03),
+      inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    color: #1d1d1f;
+    transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .option::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+      transparent, 
+      rgba(0, 102, 204, 0.08), 
+      transparent);
+    transition: left 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  
+  .option:hover::before {
+    left: 100%;
+  }
+  
+  .option:hover {
+    background: linear-gradient(135deg, 
+      rgba(0, 102, 204, 0.06) 0%, 
+      rgba(90, 200, 250, 0.04) 100%);
+    border-color: rgba(0, 102, 204, 0.15);
+    transform: translateY(-2px) scale(1.01);
+    box-shadow: 
+      0 6px 18px rgba(0, 102, 204, 0.12),
+      0 3px 9px rgba(0, 102, 204, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  }
+  
+  .option.selected,
+  .option:has(input[type="radio"]:checked) {
+    background: linear-gradient(135deg, 
+      rgba(0, 102, 204, 0.12) 0%, 
+      rgba(90, 200, 250, 0.08) 100%);
+    border-color: rgba(0, 102, 204, 0.28);
+    border-width: 2px;
+    transform: translateY(-1px) scale(1.005);
+    box-shadow: 
+      0 4px 15px rgba(0, 102, 204, 0.18),
+      0 2px 8px rgba(0, 102, 204, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  }
+  
+  .option-text {
+    font-size: 1rem;
+    padding-left: 0;
+    color: #1d1d1f;
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+    letter-spacing: -0.003em;
+  }
+  
+  /* Mobile: Submit Button in Navigation Column */
+  .quiz-navigation-column .submit-button {
+    width: 100%;
+    max-width: none;
+    padding: 1rem 2rem;
+    font-size: 1rem;
+    background: linear-gradient(135deg, #0066cc, #5ac8fa);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-weight: 600;
+    transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    box-shadow: 0 4px 16px rgba(0, 102, 204, 0.25), 0 2px 8px rgba(0, 102, 204, 0.15);
+    font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+    letter-spacing: -0.003em;
+  }
+  
+  .quiz-navigation-column .submit-button:hover:not(:disabled) {
+    background: linear-gradient(135deg, #0056b3, #3eb8f0);
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 
+      0 8px 28px rgba(0, 102, 204, 0.35),
+      0 4px 14px rgba(0, 102, 204, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  }
+  
+  .quiz-navigation-column .submit-button:disabled {
+    background: rgba(142, 142, 147, 0.3);
+    color: rgba(60, 60, 67, 0.6);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  }
+  
+  /* Hide original question navigation buttons on mobile */
+  .question-navigation-buttons {
+    display: none;
+  }
+}
+
+/* Hide mobile submit sections on desktop */
+.mobile-submit-section,
+.mobile-only-submit {
+  display: none;
+}
+
+/* Smaller mobile screens (phones in portrait) */
+@media (max-width: 480px) {
+  .quiz-title {
+    font-size: 1.2rem;
+    padding: 1rem 0.75rem;
+  }
+  
+  .quiz-questions-column {
+    padding: 0.75rem;
+  }
+  
+  .question-navigation-column {
+    padding: 0.75rem;
+  }
+  
+  .question-progress {
+    margin: -0.75rem -0.75rem 1rem -0.75rem;
+    font-size: 0.9rem;
+    border-radius: 10px;
+  }
+  
+  .question-text {
+    padding: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .options-container {
+    gap: 0.75rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .nav-arrow-button {
+    width: 45px;
+    height: 45px;
+    font-size: 1.1rem;
+    align-self: center;
+  }
+  
+  .options-grid {
+    gap: 0.75rem;
+  }
+  
+  .option {
+    min-height: 70px;
+    padding: 0.75rem;
+  }
+  
+  .option-text {
+    font-size: 0.9rem;
+  }
+  
+  .question-nav-button {
+    width: 32px;
+    height: 32px;
+    font-size: 0.8rem;
+  }
+  
+  .question-navigation h3 {
+    font-size: 0.9rem;
+  }
+  
+  .nav-button {
+    padding: 0.75rem 0.75rem;
+    font-size: 0.85rem;
+  }
+  
+  .submit-button {
+    margin: 0.75rem 0.75rem 1.5rem 0.75rem;
+    width: calc(100% - 1.5rem);
+    padding: 0.875rem;
+    font-size: 0.95rem;
+  }
+}
+
+/* Extra small screens */
+@media (max-width: 360px) {
+  .quiz-title {
+    font-size: 1.1rem;
+    padding: 0.875rem 0.5rem;
+  }
+  
+  .options-grid {
+    gap: 0.5rem;
+  }
+  
+  .option {
+    min-height: 65px;
+    padding: 0.5rem;
+  }
+  
+  .option-text {
+    font-size: 0.85rem;
+  }
+  
+  .question-nav-button {
+    width: 30px;
+    height: 30px;
+    font-size: 0.75rem;
+  }
+}
+
+/* ===== DESKTOP ENHANCEMENTS (Mobile-First Approach) ===== */
+
+/* Tablet and small desktop enhancements */
+@media (min-width: 768px) {
+  /* Quiz Title - Larger and left-aligned on desktop */
+  .quiz-title {
+    font-size: 1.75rem;
+    padding: 2rem 2rem 1.5rem 2rem;
+    text-align: left;
+    letter-spacing: -0.022em;
+  }
+
+  /* Quiz Form - Switch to 2-column layout with gap */
+  .quiz-form {
+    flex-direction: row;
+    gap: 1.5rem;
+  }
+
+  /* Questions Column - Desktop layout with 4:2 ratio (2:1) and mobile container styling */
+  .quiz-questions-column {
+    flex: 4;
+    order: 1;
+    padding: 2rem;
+    margin: 0 0 0 1rem;
+    border-right: none;
+    border-radius: 16px;
+    overflow-y: auto;
+    max-height: calc(100vh - 200px);
+    background: linear-gradient(135deg, 
+      rgba(255, 255, 255, 0.9) 0%, 
+      rgba(252, 252, 252, 0.85) 100%);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    box-shadow: 
+      0 4px 25px rgba(0, 0, 0, 0.08),
+      0 2px 10px rgba(0, 0, 0, 0.04),
+      inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  }
+
+  /* Navigation Column - Desktop layout with 4:2 ratio (2:1) and mobile container styling */
+  .quiz-navigation-column {
+    flex: 2;
+    order: 2;
+    padding: 2rem;
+    margin: 0 1rem 0 0;
+    border-radius: 16px;
+    justify-content: space-between;
+    background: linear-gradient(135deg, 
+      rgba(248, 250, 252, 0.95) 0%, 
+      rgba(241, 245, 249, 0.9) 100%);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 
+      0 8px 32px rgba(0, 102, 204, 0.12),
+      0 4px 16px rgba(0, 102, 204, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+  }
+
+  /* Submit Section - Desktop right alignment */
+  .quiz-navigation-column .submit-section {
+    display: flex;
+    justify-content: flex-end;
+    width: 100%;
+  }
+  
+  /* Submit Button - Desktop */
+  .submit-button {
+    max-width: 200px;
+    margin-left: auto; /* Pushes the button to the right */
+  }
+
+  /* Question Navigation - Desktop */
+  .question-navigation {
+    margin-bottom: 2rem;
+  }
+
+  .question-navigation h3 {
+    font-size: 1.125rem;
+    text-align: left;
+    letter-spacing: -0.016em;
+  }
+
+  /* Question Nav Buttons - Desktop layout with mobile container styling */
+  .question-nav-buttons {
+    justify-content: flex-start;
+    gap: 0.75rem;
+    padding: 0.75rem 0.5rem;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-radius: 12px;
+    box-shadow: 
+      inset 0 1px 3px rgba(0, 0, 0, 0.06),
+      0 1px 6px rgba(0, 102, 204, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+  }
+
+  .question-nav-button {
+    width: 40px;
+    height: 40px;
+    font-size: 1rem;
+    background: linear-gradient(135deg, 
+      rgba(255, 255, 255, 0.95) 0%, 
+      rgba(248, 250, 252, 0.9) 100%);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(0, 102, 204, 0.1);
+    border-radius: 8px;
+    box-shadow: 
+      0 2px 8px rgba(0, 0, 0, 0.06),
+      0 1px 4px rgba(0, 0, 0, 0.03),
+      inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  }
+
+  .question-nav-button.current {
+    width: 44px;
+    height: 44px;
+    transform: scale(1.05);
+    margin: 4px;
+  }
+
+  .question-nav-button.current:hover {
+    transform: scale(1.08) translateY(-1px);
+  }
+
+  /* Question Progress - Desktop with blue box styling */
+  .question-progress {
+    background-color: #e3f2fd;
+    padding: 0.75rem 1rem;
+    margin: 0rem 0rem 1.5rem 0rem;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #0066cc;
+    border: 1px solid #c9e2fe;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 102, 204, 0.1), 0 1px 4px rgba(0, 102, 204, 0.05);
+  }
+
+  /* Question Text - Desktop */
+  .question-text {
+    font-size: 1rem;
+    padding: 1.25rem;
+    margin-bottom: 1.5rem;
+  }
+
+  /* Options Container - Desktop layout with arrows */
+  .options-container {
+    grid-template-columns: 80px 1fr 80px;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+  }
+
+  /* Navigation Arrow Buttons - Desktop */
+  .nav-arrow-button {
+    width: 60px;
+    height: 60px;
+    font-size: 1.5rem;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
+  }
+
+  .nav-arrow-button:hover:not(:disabled) {
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: 0 6px 20px rgba(0, 102, 204, 0.15), 0 3px 10px rgba(0, 102, 204, 0.08);
+  }
+
+  .nav-arrow-button:disabled {
+    opacity: 0.3;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+  }
+
+  /* Options Grid - Desktop 2-column layout */
+  .options-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+
+  /* Options - Desktop with mobile design */
+  .option {
+    min-height: 100px;
+    padding: 1.5rem;
+    font-size: 1rem;
+    background: linear-gradient(135deg, 
+      rgba(255, 255, 255, 0.9) 0%, 
+      rgba(252, 252, 252, 0.85) 100%);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba(0, 102, 204, 0.08);
+    border-radius: 14px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 
+      0 3px 12px rgba(0, 0, 0, 0.06),
+      0 1.5px 6px rgba(0, 0, 0, 0.03),
+      inset 0 1px 0 rgba(255, 255, 255, 0.8);
+    transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .option::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, 
+      transparent, 
+      rgba(0, 102, 204, 0.08), 
+      transparent);
+    transition: left 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+
+  .option:hover::before {
+    left: 100%;
+  }
+
+  .option:hover {
+    background: linear-gradient(135deg, 
+      rgba(0, 102, 204, 0.06) 0%, 
+      rgba(90, 200, 250, 0.04) 100%);
+    border-color: rgba(0, 102, 204, 0.15);
+    transform: translateY(-2px) scale(1.01);
+    box-shadow: 
+      0 6px 18px rgba(0, 102, 204, 0.12),
+      0 3px 9px rgba(0, 102, 204, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  }
+
+  .option.selected,
+  .option:has(input[type="radio"]:checked) {
+    background: linear-gradient(135deg, 
+      rgba(0, 102, 204, 0.12) 0%, 
+      rgba(90, 200, 250, 0.08) 100%);
+    border-color: rgba(0, 102, 204, 0.28);
+    border-width: 2px;
+    transform: translateY(-1px) scale(1.005);
+    box-shadow: 
+      0 4px 15px rgba(0, 102, 204, 0.18),
+      0 2px 8px rgba(0, 102, 204, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  }
+
+  .option-text {
+    font-size: 1.1rem;
+    padding-left: 0;
+    text-align: center;
+  }
+  
+  .option.selected,
+  .option:has(input[type="radio"]:checked) {
+    background: linear-gradient(135deg, 
+      rgba(0, 102, 204, 0.12) 0%, 
+      rgba(90, 200, 250, 0.08) 100%);
+    border-color: rgba(0, 102, 204, 0.28);
+    border-width: 2px;
+    transform: translateY(-1px) scale(1.005);
+    box-shadow: 
+      0 4px 15px rgba(0, 102, 204, 0.18),
+      0 2px 8px rgba(0, 102, 204, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.85);
+  }
+
+  /* Submit Button - Desktop */
+  .submit-button {
+    max-width: 200px;
+    align-self: flex-end;
+  }
+
+  /* Question - Desktop spacing */
+  .question {
+    margin-bottom: 2.5rem;
+    padding-bottom: 2rem;
+    min-height: 400px;
+  }
+}
+
+/* Large desktop enhancements */
+@media (min-width: 1024px) {
+  /* Options Grid - Always maintain 2x2 layout for desktop */
+  .options-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+/* Ultra-wide desktop enhancements */
+@media (min-width: 1440px) {
+  /* Keep 2x2 grid layout for ultra-wide screens - no changes to options-grid */
 }

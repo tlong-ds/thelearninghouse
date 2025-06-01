@@ -98,6 +98,7 @@ class LectureListItem(BaseModel):
     title: str
     courseId: int
     description: Optional[str] = None
+    passed: Optional[bool] = False
 
 class Lecture(BaseModel):
     id: int
@@ -324,7 +325,7 @@ async def get_course_details(course_id: int, request: Request, auth_token: str =
         raise HTTPException(status_code=500, detail=str(e))
 
 # Get lectures for a course
-@router.get("/courses/{course_id}/lectures", response_model=List[Lecture])
+@router.get("/courses/{course_id}/lectures", response_model=List[LectureListItem])
 async def get_course_lectures(request: Request, course_id: int, auth_token: str = Cookie(None)):
     try:
         # Try to get token from Authorization header if cookie is not present
@@ -357,24 +358,34 @@ async def get_course_lectures(request: Request, course_id: int, auth_token: str 
                     if not cursor.fetchone():
                         raise HTTPException(status_code=404, detail="Course not found")
 
+                    # Get lectures with pass status for the current user
                     query = """
                     SELECT 
-                        LectureID as id, 
-                        CourseID as courseId,
-                        Title as title, 
-                        Description as description
-                    FROM Lectures
-                    WHERE CourseID = %s
-                    ORDER BY LectureID
+                        l.LectureID as id, 
+                        l.CourseID as courseId,
+                        l.Title as title, 
+                        l.Description as description,
+                        CASE 
+                            WHEN lr.State = 'passed' THEN 1
+                            ELSE 0
+                        END as passed
+                    FROM Lectures l
+                    LEFT JOIN LectureResults lr ON l.LectureID = lr.LectureID 
+                        AND lr.LearnerID = %s 
+                        AND lr.CourseID = %s
+                    WHERE l.CourseID = %s
+                    ORDER BY l.LectureID
                     """
-                    cursor.execute(query, (course_id,))
+                    cursor.execute(query, (user_data.get('user_id'), course_id, course_id))
                     lectures = cursor.fetchall()
                     
-                    # Ensure all fields match the Lecture model
+                    # Ensure all fields match the LectureListItem model
                     for lecture in lectures:
                         # Ensure the fields exist and have appropriate null values if missing
                         if lecture.get('description') is None:
                             lecture['description'] = None
+                        # Convert passed from 1/0 to True/False
+                        lecture['passed'] = bool(lecture.get('passed', 0))
             finally:
                 conn.close()
                 
@@ -438,21 +449,34 @@ async def get_lecture_details(request: Request, lecture_id: int, auth_token: str
                 if not lecture:
                     raise HTTPException(status_code=404, detail="Lecture not found")
             
-                # Get course lectures
+                # Get course lectures with pass status
                 cursor.execute("""
                 SELECT 
-                    LectureID as id,
-                    CourseID as courseId,
-                    Title as title,
-                    Description as description
-                FROM Lectures
-                WHERE CourseID = %s
-                ORDER BY LectureID
-                """, (lecture['courseId'],))
+                    l.LectureID as id,
+                    l.CourseID as courseId,
+                    l.Title as title,
+                    l.Description as description,
+                    CASE 
+                        WHEN lr.State = 'passed' THEN 1
+                        ELSE 0
+                    END as passed
+                FROM Lectures l
+                LEFT JOIN LectureResults lr ON l.LectureID = lr.LectureID 
+                    AND lr.LearnerID = %s 
+                    AND lr.CourseID = %s
+                WHERE l.CourseID = %s
+                ORDER BY l.LectureID
+                """, (user_data.get('user_id'), lecture['courseId'], lecture['courseId']))
                 
                 course_lectures = cursor.fetchall()
                 if not course_lectures:
                     course_lectures = []
+                else:
+                    # Convert passed from 1/0 to True/False for each lecture
+                    for course_lecture in course_lectures:
+                        if course_lecture.get('description') is None:
+                            course_lecture['description'] = None
+                        course_lecture['passed'] = bool(course_lecture.get('passed', 0))
 
                 response_data = {
                     "id": lecture['id'],

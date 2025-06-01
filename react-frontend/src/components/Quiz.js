@@ -119,9 +119,8 @@ const Quiz = ({ quiz, lectureId, onQuizComplete }) => {
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="quiz-form">
-          <div className="quiz-content">
-            {/* Left Column - Current Question and Options */}
-            <div className="quiz-questions-column">
+          {/* Left Column - Current Question and Options */}
+          <div className="quiz-questions-column">
               {(() => {
                 // Get the current question
                 const questionIds = Object.keys(quiz.questions);
@@ -143,26 +142,45 @@ const Quiz = ({ quiz, lectureId, onQuizComplete }) => {
                         {questionData.question}
                       </ReactMarkdown>
                     </div>
-                    <div className="options-grid">
-                      {questionData.options.map((option, optionIndex) => (
-                        <label 
-                          key={optionIndex} 
-                          className={`option ${answers[questionId] === option ? 'selected' : ''}`}
-                          onClick={() => handleOptionSelect(questionId, option)}
-                        >
-                          <input
-                            type="radio"
-                            name={`question-${questionId}`}
-                            value={option}
-                            checked={answers[questionId] === option}
-                            onChange={() => {}} // Empty handler to avoid React warning about controlled components
-                          />
-                          <div className="option-text">
-                            {option}
-                          </div>
-                        </label>
-                      ))}
+                    <div className="options-container">
+                      <button 
+                        type="button" 
+                        className="nav-arrow-button prev"
+                        onClick={prevQuestion}
+                        disabled={currentQuestionIndex === 0}
+                      >
+                        ‹
+                      </button>
+                      <div className="options-grid">
+                        {questionData.options.map((option, optionIndex) => (
+                          <label 
+                            key={optionIndex} 
+                            className={`option ${answers[questionId] === option ? 'selected' : ''}`}
+                            onClick={() => handleOptionSelect(questionId, option)}
+                          >
+                            <input
+                              type="radio"
+                              name={`question-${questionId}`}
+                              value={option}
+                              checked={answers[questionId] === option}
+                              onChange={() => {}} // Empty handler to avoid React warning about controlled components
+                            />
+                            <div className="option-text">
+                              {option}
+                            </div>
+                          </label>
+                        ))}
+                      </div>
+                      <button 
+                        type="button" 
+                        className="nav-arrow-button next"
+                        onClick={nextQuestion}
+                        disabled={currentQuestionIndex === questionIds.length - 1}
+                      >
+                        ›
+                      </button>
                     </div>
+                    
                     <div className="question-navigation-buttons">
                       <button 
                         type="button" 
@@ -206,15 +224,16 @@ const Quiz = ({ quiz, lectureId, onQuizComplete }) => {
                 </div>
               </div>
               
-              <button 
-                type="submit" 
-                className="submit-button"
-                disabled={loading || Object.keys(answers).length !== Object.keys(quiz.questions).length}
-              >
-                {loading ? 'Submitting...' : `Submit Quiz (${Object.keys(answers).length}/${Object.keys(quiz.questions).length} answered)`}
-              </button>
+              <div className="submit-section">
+                <button 
+                  type="submit" 
+                  className="submit-button"
+                  disabled={loading || Object.keys(answers).length !== Object.keys(quiz.questions).length}
+                >
+                  {loading ? 'Submitting...' : `Submit Quiz (${Object.keys(answers).length}/${Object.keys(quiz.questions).length} answered)`}
+                </button>
+              </div>
             </div>
-          </div>
         </form>
       )}
     </div>

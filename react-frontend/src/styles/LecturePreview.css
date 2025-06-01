@@ -292,6 +292,7 @@
   /* Global scrollbar styles applied via GlobalScrollbar.css - using scrollbar-thin class */
   scroll-behavior: smooth; /* Smooth scrolling for better UX */
   overscroll-behavior: contain; /* Prevent scroll chaining on mobile */
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%); /* Upgraded gradient for navigation tab content */
 }
 
 .navigation-tab-content::after {
@@ -492,6 +493,19 @@
   transform: translateY(-1px);
 }
 
+/* Style for passed lectures with green gradient */
+.lecture-nav-item.passed {
+  background: linear-gradient(135deg, #34c759, #7fd580);
+  color: white;
+  box-shadow: 0 3px 10px rgba(52, 199, 89, 0.25);
+  transform: translateY(-1px);
+}
+
+.lecture-nav-item.passed .lecture-index {
+  background-color: white;
+  color: #34c759;
+}
+
 .lecture-nav-item.active .lecture-index {
   background-color: white;
   color: #0066cc;
@@ -507,7 +521,7 @@
   background: rgba(0, 0, 0, 0.06);
   font-size: 12px;
   font-weight: 600;
-  color: #8e8e93;
+  color: #1d1d1f;
   flex-shrink: 0;
   transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
