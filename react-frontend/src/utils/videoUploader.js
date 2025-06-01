@@ -37,7 +37,11 @@ class VideoUploader {
    * @returns {boolean} True if the file should use chunked upload
    */
   shouldUseChunkedUpload(file) {
-    return file.size > 10 * 1024 * 1024; // Use chunked upload for files larger than 10MB
+    // Use chunked upload for files larger than 10MB
+    const useChunked = file.size > 10 * 1024 * 1024;
+    console.log(`shouldUseChunkedUpload called for file size: ${file.size} bytes (${Math.round(file.size / 1024 / 1024)}MB)`);
+    console.log(`Returning ${useChunked} for chunked upload decision`);
+    return useChunked;
   }
 
   /**
@@ -98,6 +102,12 @@ class VideoUploader {
     try {
       this.abortController = new AbortController();
       
+      // Check file size limit - removed the 100MB restriction for chunked uploads
+      const maxSize = 500 * 1024 * 1024; // 500MB max file size
+      if (file.size > maxSize) {
+        throw new Error(`File size (${Math.round(file.size / 1024 / 1024)}MB) exceeds the maximum allowed size of 500MB`);
+      }
+      
       // Compress video if it's large
       let processedFile = file;
       if (file.size > 20 * 1024 * 1024) { // 20MB
@@ -105,9 +115,13 @@ class VideoUploader {
         processedFile = await this.compressVideo(file);
       }
 
-      if (this.shouldUseChunkedUpload(processedFile)) {
-        console.log(`Using chunked upload for ${processedFile.name} (${processedFile.size} bytes)`);
-        await this.chunkedUpload(processedFile, courseId, lectureId, onProgress, onError, onSuccess);
+      const useChunked = this.shouldUseChunkedUpload(processedFile);
+      console.log(`File size: ${processedFile.size} bytes (${Math.round(processedFile.size / 1024 / 1024)}MB)`);
+      console.log(`shouldUseChunkedUpload returned: ${useChunked}`);
+
+      if (useChunked) {
+        console.log(`Using backend-proxied chunked upload for ${processedFile.name} (${processedFile.size} bytes)`);
+        await this.backendProxiedChunkedUpload(processedFile, courseId, lectureId, onProgress, onError, onSuccess);
       } else {
         console.log(`Using standard upload for ${processedFile.name} (${processedFile.size} bytes)`);
         await this.standardUpload(processedFile, courseId, lectureId, onProgress, onError, onSuccess);
@@ -117,7 +131,8 @@ class VideoUploader {
         throw new Error('Upload cancelled');
       }
       console.error('Upload failed:', error);
-      onError(error.message || 'Upload failed');
+      onError?.(error.message || 'Upload failed');
+      throw error;
     }
   }
 
@@ -134,8 +149,6 @@ class VideoUploader {
     try {
       const formData = new FormData();
       formData.append('video', file);
-      formData.append('course_id', courseId);
-      formData.append('lecture_id', lectureId);
 
       // Set up XMLHttpRequest for progress tracking
       const xhr = new XMLHttpRequest();
@@ -183,7 +196,17 @@ class VideoUploader {
   }
 
   /**
-   * Chunked upload implementation for larger files
+   * Legacy chunked upload implementation - DEPRECATED
+   * This method used direct S3 uploads with presigned URLs but caused CORS issues.
+   * Use backendProxiedChunkedUpload() instead.
+   * @deprecated Use backendProxiedChunkedUpload() for chunked uploads
+   */
+  async chunkedUpload() {
+    throw new Error('Direct S3 chunked upload is deprecated due to CORS issues. Use backendProxiedChunkedUpload() instead.');
+  }
+
+  /**
+   * Backend-proxied chunked upload implementation for larger files (avoids CORS issues)
    * @param {File} file - The video file to upload
    * @param {number} courseId - The course ID
    * @param {number} lectureId - The lecture ID
@@ -191,11 +214,11 @@ class VideoUploader {
    * @param {function} onError - Error callback function
    * @param {function} onSuccess - Success callback function
    */
-  async chunkedUpload(file, courseId, lectureId, onProgress, onError, onSuccess) {
+  async backendProxiedChunkedUpload(file, courseId, lectureId, onProgress, onError, onSuccess) {
     try {
       // Step 1: Initialize the multipart upload
       const numParts = Math.ceil(file.size / this.chunkSize);
-      console.log(`Initializing chunked upload with ${numParts} parts`);
+      console.log(`Initializing backend-proxied chunked upload with ${numParts} parts`);
       
       const initFormData = new FormData();
       initFormData.append('course_id', courseId);
@@ -204,23 +227,32 @@ class VideoUploader {
       initFormData.append('file_type', file.type);
       initFormData.append('parts', numParts);
 
-      const initResponse = await fetch(`${this.API_URL}/api/upload/init-upload`, {
+      console.log('Sending init request to:', `${this.API_URL}/api/upload/proxy/init-upload`);
+      console.log('Init form data:', Object.fromEntries(initFormData));
+
+      const initResponse = await fetch(`${this.API_URL}/api/upload/proxy/init-upload`, {
         method: 'POST',
         headers: this.createHeaders(),
         credentials: 'include',
         body: initFormData
       });
 
+      console.log('Init response status:', initResponse.status);
+      
       if (!initResponse.ok) {
-        throw new Error(`Failed to initialize upload: ${initResponse.statusText}`);
+        const errorText = await initResponse.text();
+        console.error('Init response error text:', errorText);
+        throw new Error(`Failed to initialize upload: ${initResponse.status} ${initResponse.statusText} - ${errorText}`);
       }
 
-      const { upload_id, presigned_urls } = await initResponse.json();
-      console.log(`Upload initialized with ID: ${upload_id}`);
+      const initResponseData = await initResponse.json();
+      console.log('Init response data:', initResponseData);
+      
+      const { upload_id } = initResponseData;
+      console.log(`Backend-proxied upload initialized with ID: ${upload_id}`);
       onProgress(5); // Initial progress
 
-      // Step 2: Upload each part
-      const uploadedParts = [];
+      // Step 2: Upload each part through backend proxy
       let totalUploaded = 0;
 
       for (let partNumber = 1; partNumber <= numParts; partNumber++) {
@@ -228,40 +260,46 @@ class VideoUploader {
         const end = Math.min(start + this.chunkSize, file.size);
         const chunk = file.slice(start, end);
         
-        // Get the presigned URL for this part
-        const presignedUrl = presigned_urls[partNumber];
-        if (!presignedUrl) {
-          throw new Error(`Missing presigned URL for part ${partNumber}`);
-        }
+        console.log(`Uploading part ${partNumber}/${numParts} (${chunk.size} bytes) via backend proxy`);
 
         // Upload the part with retry logic
         let retries = 0;
         let success = false;
-        let etag = null;
 
         while (retries < this.maxRetries && !success) {
           try {
-            const uploadResponse = await fetch(presignedUrl, {
-              method: 'PUT',
-              body: chunk
+            const partFormData = new FormData();
+            partFormData.append('upload_id', upload_id);
+            partFormData.append('part_number', partNumber);
+            partFormData.append('chunk', chunk);
+
+            const uploadResponse = await fetch(`${this.API_URL}/api/upload/proxy/upload-part`, {
+              method: 'POST',
+              headers: this.createHeaders(),
+              credentials: 'include',
+              body: partFormData
             });
+
+            console.log(`Part ${partNumber} upload response status:`, uploadResponse.status);
 
             if (uploadResponse.ok) {
               success = true;
-              etag = uploadResponse.headers.get('ETag');
-              if (!etag) {
-                etag = `"${Math.random().toString(36).substring(2, 15)}"`;
-                console.warn(`No ETag received for part ${partNumber}, using generated value`);
-              }
+              const partResponse = await uploadResponse.json();
+              console.log(`Part ${partNumber} uploaded successfully via backend proxy, ETag:`, partResponse.etag);
             } else {
               retries++;
-              console.warn(`Upload failed for part ${partNumber}, attempt ${retries}/${this.maxRetries}`);
-              await new Promise(resolve => setTimeout(resolve, this.retryDelay));
+              const errorText = await uploadResponse.text();
+              console.error(`Upload failed for part ${partNumber}, attempt ${retries}/${this.maxRetries}:`, uploadResponse.status, errorText);
+              if (retries < this.maxRetries) {
+                await new Promise(resolve => setTimeout(resolve, this.retryDelay));
+              }
             }
           } catch (error) {
             retries++;
-            console.error(`Error uploading part ${partNumber}:`, error);
-            await new Promise(resolve => setTimeout(resolve, this.retryDelay));
+            console.error(`Error uploading part ${partNumber}, attempt ${retries}/${this.maxRetries}:`, error);
+            if (retries < this.maxRetries) {
+              await new Promise(resolve => setTimeout(resolve, this.retryDelay));
+            }
           }
         }
 
@@ -269,61 +307,47 @@ class VideoUploader {
           throw new Error(`Failed to upload part ${partNumber} after ${this.maxRetries} attempts`);
         }
 
-        // Notify the server about the successful part upload
-        const partFormData = new FormData();
-        partFormData.append('upload_id', upload_id);
-        partFormData.append('part_number', partNumber);
-        partFormData.append('etag', etag);
-
-        const partStatusResponse = await fetch(`${this.API_URL}/api/upload/upload-part`, {
-          method: 'POST',
-          headers: this.createHeaders(),
-          credentials: 'include',
-          body: partFormData
-        });
-
-        if (!partStatusResponse.ok) {
-          throw new Error(`Failed to update part status: ${partStatusResponse.statusText}`);
-        }
-
         // Track upload progress
         totalUploaded += (end - start);
         const percentComplete = 5 + Math.round((totalUploaded / file.size) * 90); // 5% for init, 90% for upload
         onProgress(percentComplete);
 
-        uploadedParts.push({
-          PartNumber: partNumber,
-          ETag: etag
-        });
-
         console.log(`Uploaded part ${partNumber}/${numParts} (${percentComplete}%)`);
       }
 
       // Step 3: Complete the multipart upload
-      console.log('All parts uploaded, completing upload...');
+      console.log('All parts uploaded, completing backend-proxied upload...');
       
       const completeFormData = new FormData();
       completeFormData.append('upload_id', upload_id);
 
-      const completeResponse = await fetch(`${this.API_URL}/api/upload/complete-upload`, {
+      console.log('Sending complete request to:', `${this.API_URL}/api/upload/proxy/complete-upload`);
+
+      const completeResponse = await fetch(`${this.API_URL}/api/upload/proxy/complete-upload`, {
         method: 'POST',
         headers: this.createHeaders(),
         credentials: 'include',
         body: completeFormData
       });
 
+      console.log('Complete response status:', completeResponse.status);
+
       if (!completeResponse.ok) {
-        throw new Error(`Failed to complete upload: ${completeResponse.statusText}`);
+        const errorText = await completeResponse.text();
+        console.error('Complete response error text:', errorText);
+        throw new Error(`Failed to complete upload: ${completeResponse.status} ${completeResponse.statusText} - ${errorText}`);
       }
 
       const result = await completeResponse.json();
-      console.log('Upload completed successfully:', result);
+      console.log('Backend-proxied upload completed successfully:', result);
+
       onProgress(100);
       onSuccess(result);
       return result;
     } catch (error) {
-      console.error('Chunked upload failed:', error);
-      onError(error.message || 'Chunked upload failed');
+      console.error('Backend-proxied chunked upload failed with detailed error:', error);
+      console.error('Error stack:', error.stack);
+      onError(error.message || 'Backend-proxied chunked upload failed');
       throw error;
     }
   }

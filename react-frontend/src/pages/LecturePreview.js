@@ -21,6 +21,7 @@ const LecturePreview = () => {
   const { currentUser } = useAuth();
   const { startLoading, stopLoading } = useLoading();
   const navigate = useNavigate();
+  const videoRef = useRef(null);
   
   // Extract course information from navigation state
   const courseFromState = location.state || {};
@@ -75,6 +76,15 @@ const LecturePreview = () => {
   // Use actual lecture data if available, otherwise use default
   const displayLecture = lecture || defaultLecture;
   
+  // Effect to reload the video when the lecture changes
+  useEffect(() => {
+    if (videoRef.current && displayLecture.videoUrl) {
+      // Reset the video element
+      videoRef.current.pause();
+      videoRef.current.load();
+    }
+  }, [displayLecture.videoUrl]);
+  
   return (
     <div className="lecture-preview-container">
       {/* Main Content with YouTube-like Layout */}
@@ -103,6 +113,8 @@ const LecturePreview = () => {
           <div className="video-container">
             {displayLecture.videoUrl ? (
               <video 
+                ref={videoRef}
+                key={displayLecture.videoUrl} // Add a key to force re-render when URL changes
                 controls 
                 preload="metadata"
                 controlsList="nodownload"

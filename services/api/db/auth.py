@@ -25,12 +25,34 @@ import sys
 import importlib.util
 from services.api.db.token_utils import create_token, decode_token
 from sqlalchemy.orm import Session
+from contextlib import asynccontextmanager
 
 # Add parent directory to path to enable imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-# Create single FastAPI instance
-app = FastAPI()
+# Define lifespan context manager for startup/shutdown events
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup
+    print("Starting up FastAPI application...")
+    
+    # Start background tasks from upload endpoints
+    try:
+        # Import and start upload cleanup task
+        from services.api.upload_endpoints import start_cleanup_task
+        cleanup_task = start_cleanup_task()
+        print("Upload cleanup task started successfully")
+    except Exception as e:
+        print(f"Failed to start upload cleanup task: {e}")
+    
+    yield
+    
+    # Shutdown
+    print("Shutting down FastAPI application...")
+    # Any cleanup can be done here
+
+# Create single FastAPI instance with lifespan
+app = FastAPI(lifespan=lifespan)
 
 # Configure CORS with all needed origins
 app.add_middleware(

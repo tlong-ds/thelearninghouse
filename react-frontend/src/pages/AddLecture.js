@@ -17,9 +17,49 @@ const AddLecture = () => {
   const [uploadId, setUploadId] = useState(null);
   const [processStage, setProcessStage] = useState(null);
   
-  // Track stage progress for better UX
+  // Track stage progress for better UX in two-step workflow
   const updateStageProgress = (stage, status, percent) => {
     setProcessStage({ stage, status, percent });
+    
+    // Provide detailed stage messages
+    let message = '';
+    switch (stage) {
+      case 'creating':
+        if (status === 'processing') {
+          message = percent < 30 ? 'Preparing lecture data...' : 'Saving lecture to database...';
+        } else if (status === 'completed') {
+          message = 'Lecture created successfully!';
+        }
+        break;
+      case 'videoUpload':
+        if (status === 'processing') {
+          if (percent < 10) {
+            message = 'Initializing video upload...';
+          } else if (percent < 90) {
+            message = `Uploading video... ${percent}%`;
+          } else {
+            message = 'Finalizing video upload...';
+          }
+        } else if (status === 'completed') {
+          message = 'Video uploaded successfully!';
+        } else if (status === 'failed') {
+          message = 'Video upload failed';
+        }
+        break;
+      case 'completed':
+        message = 'All done!';
+        break;
+      case 'failed':
+        message = 'Operation failed';
+        break;
+      default:
+        message = 'Processing...';
+    }
+    
+    // Update loading message if we have access to it
+    if (typeof updateMessage === 'function') {
+      updateMessage(message);
+    }
   };
   
   const [lectureData, setLectureData] = useState({
@@ -70,7 +110,7 @@ const AddLecture = () => {
     const file = e.target.files[0];
     if (!file) return;
     
-    // Validate file size (max 500MB)
+    // Validate file size (max 500MB with chunked upload support)
     if (file.size > 500 * 1024 * 1024) {
       setError('Video file size must be less than 500MB');
       return;
@@ -220,23 +260,26 @@ const AddLecture = () => {
     setIsLoading(true);
     setError(null);
     
-    // Start loading screen
+    // Start loading screen with two-step workflow
     startLoading('Creating lecture...');
-    setProcessStage({ stage: 'init', status: 'processing', percent: 0 });
+    setProcessStage({ stage: 'creating', status: 'processing', percent: 0 });
     
     try {
-      // Prepare form data for the API
+      // Step 1: Create lecture without video
+      updateStageProgress('creating', 'processing', 10);
+      updateMessage('Creating lecture in database...');
+      
       const formData = new FormData();
       formData.append('title', lectureData.title);
       formData.append('description', lectureData.description);
       formData.append('content', lectureData.content);
       
-      // Add quiz data if present
+      // Add quiz data if present (but no video)
       if (lectureData.quiz.questions.length > 0) {
         formData.append('quiz', JSON.stringify(lectureData.quiz));
       }
 
-      updateStageProgress('lectureDetails', 'processing', 50);
+      updateStageProgress('creating', 'processing', 30);
 
       const response = await fetch(`${config.API_URL}/api/courses/${courseId}/lectures`, {
         method: 'POST',
@@ -248,13 +291,17 @@ const AddLecture = () => {
       });
 
       if (!response.ok) {
-        throw new Error('Failed to create lecture');
+        const errorText = await response.text();
+        throw new Error(`Failed to create lecture: ${response.status} ${errorText}`);
       }
       
       const lectureResponse = await response.json();
       const lectureId = lectureResponse.id;
       
-      // Handle video upload if present
+      updateStageProgress('creating', 'completed', 50);
+      updateMessage('Lecture created successfully!');
+      
+      // Step 2: Handle video upload separately if present
       if (lectureData.video) {
         updateStageProgress('videoUpload', 'processing', 0);
         updateMessage('Uploading video...');
@@ -265,42 +312,56 @@ const AddLecture = () => {
             courseId,
             lectureId,
             (progress) => {
-              // Update stage progress only
+              // Map video upload progress to the remaining 50% of total progress
+              const mappedProgress = 50 + (progress / 2); // 50% to 100%
               updateStageProgress('videoUpload', 'processing', progress);
+              // Update overall loading message progress
+              if (progress === 100) {
+                updateMessage('Video upload completed!');
+              } else {
+                updateMessage(`Uploading video... ${progress}%`);
+              }
             },
             (errorMsg) => {
               console.error('Video upload error:', errorMsg);
-              // Continue with success even if video upload fails
               updateStageProgress('videoUpload', 'failed', 100);
-              setError(`Lecture created but video upload failed: ${errorMsg}`);
+              setError(`Lecture created successfully, but video upload failed: ${errorMsg}. You can upload the video later.`);
+              // Still proceed to completion since lecture was created
             },
             (result) => {
               updateStageProgress('videoUpload', 'completed', 100);
+              updateMessage('Video uploaded successfully!');
               console.log('Video upload complete:', result);
             }
           );
         } catch (videoError) {
           console.error('Video upload error:', videoError);
-          // Continue with success even if video upload fails
           updateStageProgress('videoUpload', 'failed', 100);
-          setError(`Lecture created but video upload failed: ${videoError.message}`);
+          setError(`Lecture created successfully, but video upload failed: ${videoError.message}. You can upload the video later.`);
+          // Still proceed to completion since lecture was created
         }
       }
 
-      // All stages completed
-      setProcessStage('completed');
-      updateMessage('Lecture created successfully!');
+      // All stages completed (even if video upload failed, lecture was created)
+      setProcessStage({ stage: 'completed', status: 'completed', percent: 100 });
+      updateMessage(
+        lectureData.video && processStage?.stage !== 'failed' ? 
+        'Lecture and video uploaded successfully!' : 
+        'Lecture created successfully!'
+      );
       
       // Navigate after a short delay to show completion
       setTimeout(() => {
         stopLoading();
         navigate(`/manage-course/${courseId}`);
-      }, 1000);
+      }, 1500);
 
     } catch (err) {
-      setError('Failed to create lecture. Please try again.');
-      console.error('Error:', err);
+      console.error('Error creating lecture:', err);
+      setError(`Failed to create lecture: ${err.message}`);
+      setProcessStage({ stage: 'failed', status: 'failed', percent: 0 });
       stopLoading();
+      setIsLoading(false);
     }
   };
 
@@ -381,8 +442,8 @@ const AddLecture = () => {
                       <div className="upload-info">
                         <span>Supports: MP4, WebM, MOV</span>
                         <span>Maximum size: 500MB</span>
-                        {lectureData.video && lectureData.video.size > 10 * 1024 * 1024 && (
-                          <span className="upload-note">Large file will use chunked upload</span>
+                        {lectureData.video && (
+                          <span className="upload-note">Video will upload after lecture creation</span>
                         )}
                       </div>
                     </div>
@@ -529,9 +590,17 @@ const AddLecture = () => {
               className="primary-btn"
               disabled={isLoading}
             >
-              {isLoading ? 'Creating...' : 'Create Lecture'}
+              {isLoading ? (
+                processStage?.stage === 'creating' ? 'Creating Lecture...' :
+                processStage?.stage === 'videoUpload' ? 'Uploading Video...' :
+                'Processing...'
+              ) : (
+                lectureData.video ? 'Create Lecture & Upload Video' : 'Create Lecture'
+              )}
             </button>
           </div>
+
+
         </form>
       </div>
     </div>

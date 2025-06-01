@@ -10,7 +10,6 @@ import boto3
 import json
 import threading
 import asyncio
-from io import BytesIO
 from botocore.exceptions import ClientError
 from datetime import datetime
 from fastapi.middleware.cors import CORSMiddleware
@@ -2119,58 +2118,17 @@ async def create_lecture(
                 # Commit all database changes at once
                 conn.commit()
                 
-                # Return immediately after database operations - handle video upload asynchronously
+                # Prepare response
                 response = {
                     "id": lecture_id,
                     "title": title,
                     "message": "Lecture created successfully"
                 }
                 
-                # Handle video upload synchronously but efficiently
+                # Note: Video upload is now handled separately through upload_endpoints.py
+                # This separates concerns and allows for better error handling and chunked uploads
                 if video:
-                    try:
-                        # File validation
-                        video.file.seek(0, 2)  # Seek to end
-                        file_size = video.file.tell()
-                        video.file.seek(0)  # Reset to beginning
-                        
-                        if file_size > 500 * 1024 * 1024:  # 500MB in bytes
-                            raise HTTPException(status_code=400, detail="Video file size must be less than 500MB")
-                        
-                        # Check file type
-                        if not video.content_type.startswith('video/'):
-                            raise HTTPException(status_code=400, detail="Invalid file type. Please upload a video file")
-                        
-                        # Read video content into memory for upload
-                        video_content = video.file.read()
-                        video.file.seek(0)  # Reset file position
-                        
-                        # Upload to S3 with the video content
-                        media_path = f"videos/cid{course_id}/lid{lecture_id}/vid_lecture.mp4"
-                        
-                        # Create BytesIO object from video content
-                        video_stream = BytesIO(video_content)
-                        
-                        # Upload to S3 using the BytesIO stream
-                        s3.upload_fileobj(
-                            video_stream,
-                            "tlhmaterials",
-                            media_path,
-                            ExtraArgs={
-                                'ContentType': video.content_type,
-                                'ACL': 'public-read',
-                                'ContentDisposition': 'inline'
-                            }
-                        )
-                        
-                        print(f"Video upload completed for lecture {lecture_id}")
-                        response["video_status"] = "uploaded"
-                        response["video_url"] = f"https://tlhmaterials.s3-{REGION}.amazonaws.com/{media_path}"
-                        response["message"] = "Lecture created successfully with video."
-                        
-                    except Exception as video_error:
-                        print(f"Video upload failed: {str(video_error)}")
-                        response["warning"] = f"Lecture created but video upload failed: {str(video_error)}"
+                    response["note"] = "Lecture created successfully. Please use the dedicated upload endpoints for video upload."
                 
                 
                 # Invalidate cache patterns in background (non-blocking)
@@ -2187,10 +2145,6 @@ async def create_lecture(
                 
                 # Start background cache invalidation
                 cache_thread = threading.Thread(target=background_cache_invalidation)
-                cache_thread.daemon = True
-                cache_thread.start()
-                
-                return response
                 cache_thread.daemon = True
                 cache_thread.start()
                 
