@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../services/AuthContext';
 import { images } from '../utils/images';
 import '../styles/Login.css';
+import gradientVideo from '../assets/videos/gradient-bg.mp4';
+import darkLogo from '../assets/dark_logo.webp';
 
 const Login = () => {
   const [isLogin, setIsLogin] = useState(true);
@@ -118,159 +120,243 @@ const Login = () => {
   };
   
   return (
-    <div className="auth-container">
-      <div className="auth-logo">
-        <img src={images.lightLogo} alt="The Learning House Logo" />
+    <div className="login-container">
+      {/* Video Background - Same as Home page */}
+      <div className="login-video-background">
+        <video
+          className="login-background-video"
+          autoPlay
+          loop
+          muted
+          playsInline
+          src={gradientVideo}
+        >
+          {/* Fallback for browsers that don't support video */}
+        </video>
+        <div className="login-video-overlay"></div>
       </div>
-      
-      <h1 className="auth-title">The Learning House</h1>
-      <p className="auth-subtitle">The Best Learning Platform for Learners and Instructors!</p>
-      
-      <div className="auth-form-container">
-        <div className="role-selector">
-          <label>Select your role:</label>
-          <select value={role} onChange={(e) => setRole(e.target.value)}>
-            <option value="Learner">Learner</option>
-            <option value="Instructor">Instructor</option>
-          </select>
-        </div>
-        
-        <div className="auth-tabs">
-          <button 
-            className={isLogin ? 'active' : ''}
-            onClick={() => setIsLogin(true)}
-          >
-            Login
-          </button>
-          <button 
-            className={!isLogin ? 'active' : ''}
-            onClick={() => setIsLogin(false)}
-          >
-            Sign Up
-          </button>
-        </div>
-        
-        {isLogin ? (
-          <form className="auth-form" onSubmit={handleLogin}>
-            <div className="form-group">
-              <label htmlFor="username">Username</label>
-              <input
-                type="text"
-                id="username"
-                placeholder="Enter username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-              />
-            </div>
-            
-            <div className="form-group">
-              <label htmlFor="password">Password</label>
-              <input
-                type="password"
-                id="password"
-                placeholder="Enter password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-            
-            {error && <div className="error-message">{error}</div>}
-            
-            <button type="submit" className="auth-button">Login</button>
-          </form>
-        ) : (
-          <form className="auth-form" onSubmit={handleRegister}>
-            <h3>Create Account</h3>
-            
-            <div className="form-group">
-              <label htmlFor="fullName">Full Name</label>
-              <input
-                type="text"
-                id="fullName"
-                placeholder="Enter your full name"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-              />
-            </div>
-            
-            <div className="form-group">
-              <label htmlFor="reg-username">Username</label>
-              <input
-                type="text"
-                id="reg-username"
-                placeholder="Choose a username"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-              />
-            </div>
-            
-            <div className="form-group">
-              <label htmlFor="email">Email</label>
-              <input
-                type="email"
-                id="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-            </div>
-            
-            <div className="form-group">
-              <label htmlFor="reg-password">Password</label>
-              <input
-                type="password"
-                id="reg-password"
-                placeholder="Choose a password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-              />
-            </div>
-            
-            <div className="form-group">
-              <label htmlFor="confirmPassword">Confirm Password</label>
-              <input
-                type="password"
-                id="confirmPassword"
-                placeholder="Confirm password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-              />
-            </div>
-            
-            {role === 'Learner' ? (
-              <div className="form-group">
-                <label htmlFor="phone">Phone Number</label>
-                <input
-                  type="text"
-                  id="phone"
-                  placeholder="Enter your phone number"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                />
+
+      {/* Login Card */}
+      <div className="login-card">
+        {/* Left Column - Dummy Image */}
+        <div className="login-card-left">
+          <div className="login-image-container">
+            <div className="login-decorative-graphic">
+              <div className="graphic-element element-1"></div>
+              <div className="graphic-element element-2"></div>
+              <div className="graphic-element element-3"></div>
+              <div className="graphic-text">
+                <img src={darkLogo} alt="The Learning House Logo" className="left-column-logo" />
+                <h2>Welcome to</h2>
+                <h1>The Learning House</h1>
+                <p>Discover knowledge, connect with experts, and transform your learning journey.</p>
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Right Column - Login Form */}
+        <div className="login-card-right">
+          {/* Cancel Button */}
+          <button 
+            type="button" 
+            className="login-cancel-btn"
+            onClick={() => navigate('/')}
+            aria-label="Go to Home"
+          >
+            <i className="fas fa-times"></i>
+          </button>
+          
+          <div className="login-form-wrapper">
+            {/* Header */}
+            <div className="login-header">
+              <h2 className="login-title">
+                {isLogin ? 'Sign In' : 'Join The Learning House'}
+              </h2>
+              <p className="login-subtitle">
+                {isLogin 
+                  ? 'Sign in to continue your learning journey' 
+                  : 'Create your account to get started'
+                }
+              </p>
+            </div>
+
+            {/* Role Selector */}
+            <div className="login-role-selector">
+              <label>I am a:</label>
+              <div className="role-options">
+                <button 
+                  type="button"
+                  className={`role-option ${role === 'Learner' ? 'active' : ''}`}
+                  onClick={() => setRole('Learner')}
+                >
+                  <i className="fas fa-graduation-cap"></i>
+                  <span>Learner</span>
+                </button>
+                <button 
+                  type="button"
+                  className={`role-option ${role === 'Instructor' ? 'active' : ''}`}
+                  onClick={() => setRole('Instructor')}
+                >
+                  <i className="fas fa-chalkboard-teacher"></i>
+                  <span>Instructor</span>
+                </button>
+              </div>
+            </div>
+
+            {/* Auth Tabs */}
+            <div className="login-auth-tabs">
+              <button 
+                type="button"
+                className={`auth-tab ${isLogin ? 'active' : ''}`}
+                onClick={() => setIsLogin(true)}
+              >
+                Sign In
+              </button>
+              <button 
+                type="button"
+                className={`auth-tab ${!isLogin ? 'active' : ''}`}
+                onClick={() => setIsLogin(false)}
+              >
+                Sign Up
+              </button>
+            </div>
+
+            {/* Forms */}
+            {isLogin ? (
+              <form className="login-form" onSubmit={handleLogin}>
+                <div className="form-group">
+                  <input
+                    type="text"
+                    id="username"
+                    placeholder="Enter your username"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    autoComplete="username"
+                  />
+                </div>
+                
+                <div className="form-group">
+                  <input
+                    type="password"
+                    id="password"
+                    placeholder="Enter your password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    autoComplete="current-password"
+                  />
+                </div>
+                
+                {error && <div className="error-message">{error}</div>}
+                
+                <button type="submit" className="login-submit-btn">
+                  <span>Sign In</span>
+                  <i className="fas fa-arrow-right"></i>
+                </button>
+                
+                <div className="login-copyright">
+                  &copy; {new Date().getFullYear()} The Learning House. All rights reserved.
+                </div>
+              </form>
             ) : (
-              <div className="form-group">
-                <label htmlFor="expertise">Expertise</label>
-                <input
-                  type="text"
-                  id="expertise"
-                  placeholder="Enter your expertise area"
-                  value={expertise}
-                  onChange={(e) => setExpertise(e.target.value)}
-                />
-              </div>
+              <form className="login-form register-form" onSubmit={handleRegister}>
+                <div className="form-row">
+                  <div className="form-group">
+                    <input
+                      type="text"
+                      id="fullName"
+                      placeholder="Enter your full name"
+                      value={fullName}
+                      onChange={(e) => setFullName(e.target.value)}
+                      autoComplete="name"
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <input
+                      type="text"
+                      id="reg-username"
+                      placeholder="Choose a username"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      autoComplete="username"
+                    />
+                  </div>
+                </div>
+                
+                <div className="form-group">
+                  <input
+                    type="email"
+                    id="email"
+                    placeholder="Enter your email address"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    autoComplete="email"
+                  />
+                </div>
+                
+                <div className="form-row">
+                  <div className="form-group">
+                    <input
+                      type="password"
+                      id="reg-password"
+                      placeholder="Create a password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      autoComplete="new-password"
+                    />
+                  </div>
+                  
+                  <div className="form-group">
+                    <input
+                      type="password"
+                      id="confirmPassword"
+                      placeholder="Confirm your password"
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      autoComplete="new-password"
+                    />
+                  </div>
+                </div>
+                
+                {role === 'Learner' ? (
+                  <div className="form-group">
+                    <input
+                      type="tel"
+                      id="phone"
+                      placeholder="Enter your phone number"
+                      value={phone}
+                      onChange={(e) => setPhone(e.target.value)}
+                      autoComplete="tel"
+                    />
+                  </div>
+                ) : (
+                  <div className="form-group">
+                    <input
+                      type="text"
+                      id="expertise"
+                      placeholder="e.g., Computer Science, Mathematics, Physics"
+                      value={expertise}
+                      onChange={(e) => setExpertise(e.target.value)}
+                    />
+                  </div>
+                )}
+                
+                {error && <div className="error-message">{error}</div>}
+                
+                <button type="submit" className="login-submit-btn">
+                  <span>Create Account</span>
+                  <i className="fas fa-arrow-right"></i>
+                </button>
+                
+                <div className="login-copyright">
+                  &copy; {new Date().getFullYear()} The Learning House. All rights reserved.
+                </div>
+              </form>
             )}
-            
-            {error && <div className="error-message">{error}</div>}
-            
-            <button type="submit" className="auth-button">Sign Up</button>
-          </form>
-        )}
+          </div>
+        </div>
       </div>
-      
-      <footer className="footer">
-        <p>© 2025 The Learning House. All rights reserved.</p>
-      </footer>
     </div>
   );
 };

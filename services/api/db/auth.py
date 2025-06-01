@@ -130,13 +130,14 @@ async def login(response: Response, payload: LoginPayload):
 
         conn = connect_db()
         user_id = None
+        full_name = None
         try:
             with conn.cursor() as cur:
-                # Get both password and user ID for token creation
+                # Get password, user ID, and full name for token creation
                 if payload.role == "Learner":
-                    query = f"SELECT Password, LearnerID FROM {table} WHERE AccountName=%s LIMIT 1"
+                    query = f"SELECT Password, LearnerID, LearnerName FROM {table} WHERE AccountName=%s LIMIT 1"
                 else:  # Instructor
-                    query = f"SELECT Password, InstructorID FROM {table} WHERE AccountName=%s LIMIT 1"
+                    query = f"SELECT Password, InstructorID, InstructorName FROM {table} WHERE AccountName=%s LIMIT 1"
                     
                 print(f"Executing query: {query} with username: {payload.username}")
                 
@@ -149,7 +150,8 @@ async def login(response: Response, payload: LoginPayload):
                     
                 password_valid = check_password(payload.password, row[0])
                 user_id = row[1]  # Get the LearnerID or InstructorID
-                print(f"Password check result: {password_valid}, User ID: {user_id}")
+                full_name = row[2]  # Get the LearnerName or InstructorName
+                print(f"Password check result: {password_valid}, User ID: {user_id}, Full Name: {full_name}")
                 
                 if not password_valid:
                     print(f"Authentication failed: Invalid password")
@@ -160,13 +162,14 @@ async def login(response: Response, payload: LoginPayload):
         finally:
             conn.close()
         
-        # User authenticated successfully - include user_id in token
+        # User authenticated successfully - include user_id and full name in token
         user_data = {
             "username": payload.username, 
             "role": payload.role,
-            "user_id": user_id
+            "user_id": user_id,
+            "full_name": full_name
         }
-        print(f"Authentication successful for: {payload.username} (ID: {user_id})")
+        print(f"Authentication successful for: {payload.username} (ID: {user_id}, Name: {full_name})")
         
         token = create_token(user_data)
         # Set cookie with less restrictive settings for cross-origin
@@ -184,6 +187,7 @@ async def login(response: Response, payload: LoginPayload):
             "username": user_data["username"], 
             "role": user_data["role"],
             "user_id": user_data["user_id"],
+            "full_name": user_data["full_name"],
             "token": token
         }
     except Exception as e:
@@ -201,7 +205,8 @@ async def whoami(auth_token: str = Cookie(None)):
     return {
         "username": payload["username"], 
         "role": payload["role"],
-        "user_id": payload.get("user_id")
+        "user_id": payload.get("user_id"),
+        "full_name": payload.get("full_name")
     }
 
 @app.get("/protected")

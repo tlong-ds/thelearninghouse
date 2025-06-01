@@ -18,11 +18,13 @@ export const AuthProvider = ({ children }) => {
         const token = localStorage.getItem('auth_token');
         const storedUsername = localStorage.getItem('username');
         const storedRole = localStorage.getItem('user_role');
+        const storedFullName = localStorage.getItem('full_name');
         
         if (token && storedUsername && storedRole) {
           setCurrentUser({
             username: storedUsername,
-            role: storedRole
+            role: storedRole,
+            full_name: storedFullName
           });
           setIsAuthenticated(true);
           setLoading(false);
@@ -37,7 +39,8 @@ export const AuthProvider = ({ children }) => {
         if (response.data.username) {
           setCurrentUser({
             username: response.data.username,
-            role: response.data.role
+            role: response.data.role,
+            full_name: response.data.full_name
           });
           setIsAuthenticated(true);
         }
@@ -65,14 +68,16 @@ export const AuthProvider = ({ children }) => {
       });
       
       if (response.data.token) {
-        // Store token in localStorage
+        // Store token and user data in localStorage
         localStorage.setItem('auth_token', response.data.token);
         localStorage.setItem('user_role', response.data.role);
         localStorage.setItem('username', response.data.username);
+        localStorage.setItem('full_name', response.data.full_name);
         
         setCurrentUser({
           username: response.data.username,
-          role: response.data.role
+          role: response.data.role,
+          full_name: response.data.full_name
         });
         setIsAuthenticated(true);
         return true;
@@ -95,6 +100,7 @@ export const AuthProvider = ({ children }) => {
       localStorage.removeItem('auth_token');
       localStorage.removeItem('user_role');
       localStorage.removeItem('username');
+      localStorage.removeItem('full_name');
       
       setCurrentUser(null);
       setIsAuthenticated(false);

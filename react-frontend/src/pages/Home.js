@@ -202,16 +202,29 @@ const Home = () => {
                             {/* Fallback for browsers that don't support video */}
                         </video>
                     </div>
-                    <h1>The Learning House</h1>
+                    <h1>{currentUser ? `Welcome, ${currentUser.full_name}!` : 'The Learning House'}</h1>
                     <p className="macos-subtitle">A comprehensive marketplace uniting passionate learners with expert instructors</p>
                     
                     <div className="macos-cta-container">
-                        <Link to="/courses" className="macos-cta-primary">
-                            Explore Courses
-                        </Link>
-                        <Link to="/edumate" className="macos-cta-secondary">
-                            Try Edumate AI
-                        </Link>
+                        {currentUser ? (
+                            <>
+                                <Link to="/courses" className="macos-cta-primary">
+                                    Explore Courses
+                                </Link>
+                                <Link to="/edumate" className="macos-cta-secondary">
+                                    Try Edumate AI
+                                </Link>
+                            </>
+                        ) : (
+                            <>
+                                <Link to="/login" className="macos-cta-primary">
+                                    Explore Courses
+                                </Link>
+                                <Link to="/login" className="macos-cta-secondary">
+                                    Try Edumate AI
+                                </Link>
+                            </>
+                        )}
                     </div>
                 </motion.section>
                 
@@ -339,12 +352,6 @@ const Home = () => {
                     </div>
                 </motion.section>
             </motion.main>
-            
-            <footer className="macos-footer">
-                <div className="macos-footer-bottom">
-                    <p>&copy; {new Date().getFullYear()} The Learning House. All rights reserved.</p>
-                </div>
-            </footer>
         </div>
     );
 };

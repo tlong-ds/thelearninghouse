@@ -24,7 +24,7 @@ const Header = ({ username, role, onLogout }) => {
   const handleLogout = () => {
     setIsDropdownOpen(false);
     onLogout();
-    navigate('/login');
+    navigate('/');
   };
 
   const handleSettingsClick = () => {
