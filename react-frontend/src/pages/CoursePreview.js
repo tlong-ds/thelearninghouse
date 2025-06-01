@@ -250,7 +250,7 @@ const CoursePreview = () => {
               <p>This course is still being prepared. Check back soon!</p>
             </div>
           ) : (
-            <div className="lectures-grid">
+            <div className="lectures-grid scrollbar-auto-hide">
               {lectures.map((lecture, index) => (
                 <div key={lecture.id} className="lecture-card">
                   {/* Header row with order and title */}

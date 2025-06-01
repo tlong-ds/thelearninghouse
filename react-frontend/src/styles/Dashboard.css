@@ -364,57 +364,9 @@
   /* Auto-hiding scrollbar styling */
 }
 
-/* Auto-hiding scrollbar for courses list */
-.dashboard-courses-list::-webkit-scrollbar {
-  width: 6px;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
+/* Global scrollbar styles applied via GlobalScrollbar.css - using scrollbar-auto-hide class */
 
-.dashboard-courses-list::-webkit-scrollbar-track {
-  background: transparent;
-  border-radius: 3px;
-}
-
-.dashboard-courses-list::-webkit-scrollbar-thumb {
-  background: rgba(0, 122, 255, 0.4);
-  border-radius: 3px;
-  transition: background 0.3s ease, opacity 0.3s ease;
-}
-
-.dashboard-courses-list::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 122, 255, 0.6);
-}
-
-/* Show scrollbar on hover or during scroll */
-.dashboard-courses-list:hover::-webkit-scrollbar {
-  opacity: 1;
-}
-
-.dashboard-courses-list:hover::-webkit-scrollbar-thumb {
-  opacity: 1;
-}
-
-/* Firefox scrollbar styling */
-.dashboard-courses-list {
-  scrollbar-width: thin;
-  scrollbar-color: transparent transparent;
-  transition: scrollbar-color 0.3s ease;
-}
-
-.dashboard-courses-list:hover {
-  scrollbar-color: rgba(0, 122, 255, 0.4) transparent;
-}
-
-/* Hide scrollbar completely for statistics tab */
-.dashboard-statistics-tab::-webkit-scrollbar {
-  display: none;
-}
-
-/* Firefox - hide scrollbar for statistics tab */
-.dashboard-statistics-tab {
-  scrollbar-width: none;
-}
+/* Global scrollbar styles applied via GlobalScrollbar.css - using scrollbar-hidden class */
 
 .dashboard-course-card {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.85));

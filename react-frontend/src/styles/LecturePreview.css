@@ -289,8 +289,7 @@
   /* Adding padding bottom via a pseudo-element for scroll space */
   position: relative;
   -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-  scrollbar-width: thin; /* Thin scrollbar for Firefox */
-  scrollbar-gutter: stable; /* Prevent layout shift when scrollbar appears */
+  /* Global scrollbar styles applied via GlobalScrollbar.css - using scrollbar-thin class */
   scroll-behavior: smooth; /* Smooth scrolling for better UX */
   overscroll-behavior: contain; /* Prevent scroll chaining on mobile */
 }
@@ -354,30 +353,10 @@
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
-  scrollbar-width: thin;
+  /* Global scrollbar styles applied via GlobalScrollbar.css - using scrollbar-thin class */
 }
 
-/* Webkit scrollbar styling for lecture chat */
-.lecture-chat .messages-list::-webkit-scrollbar {
-  width: 6px;
-  background: transparent;
-}
-
-.lecture-chat .messages-list::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.03);
-  border-radius: 6px;
-  margin: 8px 0;
-}
-
-.lecture-chat .messages-list::-webkit-scrollbar-thumb {
-  background: rgba(0, 102, 204, 0.6);
-  border-radius: 6px;
-  min-height: 20px;
-}
-
-.lecture-chat .messages-list::-webkit-scrollbar-thumb:hover {
-  background: #0066cc;
-}
+/* Global scrollbar styles applied via GlobalScrollbar.css - using scrollbar-thin class */
 
 .lecture-chat .chat-input-form {
   position: relative !important;
@@ -451,8 +430,7 @@
   height: 100%;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-  scrollbar-width: thin; /* Thin scrollbar for Firefox */
-  scrollbar-gutter: stable; /* Prevent layout shift when scrollbar appears */
+  /* Global scrollbar styles applied via GlobalScrollbar.css - using scrollbar-thin class */
   scroll-behavior: smooth; /* Smooth scrolling for better UX */
   overscroll-behavior: contain; /* Prevent scroll chaining on mobile */
   padding-right: 8px; /* Add padding for scrollbar */
@@ -745,8 +723,7 @@
     overflow-y: auto !important; /* Force scrolling on mobile */
     padding-bottom: 32px !important; /* Extra padding at bottom for better scrolling experience */
     -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
-    scrollbar-width: thin; /* Thin scrollbar for Firefox */
-    scrollbar-gutter: stable; /* Prevent layout shift when scrollbar appears */
+    /* Global scrollbar styles applied via GlobalScrollbar.css - using scrollbar-thin class */
     scroll-behavior: smooth; /* Smooth scrolling for better UX */
     overscroll-behavior: contain; /* Prevent scroll chaining on mobile */
     border-radius: 10px !important; /* Consistent border radius */
@@ -818,7 +795,7 @@
     padding: 16px !important;
     padding-right: 20px !important; /* Add extra padding for scrollbar */
     -webkit-overflow-scrolling: touch !important; /* Smooth scrolling on iOS */
-    scrollbar-width: thin !important; /* Thin scrollbar for Firefox */
+    /* Global scrollbar styles applied via GlobalScrollbar.css - using scrollbar-thin class */
     scroll-behavior: smooth !important;
     overscroll-behavior: contain !important;
   }
@@ -954,68 +931,8 @@
   }
 }
 
-/* Custom scrollbar for WebKit browsers */
-.lecture-nav-list::-webkit-scrollbar {
-  width: 8px;
-}
+/* Global scrollbar styles applied via GlobalScrollbar.css - using scrollbar-thin class */
 
-.lecture-nav-list::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.03);
-  border-radius: 4px;
-}
+/* Global scrollbar styles applied via GlobalScrollbar.css - using scrollbar-thin class */
 
-.lecture-nav-list::-webkit-scrollbar-thumb {
-  background: rgba(0, 0, 0, 0.15);
-  border-radius: 4px;
-  transition: background 0.3s ease;
-}
-
-.lecture-nav-list::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 0, 0, 0.25);
-}
-
-/* Navigation tab content scrollbar styling */
-.navigation-tab-content::-webkit-scrollbar {
-  width: 6px;
-  background: transparent;
-}
-
-.navigation-tab-content::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.03);
-  border-radius: 4px;
-  margin: 4px 0;
-}
-
-.navigation-tab-content::-webkit-scrollbar-thumb {
-  background: rgba(0, 102, 204, 0.4);
-  border-radius: 4px;
-  transition: background 0.3s ease;
-  min-height: 30px;
-}
-
-.navigation-tab-content::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 102, 204, 0.6);
-}
-
-/* Content tab scrollbar styling */
-.content-tab::-webkit-scrollbar {
-  width: 6px;
-  background: transparent;
-}
-
-.content-tab::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.03);
-  border-radius: 4px;
-  margin: 4px 0;
-}
-
-.content-tab::-webkit-scrollbar-thumb {
-  background: rgba(0, 102, 204, 0.4);
-  border-radius: 4px;
-  transition: background 0.3s ease;
-  min-height: 30px;
-}
-
-.content-tab::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 102, 204, 0.6);
-}
+/* Global scrollbar styles applied via GlobalScrollbar.css - using scrollbar-thin class */

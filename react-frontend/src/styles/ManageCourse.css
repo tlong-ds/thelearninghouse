@@ -398,25 +398,7 @@
   position: relative; /* Required for sticky positioning */
 }
 
-/* Custom scrollbar for learners table container */
-.learners-table-container::-webkit-scrollbar {
-  width: 8px;
-}
-
-.learners-table-container::-webkit-scrollbar-track {
-  background: rgba(0, 0, 0, 0.05);
-  border-radius: 4px;
-}
-
-.learners-table-container::-webkit-scrollbar-thumb {
-  background: rgba(0, 122, 255, 0.3);
-  border-radius: 4px;
-  transition: background 0.2s ease;
-}
-
-.learners-table-container::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 122, 255, 0.5);
-}
+/* Global scrollbar styles applied via GlobalScrollbar.css - using default scrollbar */
 
 /* Enhanced sticky header effect */
 .learners-table thead {
@@ -957,32 +939,7 @@
   padding-right: 8px;
 }
 
-/* Auto-hiding scrollbar styling for lectures grid */
-.lectures-grid::-webkit-scrollbar {
-  width: 6px;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.lectures-grid::-webkit-scrollbar-track {
-  background: transparent;
-  border-radius: 3px;
-}
-
-.lectures-grid::-webkit-scrollbar-thumb {
-  background: rgba(0, 122, 255, 0.4);
-  border-radius: 3px;
-  transition: background 0.3s ease, opacity 0.3s ease;
-}
-
-.lectures-grid::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 122, 255, 0.6);
-}
-
-/* Show scrollbar on hover or during scroll */
-.lectures-grid:hover::-webkit-scrollbar {
-  opacity: 1;
-}
+/* Global scrollbar styles applied via GlobalScrollbar.css - using scrollbar-auto-hide class */
 
 /* Lecture Card - CoursePreview Style */
 .lecture-card {

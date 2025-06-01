@@ -218,47 +218,7 @@
 }
 
 /* Auto-hiding scrollbar for instructor statistics tab */
-.instructor-statistics-tab::-webkit-scrollbar {
-  width: 6px;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.instructor-statistics-tab::-webkit-scrollbar-track {
-  background: transparent;
-  border-radius: 3px;
-}
-
-.instructor-statistics-tab::-webkit-scrollbar-thumb {
-  background: rgba(0, 122, 255, 0.4);
-  border-radius: 3px;
-  transition: background 0.3s ease, opacity 0.3s ease;
-}
-
-.instructor-statistics-tab::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 122, 255, 0.6);
-}
-
-/* Show scrollbar on hover or during scroll */
-.instructor-statistics-tab:hover::-webkit-scrollbar {
-  opacity: 1;
-}
-
-.instructor-statistics-tab:hover::-webkit-scrollbar-thumb {
-  opacity: 1;
-}
-
-/* Firefox scrollbar styling for instructor statistics tab */
-.instructor-statistics-tab {
-  scrollbar-width: thin;
-  scrollbar-color: transparent transparent;
-  transition: scrollbar-color 0.3s ease;
-  -webkit-overflow-scrolling: touch;
-}
-
-.instructor-statistics-tab:hover {
-  scrollbar-color: rgba(0, 122, 255, 0.4) transparent;
-}
+/* Global scrollbar styles applied via GlobalScrollbar.css - using scrollbar-auto-hide class */
 
 /* Charts */
 .instructor-chart-container {
@@ -522,46 +482,7 @@
   margin-right: calc(-1.5rem - 8px);
 }
 
-.instructor-courses-list::-webkit-scrollbar {
-  width: 6px;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.instructor-courses-list::-webkit-scrollbar-track {
-  background: transparent;
-  border-radius: 3px;
-}
-
-.instructor-courses-list::-webkit-scrollbar-thumb {
-  background: rgba(0, 122, 255, 0.4);
-  border-radius: 3px;
-  transition: background 0.3s ease, opacity 0.3s ease;
-}
-
-.instructor-courses-list::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 122, 255, 0.6);
-}
-
-/* Show scrollbar on hover or during scroll */
-.instructor-courses-list:hover::-webkit-scrollbar {
-  opacity: 1;
-}
-
-.instructor-courses-list:hover::-webkit-scrollbar-thumb {
-  opacity: 1;
-}
-
-.instructor-courses-list {
-  scrollbar-width: thin;
-  scrollbar-color: transparent transparent;
-  transition: scrollbar-color 0.3s ease;
-  -webkit-overflow-scrolling: touch;
-}
-
-.instructor-courses-list:hover {
-  scrollbar-color: rgba(0, 122, 255, 0.4) transparent;
-}
+/* Global scrollbar styles applied via GlobalScrollbar.css - using scrollbar-auto-hide class */
 
 .instructor-course-card {
   background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.75));

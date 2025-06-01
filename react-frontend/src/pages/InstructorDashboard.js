@@ -425,7 +425,7 @@ const InstructorDashboard = () => {
 
           <div className="instructor-tab-content">
             {activeTab === 'statistics' && (
-              <div className="instructor-statistics-tab">
+              <div className="instructor-statistics-tab scrollbar-hidden">
                 <div className="instructor-statistics-controls">
                   <div className="instructor-filters-row">
                     <div className="instructor-course-filter-controls">
@@ -650,7 +650,7 @@ const InstructorDashboard = () => {
                       </button>
                     </div>
 
-                    <div className="instructor-courses-list">
+                    <div className="instructor-courses-list scrollbar-auto-hide">
                       {sortCourses(dashboardData.courses).map(course => (
                         <div 
                           key={course.id} 

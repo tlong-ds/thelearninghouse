@@ -182,7 +182,7 @@ const EdumateChat = forwardRef(({ lectureId = null, className = '', isEmbedded =
         </div>
       )}
 
-      <div className="chat-messages-container">
+      <div className="chat-messages-container scrollbar-thin">
         <div className="messages-list">
           {messages.map(msg => (
             <div

@@ -503,44 +503,6 @@ body {
   padding-right: 8px;
 }
 
-/* Auto-hiding scrollbar styling for lectures grid */
-.lectures-grid::-webkit-scrollbar {
-  width: 6px;
-  opacity: 0;
-  transition: opacity 0.3s ease;
-}
-
-.lectures-grid::-webkit-scrollbar-track {
-  background: transparent;
-  border-radius: 3px;
-}
-
-.lectures-grid::-webkit-scrollbar-thumb {
-  background: rgba(0, 122, 255, 0.4);
-  border-radius: 3px;
-  transition: background 0.3s ease, opacity 0.3s ease;
-}
-
-.lectures-grid::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 122, 255, 0.6);
-}
-
-/* Show scrollbar on hover or during scroll */
-.lectures-grid:hover::-webkit-scrollbar {
-  opacity: 1;
-}
-
-.lectures-grid:hover::-webkit-scrollbar-thumb {
-  opacity: 1;
-}
-
-/* Firefox auto-hiding scrollbar */
-.lectures-grid {
-  scrollbar-width: thin;
-  scrollbar-color: transparent transparent;
-  transition: scrollbar-color 0.3s ease;
-}
-
 .lectures-grid:hover {
   scrollbar-color: rgba(0, 122, 255, 0.4) transparent;
 }
@@ -582,27 +544,7 @@ body {
   -ms-overflow-style: none;
 }
 
-/* Enhanced scrollbar animation timing */
-.lectures-grid::-webkit-scrollbar {
-  transition: opacity 0.2s ease-in-out;
-}
-
-/* Fade out scrollbar after scroll ends */
-@keyframes fadeOutScrollbar {
-  0% { opacity: 1; }
-  100% { opacity: 0; }
-}
-
-/* Apply fade out animation when not hovering */
-.lectures-grid:not(:hover)::-webkit-scrollbar {
-  animation: fadeOutScrollbar 0.3s ease-out 1s forwards;
-}
-
-/* Reset animation on hover */
-.lectures-grid:hover::-webkit-scrollbar {
-  animation: none;
-  opacity: 1;
-}
+/* Global scrollbar styles applied via GlobalScrollbar.css - using scrollbar-auto-hide class */
 
 /* Enhanced Course Content Animations */
 .lectures-grid {

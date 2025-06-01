@@ -20,6 +20,7 @@ import Dashboard from './pages/Dashboard';
 import InstructorDashboard from './pages/InstructorDashboard';
 import Home from './pages/Home';
 import { setScrollbarWidth } from './utils/scrollbar';
+import './styles/GlobalScrollbar.css';
 import './styles/App.css';
 
 // Helper component to conditionally render header

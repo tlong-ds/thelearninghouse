@@ -167,7 +167,7 @@ const LecturePreview = () => {
           </div>
 
           {/* Tab Content */}
-          <div className="tab-content">
+          <div className="tab-content scrollbar-thin">
             <div className={`tab-content-inner ${activeTab === 'chatbot' ? 'no-padding' : ''} ${activeTab === 'navigation' ? 'navigation-tab-content' : ''}`}>
               
               {/* Navigation Tab */}
@@ -199,7 +199,7 @@ const LecturePreview = () => {
 
               {/* Content Tab */}
               {activeTab === 'content' && (
-                <div className="content-tab">
+                <div className="content-tab scrollbar-auto-hide">
                   <h3>Lecture Content</h3>
                   {displayLecture.content ? (
                     <div className="lecture-content">
