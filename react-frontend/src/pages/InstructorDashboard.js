@@ -5,7 +5,7 @@ import { fetchInstructorDashboard } from '../services/api';
 import '../styles/InstructorDashboard.css';
 
 // Unified StatisticsChart component
-const StatisticsChart = ({ data, title, yAxisLabel, color }) => {
+const StatisticsChart = ({ data, title, yAxisLabel, color, hideDates = false }) => {
   const chartRef = useRef(null);
   const [chartDimensions, setChartDimensions] = useState({ width: 500, height: 280 });
   
@@ -124,7 +124,7 @@ const StatisticsChart = ({ data, title, yAxisLabel, color }) => {
           })}
           
           {/* X-axis labels */}
-          {points.map((point, i) => {
+          {!hideDates && points.map((point, i) => {
             if (i % Math.max(1, Math.floor(points.length / 5)) === 0 || i === points.length - 1) {
               return (
                 <text
@@ -155,7 +155,7 @@ const StatisticsChart = ({ data, title, yAxisLabel, color }) => {
                 stroke={color}
                 strokeWidth="2"
               />
-              <title>{`Date: ${point.date}, ${yAxisLabel}: ${point.value}`}</title>
+              <title>{hideDates ? `${yAxisLabel}: ${point.value}` : `Date: ${point.date}, ${yAxisLabel}: ${point.value}`}</title>
             </g>
           ))}
         </svg>
@@ -521,6 +521,7 @@ const InstructorDashboard = () => {
                               title="Course Enrollment Trends"
                               yAxisLabel="New Enrollments"
                               color="#4CAF50"
+                              hideDates={true}
                             />
                           </div>
                           
@@ -531,6 +532,7 @@ const InstructorDashboard = () => {
                                 title="Rating Trends"
                                 yAxisLabel="Average Rating"
                                 color="#FF9800"
+                                hideDates={true}
                               />
                             </div>
                           )}
@@ -542,6 +544,7 @@ const InstructorDashboard = () => {
                                 title="Completion Rate Trends"
                                 yAxisLabel="Completion Rate (%)"
                                 color="#2196F3"
+                                hideDates={true}
                               />
                             </div>
                           )}
