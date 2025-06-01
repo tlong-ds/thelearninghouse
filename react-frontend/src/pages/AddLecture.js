@@ -1,71 +1,63 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { useAuth } from '../services/AuthContext';
 import { useLoading } from '../services/LoadingContext';
 import config from '../config';
+import VideoUploader from '../utils/videoUploader';
 import '../styles/AddLecture.css';
-
-const API_URL = config.API_URL
 
 const AddLecture = () => {
   const { courseId } = useParams();
   const navigate = useNavigate();
-  const { currentUser, logout } = useAuth();
-  const { startLoading, stopLoading, updateProgress, updateMessage, isLoading } = useLoading();
-  const [error, setError] = useState('');
+  const { startLoading, updateMessage, stopLoading } = useLoading();
+  
   const [course, setCourse] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [videoPreview, setVideoPreview] = useState(null);
+  const [uploadId, setUploadId] = useState(null);
+  const [processStage, setProcessStage] = useState(null);
+  
+  // Track stage progress for better UX
+  const updateStageProgress = (stage, status, percent) => {
+    setProcessStage({ stage, status, percent });
+  };
+  
   const [lectureData, setLectureData] = useState({
     title: '',
     description: '',
     content: '',
     video: null,
-    attachments: [],
     quiz: {
       questions: []
     }
   });
-  const [videoPreview, setVideoPreview] = useState(null);
-  
-  // Progress tracking states
-  const [processStage, setProcessStage] = useState('');
-  const [stageProgress, setStageProgress] = useState({
-    lectureDetails: { status: 'pending', progress: 0 },
-    quiz: { status: 'pending', progress: 0 },
-    videoUpload: { status: 'pending', progress: 0 }
-  });
 
+  // Fetch course data for form context
   useEffect(() => {
-    // Redirect if not an instructor
-    if (currentUser && currentUser.role !== 'Instructor') {
-      navigate('/courses');
-      return;
-    }
-
-    // Fetch course details
     const fetchCourse = async () => {
       try {
-        const response = await fetch(`${API_URL}/api/instructor/courses/${courseId}`, {
-          credentials: 'include',
+        const response = await fetch(`${config.API_URL}/api/instructor/courses/${courseId}`, {
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
-          }
+          },
+          credentials: 'include'
         });
-
+        
         if (!response.ok) {
-          throw new Error('Failed to fetch course details');
+          throw new Error('Failed to fetch course');
         }
-
+        
         const data = await response.json();
         setCourse(data);
       } catch (err) {
-        setError('Failed to fetch course details');
-        console.error('Error:', err);
+        console.error('Error fetching course:', err);
+        setError('Failed to load course information. Please try again.');
       }
     };
-
+    
     fetchCourse();
-  }, [courseId, currentUser, navigate]);
-
+  }, [courseId]);
+  
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setLectureData(prev => ({
@@ -73,139 +65,180 @@ const AddLecture = () => {
       [name]: value
     }));
   };
-
+  
+  const handleVideoChange = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    // Validate file size (max 500MB)
+    if (file.size > 500 * 1024 * 1024) {
+      setError('Video file size must be less than 500MB');
+      return;
+    }
+    
+    // Validate file type
+    if (!file.type.startsWith('video/')) {
+      setError('Please upload a valid video file');
+      return;
+    }
+    
+    setLectureData(prev => ({
+      ...prev,
+      video: file
+    }));
+    
+    // Create preview URL
+    const objectUrl = URL.createObjectURL(file);
+    setVideoPreview(objectUrl);
+    
+    // Clear error if any
+    setError(null);
+    
+    return () => URL.revokeObjectURL(objectUrl);
+  };
+  
+  // Quiz handling functions
   const handleQuizAdd = () => {
     setLectureData(prev => ({
       ...prev,
       quiz: {
+        ...prev.quiz,
         questions: [
           ...prev.quiz.questions,
           {
             question: '',
-            options: ['', '', '', ''],
+            options: ['', ''],
             correctAnswer: 0
           }
         ]
       }
     }));
   };
-
+  
   const handleQuizQuestionChange = (index, field, value) => {
-    setLectureData(prev => {
-      const updatedQuestions = [...prev.quiz.questions];
-      if (field === 'options') {
-        updatedQuestions[index] = {
-          ...updatedQuestions[index],
-          options: value
-        };
-      } else if (field === 'correctAnswer') {
-        updatedQuestions[index] = {
-          ...updatedQuestions[index],
-          correctAnswer: parseInt(value)
-        };
-      } else {
-        updatedQuestions[index] = {
-          ...updatedQuestions[index],
-          [field]: value
-        };
-      }
-      return {
-        ...prev,
-        quiz: {
-          ...prev.quiz,
-          questions: updatedQuestions
-        }
-      };
-    });
-  };
-
-  const handleQuizQuestionRemove = (indexToRemove) => {
+    const updatedQuestions = [...lectureData.quiz.questions];
+    updatedQuestions[index] = {
+      ...updatedQuestions[index],
+      [field]: value
+    };
+    
     setLectureData(prev => ({
       ...prev,
       quiz: {
-        questions: prev.quiz.questions.filter((_, index) => index !== indexToRemove)
+        ...prev.quiz,
+        questions: updatedQuestions
       }
     }));
   };
-
-  const handleVideoChange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      if (file.size > 100 * 1024 * 1024) { // 100MB limit
-        setError('Video file size must be less than 100MB');
-        return;
-      }
-      if (!file.type.startsWith('video/')) {
-        setError('Please upload a valid video file');
-        return;
-      }
-      setLectureData(prev => ({ ...prev, video: file }));
-      setVideoPreview(URL.createObjectURL(file));
-      setError('');
-    }
-  };
-
-  const updateStageProgress = (stage, status, progress = 0) => {
-    setStageProgress(prev => ({
+  
+  const handleQuizOptionChange = (qIndex, oIndex, value) => {
+    const updatedQuestions = [...lectureData.quiz.questions];
+    const options = [...updatedQuestions[qIndex].options];
+    options[oIndex] = value;
+    
+    updatedQuestions[qIndex] = {
+      ...updatedQuestions[qIndex],
+      options
+    };
+    
+    setLectureData(prev => ({
       ...prev,
-      [stage]: { status, progress }
+      quiz: {
+        ...prev.quiz,
+        questions: updatedQuestions
+      }
     }));
   };
-
+  
+  const handleQuizOptionAdd = (qIndex) => {
+    const updatedQuestions = [...lectureData.quiz.questions];
+    updatedQuestions[qIndex].options.push('');
+    
+    setLectureData(prev => ({
+      ...prev,
+      quiz: {
+        ...prev.quiz,
+        questions: updatedQuestions
+      }
+    }));
+  };
+  
+  const handleQuizOptionRemove = (qIndex, oIndex) => {
+    const updatedQuestions = [...lectureData.quiz.questions];
+    updatedQuestions[qIndex].options.splice(oIndex, 1);
+    
+    // Update correctAnswer if needed
+    if (updatedQuestions[qIndex].correctAnswer >= updatedQuestions[qIndex].options.length) {
+      updatedQuestions[qIndex].correctAnswer = 0;
+    }
+    
+    setLectureData(prev => ({
+      ...prev,
+      quiz: {
+        ...prev.quiz,
+        questions: updatedQuestions
+      }
+    }));
+  };
+  
+  const handleQuizQuestionRemove = (qIndex) => {
+    const updatedQuestions = [...lectureData.quiz.questions];
+    updatedQuestions.splice(qIndex, 1);
+    
+    setLectureData(prev => ({
+      ...prev,
+      quiz: {
+        ...prev.quiz,
+        questions: updatedQuestions
+      }
+    }));
+  };
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
-    startLoading('Creating lecture...', true);
-    setError('');
-
+    
+    // Validate form data
+    if (!lectureData.title.trim() || !lectureData.description.trim() || !lectureData.content.trim()) {
+      setError('Please fill in all required fields');
+      return;
+    }
+    
+    // Validate quiz if present
+    if (lectureData.quiz.questions.length > 0) {
+      const invalidQuestions = lectureData.quiz.questions.filter(q => 
+        !q.question.trim() || 
+        q.options.some(o => !o.trim()) ||
+        q.options.length < 2
+      );
+      
+      if (invalidQuestions.length > 0) {
+        setError('Please fill in all quiz questions and options');
+        return;
+      }
+    }
+    
+    setIsLoading(true);
+    setError(null);
+    
+    // Start loading screen
+    startLoading('Creating lecture...');
+    setProcessStage({ stage: 'init', status: 'processing', percent: 0 });
+    
     try {
-      // Stage 1: Adding lecture details to database
-      setProcessStage('lectureDetails');
-      updateStageProgress('lectureDetails', 'processing', 0);
-      updateMessage('Adding lecture details to database...');
-      updateProgress(10);
-
+      // Prepare form data for the API
       const formData = new FormData();
       formData.append('title', lectureData.title);
       formData.append('description', lectureData.description);
       formData.append('content', lectureData.content);
       
-      // Only add quiz if there are questions
+      // Add quiz data if present
       if (lectureData.quiz.questions.length > 0) {
         formData.append('quiz', JSON.stringify(lectureData.quiz));
       }
 
       updateStageProgress('lectureDetails', 'processing', 50);
-      updateProgress(30);
 
-      // Stage 2: Adding quiz to database (if exists)
-      if (lectureData.quiz.questions.length > 0) {
-        setProcessStage('quiz');
-        updateStageProgress('quiz', 'processing', 0);
-        updateMessage('Processing quiz questions...');
-        updateProgress(50);
-        // Quiz is included in the main request, so we'll simulate progress
-        await new Promise(resolve => setTimeout(resolve, 500));
-        updateStageProgress('quiz', 'processing', 100);
-        updateStageProgress('quiz', 'completed', 100);
-      } else {
-        updateStageProgress('quiz', 'skipped', 100);
-      }
-
-      updateStageProgress('lectureDetails', 'completed', 100);
-      updateProgress(60);
-
-      // Stage 3: Uploading video to cloud (if exists)
-      if (lectureData.video) {
-        setProcessStage('videoUpload');
-        updateStageProgress('videoUpload', 'processing', 0);
-        updateMessage('Uploading video to cloud storage...');
-        updateProgress(70);
-        formData.append('video', lectureData.video);
-      } else {
-        updateStageProgress('videoUpload', 'skipped', 100);
-      }
-
-      const response = await fetch(`${API_URL}/api/courses/${courseId}/lectures`, {
+      const response = await fetch(`${config.API_URL}/api/courses/${courseId}/lectures`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
@@ -214,25 +247,49 @@ const AddLecture = () => {
         body: formData
       });
 
-      // Simulate video upload progress if video exists
-      if (lectureData.video) {
-        // Simulate upload progress
-        for (let i = 10; i <= 100; i += 10) {
-          await new Promise(resolve => setTimeout(resolve, 200));
-          updateStageProgress('videoUpload', 'processing', i);
-          updateProgress(70 + (i * 0.25)); // Progress from 70% to 95%
-        }
-        updateStageProgress('videoUpload', 'completed', 100);
-      }
-
       if (!response.ok) {
         throw new Error('Failed to create lecture');
+      }
+      
+      const lectureResponse = await response.json();
+      const lectureId = lectureResponse.id;
+      
+      // Handle video upload if present
+      if (lectureData.video) {
+        updateStageProgress('videoUpload', 'processing', 0);
+        updateMessage('Uploading video...');
+        
+        try {
+          await VideoUploader.uploadVideo(
+            lectureData.video,
+            courseId,
+            lectureId,
+            (progress) => {
+              // Update stage progress only
+              updateStageProgress('videoUpload', 'processing', progress);
+            },
+            (errorMsg) => {
+              console.error('Video upload error:', errorMsg);
+              // Continue with success even if video upload fails
+              updateStageProgress('videoUpload', 'failed', 100);
+              setError(`Lecture created but video upload failed: ${errorMsg}`);
+            },
+            (result) => {
+              updateStageProgress('videoUpload', 'completed', 100);
+              console.log('Video upload complete:', result);
+            }
+          );
+        } catch (videoError) {
+          console.error('Video upload error:', videoError);
+          // Continue with success even if video upload fails
+          updateStageProgress('videoUpload', 'failed', 100);
+          setError(`Lecture created but video upload failed: ${videoError.message}`);
+        }
       }
 
       // All stages completed
       setProcessStage('completed');
       updateMessage('Lecture created successfully!');
-      updateProgress(100);
       
       // Navigate after a short delay to show completion
       setTimeout(() => {
@@ -243,12 +300,6 @@ const AddLecture = () => {
     } catch (err) {
       setError('Failed to create lecture. Please try again.');
       console.error('Error:', err);
-      // Reset progress on error
-      setStageProgress({
-        lectureDetails: { status: 'error', progress: 0 },
-        quiz: { status: 'pending', progress: 0 },
-        videoUpload: { status: 'pending', progress: 0 }
-      });
       stopLoading();
     }
   };
@@ -329,7 +380,10 @@ const AddLecture = () => {
                       </div>
                       <div className="upload-info">
                         <span>Supports: MP4, WebM, MOV</span>
-                        <span>Maximum size: 100MB</span>
+                        <span>Maximum size: 500MB</span>
+                        {lectureData.video && lectureData.video.size > 10 * 1024 * 1024 && (
+                          <span className="upload-note">Large file will use chunked upload</span>
+                        )}
                       </div>
                     </div>
                   ) : (
@@ -366,12 +420,14 @@ const AddLecture = () => {
                     controls 
                     src={videoPreview} 
                     className="preview-player"
-                    poster={videoPreview}
                   />
                   <div className="video-info">
                     <span className="video-name">{lectureData.video.name}</span>
                     <span className="video-size">
                       {Math.round(lectureData.video.size / (1024 * 1024))}MB
+                      {lectureData.video.size > 10 * 1024 * 1024 && (
+                        <span className="upload-method"> (chunked upload)</span>
+                      )}
                     </span>
                   </div>
                 </div>
@@ -420,11 +476,7 @@ const AddLecture = () => {
                           type="text"
                           placeholder={`Option ${oIndex + 1}`}
                           value={option}
-                          onChange={(e) => {
-                            const newOptions = [...question.options];
-                            newOptions[oIndex] = e.target.value;
-                            handleQuizQuestionChange(qIndex, 'options', newOptions);
-                          }}
+                          onChange={(e) => handleQuizOptionChange(qIndex, oIndex, e.target.value)}
                         />
                         <div className="correct-answer">
                           <input
@@ -436,8 +488,29 @@ const AddLecture = () => {
                           <label>Correct Answer</label>
                         </div>
                       </div>
+                      
+                      {question.options.length > 2 && (
+                        <button
+                          type="button"
+                          className="remove-option-button"
+                          onClick={() => handleQuizOptionRemove(qIndex, oIndex)}
+                        >
+                          <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                            <line x1="18" y1="6" x2="6" y2="18"/>
+                            <line x1="6" y1="6" x2="18" y2="18"/>
+                          </svg>
+                        </button>
+                      )}
                     </div>
                   ))}
+                  
+                  <button
+                    type="button"
+                    className="add-option-button"
+                    onClick={() => handleQuizOptionAdd(qIndex)}
+                  >
+                    Add Option
+                  </button>
                 </div>
               </div>
             ))}

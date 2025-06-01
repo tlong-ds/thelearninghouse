@@ -2134,8 +2134,8 @@ async def create_lecture(
                         file_size = video.file.tell()
                         video.file.seek(0)  # Reset to beginning
                         
-                        if file_size > 100 * 1024 * 1024:  # 100MB in bytes
-                            raise HTTPException(status_code=400, detail="Video file size must be less than 100MB")
+                        if file_size > 500 * 1024 * 1024:  # 500MB in bytes
+                            raise HTTPException(status_code=400, detail="Video file size must be less than 500MB")
                         
                         # Check file type
                         if not video.content_type.startswith('video/'):

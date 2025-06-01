@@ -88,6 +88,18 @@ except ImportError:
     spec.loader.exec_module(chat_endpoints)
     chat_router = chat_endpoints.router
 
+# Import and include upload router
+try:
+    from services.api.upload_endpoints import router as upload_router
+except ImportError:
+    spec = importlib.util.spec_from_file_location(
+        "upload_endpoints", 
+        os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "upload_endpoints.py")
+    )
+    upload_endpoints = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(upload_endpoints)
+    upload_router = upload_endpoints.router
+
 # Debug print of available routes
 print("DEBUG: Available routes in api_router:")
 for route in api_router.routes:
@@ -96,6 +108,7 @@ for route in api_router.routes:
 # Include API routers
 app.include_router(api_router, prefix="/api")
 app.include_router(chat_router, prefix="/api")
+app.include_router(upload_router, prefix="/api")
 
 
 class LoginPayload(BaseModel):

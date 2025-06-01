@@ -275,7 +275,6 @@ const ManageCourse = () => {
                                     style={{width: `${enrollment.progress}%`}}
                                   ></div>
                                 </div>
-                                <span className="progress-text">{enrollment.progress}%</span>
                               </div>
                             </td>
                             <td>
