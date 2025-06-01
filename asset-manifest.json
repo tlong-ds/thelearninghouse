@@ -1,7 +1,7 @@
 {
   "files": {
-    "main.css": "/thelearninghouse/static/css/main.569d62e0.css",
-    "main.js": "/thelearninghouse/static/js/main.92cd83f1.js",
+    "main.css": "/thelearninghouse/static/css/main.116a98d1.css",
+    "main.js": "/thelearninghouse/static/js/main.3a6a3958.js",
     "static/js/453.2c008623.chunk.js": "/thelearninghouse/static/js/453.2c008623.chunk.js",
     "static/media/gradient-bg.mp4": "/thelearninghouse/static/media/gradient-bg.c36edb84e113cf2c4a88.mp4",
     "static/media/KaTeX_AMS-Regular.ttf": "/thelearninghouse/static/media/KaTeX_AMS-Regular.853be92419a6c3766b9a.ttf",
@@ -72,12 +72,12 @@
     "static/media/KaTeX_Size3-Regular.woff": "/thelearninghouse/static/media/KaTeX_Size3-Regular.7947224e8a9914fa332b.woff",
     "static/media/KaTeX_Size3-Regular.woff2": "/thelearninghouse/static/media/KaTeX_Size3-Regular.e1951519f6f0596f7356.woff2",
     "index.html": "/thelearninghouse/index.html",
-    "main.569d62e0.css.map": "/thelearninghouse/static/css/main.569d62e0.css.map",
-    "main.92cd83f1.js.map": "/thelearninghouse/static/js/main.92cd83f1.js.map",
+    "main.116a98d1.css.map": "/thelearninghouse/static/css/main.116a98d1.css.map",
+    "main.3a6a3958.js.map": "/thelearninghouse/static/js/main.3a6a3958.js.map",
     "453.2c008623.chunk.js.map": "/thelearninghouse/static/js/453.2c008623.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.569d62e0.css",
-    "static/js/main.92cd83f1.js"
+    "static/css/main.116a98d1.css",
+    "static/js/main.3a6a3958.js"
   ]
 }
