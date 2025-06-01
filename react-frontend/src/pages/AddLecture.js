@@ -206,7 +206,7 @@ const AddLecture = () => {
         updateStageProgress('videoUpload', 'skipped', 100);
       }
 
-      const response = await fetch(`http://localhost:8503/api/courses/${courseId}/lectures`, {
+      const response = await fetch(`${API_URL}/api/courses/${courseId}/lectures`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('auth_token')}`
